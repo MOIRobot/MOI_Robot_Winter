@@ -1,0 +1,8 @@
+prefix=/home/jobsg/MOI_Robot_Winter/install
+
+Name: winter_description
+Description: Description of winter_description
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/jobsg/MOI_Robot_Winter/install/lib 
+Requires: 

@@ -1,0 +1,31 @@
+<launch>
+
+	<arg name="urdf_file" default="$(find xacro)/xacro.py $(find winter_description)/urdf/winter.urdf.xacro"/>
+	<param name="robot_description" command="$(arg urdf_file)" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find winter_description)/rviz/winter_demo.rviz" required="true" />
+
+	<arg name="source_list" default="[wheel_joint_states]"/>
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+		<rosparam param="source_list" subst_value="True">$(arg source_list)</rosparam>
+		<param name="use_gui" type="Boolean" value="False"/>
+	</node>
+	
+	<!--  The package takes the joint angles of the robot as input and publishes the 3D poses of the robot links-->
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+	<!-- fake odom published -->
+	<node name="fake_winter_base" pkg="winter_bringup" type="fake_odom_publisher"/>
+
+</launch>
+
+
+
+
+
+
+
+
+
+
+
+

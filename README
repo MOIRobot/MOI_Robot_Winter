@@ -5,7 +5,7 @@ How to use this source code?
 git clone git@github.com:MOIRobot/MOI_Robot_Winter.git
 2, how to update with the source code from the website
 git pull
-2, if you do any changes remember to add information in your file
+3, if you do any changes remember to add information in your file
 git add .
 git commit -m "add you information"
 git push

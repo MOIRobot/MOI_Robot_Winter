@@ -9,3 +9,7 @@ git pull
 git add .
 git commit -m "add you information"
 git push
+
+5, It's convenient if the ROS environment variables are automatically added to your bash session every time a new shell is launched: 
+echo "source /your.path/MOI_Robot_Winter/devel/setup.bash" >> ~/.bashrc
+source ~/.bashrc

@@ -1,0 +1,14 @@
+1，LINUX 常用play命令播放MP3等文件 安装play命令如下
+	a、打开一个终端（Ctrl+Alt+T），然后输入如下命令：sudo apt-get install sox
+	b，通过下面的命令来让 SOX 可以播放它所支持的音频格式文件：sudo apt-get install sox libsox-fmt-all
+	c，比如要播放系统中所有音频文件，我们可以采用这个命令：play *mp3
+	d，在播放的时候，我们可以按下 Ctrl+C 来终端当前音频的播放转到下一个音频。
+	e，关于更多的 SOX 的操作命令我们可以使用 man 命令来查看详细的介绍：man sox
+
+2，使用百度tts库合成语音文件
+	文件实例 src/下的tts_baidu.py文件
+3，使用开源包ttsx发音
+	a,使用TTSX 首先安装pyttsx包 解压目录下的pyttsx-1.1.tar.gz 安装该包
+	b,文件实例 src/下的ttsx.py文件
+4，ros 发声节点
+	src 下voice_node.py 通过接受/robot_state 下机器人的状态来发出状态声音

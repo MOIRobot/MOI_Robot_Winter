@@ -27,3 +27,7 @@ $git push
 6, It's convenient if the ROS environment variables are automatically added to your bash session every time a new shell is launched: 
 $echo "source /your.path/MOI_Robot_Winter/devel/setup.bash" >> ~/.bashrc
 $source ~/.bashrc
+
+7, create a basic package
+catkin_create_pkg package_name std_msgs rospy roscpp
+

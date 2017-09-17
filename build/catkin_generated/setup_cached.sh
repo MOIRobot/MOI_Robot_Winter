@@ -7,9 +7,8 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH="/home/jobsg/MOI_Robot_Winter/devel:$CMAKE_PREFIX_PATH"
-export LD_LIBRARY_PATH="/home/jobsg/MOI_Robot_Winter/devel/lib:$LD_LIBRARY_PATH"
-export PKG_CONFIG_PATH="/home/jobsg/MOI_Robot_Winter/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
-export PWD="/home/jobsg/MOI_Robot_Winter/build"
-export ROSLISP_PACKAGE_DIRECTORIES="/home/jobsg/MOI_Robot_Winter/devel/share/common-lisp"
-export ROS_PACKAGE_PATH="/home/jobsg/MOI_Robot_Winter/src:$ROS_PACKAGE_PATH"
+export CMAKE_PREFIX_PATH="/home/jobs/MOI_Robot_Winter/devel:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/home/jobs/MOI_Robot_Winter/devel/lib:/home/jobs/my_workspace/devel/lib:/home/jobs/study_ws/devel/lib:/home/jobs/catkin_ws/devel/lib:/home/jobs/mecAGV/devel/lib:/opt/ros/indigo/lib:/opt/ros/indigo/lib/x86_64-linux-gnu:/opt/ros/indigo/lib/python2.7/dist-packages:/opt/ros/indigo/lib/python2.7/dist-packages:/opt/ros/indigo/lib/python2.7/dist-packages:/opt/ros/indigo/lib/python2.7/dist-packages:/opt/ros/indigo/lib/python2.7/dist-packages"
+export PKG_CONFIG_PATH="/home/jobs/MOI_Robot_Winter/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
+export PWD="/home/jobs/MOI_Robot_Winter/build"
+export ROS_PACKAGE_PATH="/home/jobs/MOI_Robot_Winter/src:$ROS_PACKAGE_PATH"

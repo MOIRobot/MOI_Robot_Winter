@@ -1,0 +1,7 @@
+<launch>
+	
+	<node pkg="winter_simulation" type="fake_odo_publiser" name="fake_odo_publiser" output="screen">
+	</node>
+	
+</launch>
+

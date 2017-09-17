@@ -1,0 +1,4 @@
+1,fake_base_controller.py
+#接收cmdvel信息并发布速度到carspeed话题上
+2,fake_controller.cpp
+接收cmdvel速度信息 并按照该速度定时在odom话题上发布里程数据

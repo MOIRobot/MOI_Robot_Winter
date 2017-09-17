@@ -1,0 +1,8 @@
+prefix=/home/jobs/MOI_Robot_Winter/install
+
+Name: winter_keyboard
+Description: Description of winter_keyboard
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/jobs/MOI_Robot_Winter/install/lib 
+Requires: 

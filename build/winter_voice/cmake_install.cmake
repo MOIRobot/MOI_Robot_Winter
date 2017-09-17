@@ -1,8 +1,8 @@
-# Install script for directory: /home/jobsg/MOI_Robot_Winter/src/winter_voice
+# Install script for directory: /home/jobs/MOI_Robot_Winter/src/winter_voice
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  SET(CMAKE_INSTALL_PREFIX "/home/jobsg/MOI_Robot_Winter/install")
+  SET(CMAKE_INSTALL_PREFIX "/home/jobs/MOI_Robot_Winter/install")
 ENDIF(NOT DEFINED CMAKE_INSTALL_PREFIX)
 STRING(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -33,17 +33,17 @@ IF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 ENDIF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 
 IF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/jobsg/MOI_Robot_Winter/build/winter_voice/catkin_generated/installspace/winter_voice.pc")
+  FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/jobs/MOI_Robot_Winter/build/winter_voice/catkin_generated/installspace/winter_voice.pc")
 ENDIF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
 
 IF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
   FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/winter_voice/cmake" TYPE FILE FILES
-    "/home/jobsg/MOI_Robot_Winter/build/winter_voice/catkin_generated/installspace/winter_voiceConfig.cmake"
-    "/home/jobsg/MOI_Robot_Winter/build/winter_voice/catkin_generated/installspace/winter_voiceConfig-version.cmake"
+    "/home/jobs/MOI_Robot_Winter/build/winter_voice/catkin_generated/installspace/winter_voiceConfig.cmake"
+    "/home/jobs/MOI_Robot_Winter/build/winter_voice/catkin_generated/installspace/winter_voiceConfig-version.cmake"
     )
 ENDIF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
 
 IF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/winter_voice" TYPE FILE FILES "/home/jobsg/MOI_Robot_Winter/src/winter_voice/package.xml")
+  FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/winter_voice" TYPE FILE FILES "/home/jobs/MOI_Robot_Winter/src/winter_voice/package.xml")
 ENDIF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
 

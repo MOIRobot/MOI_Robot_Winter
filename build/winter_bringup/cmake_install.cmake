@@ -1,8 +1,8 @@
-# Install script for directory: /home/jobsg/MOI_Robot_Winter/src/winter_bringup
+# Install script for directory: /home/jobs/MOI_Robot_Winter/src/winter_bringup
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  SET(CMAKE_INSTALL_PREFIX "/home/jobsg/MOI_Robot_Winter/install")
+  SET(CMAKE_INSTALL_PREFIX "/home/jobs/MOI_Robot_Winter/install")
 ENDIF(NOT DEFINED CMAKE_INSTALL_PREFIX)
 STRING(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -33,17 +33,17 @@ IF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 ENDIF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 
 IF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/jobsg/MOI_Robot_Winter/build/winter_bringup/catkin_generated/installspace/winter_bringup.pc")
+  FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/jobs/MOI_Robot_Winter/build/winter_bringup/catkin_generated/installspace/winter_bringup.pc")
 ENDIF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
 
 IF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
   FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/winter_bringup/cmake" TYPE FILE FILES
-    "/home/jobsg/MOI_Robot_Winter/build/winter_bringup/catkin_generated/installspace/winter_bringupConfig.cmake"
-    "/home/jobsg/MOI_Robot_Winter/build/winter_bringup/catkin_generated/installspace/winter_bringupConfig-version.cmake"
+    "/home/jobs/MOI_Robot_Winter/build/winter_bringup/catkin_generated/installspace/winter_bringupConfig.cmake"
+    "/home/jobs/MOI_Robot_Winter/build/winter_bringup/catkin_generated/installspace/winter_bringupConfig-version.cmake"
     )
 ENDIF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
 
 IF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/winter_bringup" TYPE FILE FILES "/home/jobsg/MOI_Robot_Winter/src/winter_bringup/package.xml")
+  FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/winter_bringup" TYPE FILE FILES "/home/jobs/MOI_Robot_Winter/src/winter_bringup/package.xml")
 ENDIF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
 

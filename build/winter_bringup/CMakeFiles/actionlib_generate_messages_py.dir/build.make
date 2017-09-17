@@ -35,10 +35,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/jobsg/MOI_Robot_Winter/src
+CMAKE_SOURCE_DIR = /home/jobs/MOI_Robot_Winter/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/jobsg/MOI_Robot_Winter/build
+CMAKE_BINARY_DIR = /home/jobs/MOI_Robot_Winter/build
 
 # Utility rule file for actionlib_generate_messages_py.
 
@@ -56,10 +56,10 @@ winter_bringup/CMakeFiles/actionlib_generate_messages_py.dir/build: actionlib_ge
 .PHONY : winter_bringup/CMakeFiles/actionlib_generate_messages_py.dir/build
 
 winter_bringup/CMakeFiles/actionlib_generate_messages_py.dir/clean:
-	cd /home/jobsg/MOI_Robot_Winter/build/winter_bringup && $(CMAKE_COMMAND) -P CMakeFiles/actionlib_generate_messages_py.dir/cmake_clean.cmake
+	cd /home/jobs/MOI_Robot_Winter/build/winter_bringup && $(CMAKE_COMMAND) -P CMakeFiles/actionlib_generate_messages_py.dir/cmake_clean.cmake
 .PHONY : winter_bringup/CMakeFiles/actionlib_generate_messages_py.dir/clean
 
 winter_bringup/CMakeFiles/actionlib_generate_messages_py.dir/depend:
-	cd /home/jobsg/MOI_Robot_Winter/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/jobsg/MOI_Robot_Winter/src /home/jobsg/MOI_Robot_Winter/src/winter_bringup /home/jobsg/MOI_Robot_Winter/build /home/jobsg/MOI_Robot_Winter/build/winter_bringup /home/jobsg/MOI_Robot_Winter/build/winter_bringup/CMakeFiles/actionlib_generate_messages_py.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/jobs/MOI_Robot_Winter/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/jobs/MOI_Robot_Winter/src /home/jobs/MOI_Robot_Winter/src/winter_bringup /home/jobs/MOI_Robot_Winter/build /home/jobs/MOI_Robot_Winter/build/winter_bringup /home/jobs/MOI_Robot_Winter/build/winter_bringup/CMakeFiles/actionlib_generate_messages_py.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : winter_bringup/CMakeFiles/actionlib_generate_messages_py.dir/depend
 

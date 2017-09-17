@@ -4,5 +4,5 @@ PROJECT_PKG_CONFIG_INCLUDE_DIRS = "".split(';') if "" != "" else []
 PROJECT_CATKIN_DEPENDS = "".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
 PROJECT_NAME = "winter_bringup"
-PROJECT_SPACE_DIR = "/home/jobsg/MOI_Robot_Winter/devel"
+PROJECT_SPACE_DIR = "/home/jobs/MOI_Robot_Winter/devel"
 PROJECT_VERSION = "0.0.0"

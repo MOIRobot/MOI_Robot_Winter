@@ -1,8 +1,8 @@
-prefix=/home/jobsg/MOI_Robot_Winter/install
+prefix=/home/jobs/MOI_Robot_Winter/install
 
 Name: winter_voice
 Description: Description of winter_voice
 Version: 0.0.0
 Cflags: 
-Libs: -L/home/jobsg/MOI_Robot_Winter/install/lib 
+Libs: -L/home/jobs/MOI_Robot_Winter/install/lib 
 Requires: 

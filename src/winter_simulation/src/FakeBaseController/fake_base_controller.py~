@@ -1,0 +1,54 @@
+#!/usr/bin/env python 
+#coding=utf-8
+
+
+#接收cmdvel信息并发布到carspeed话题上
+
+
+import roslib; roslib.load_manifest('agv') 
+import rospy
+import tf.transformations
+from geometry_msgs.msg import Twist 
+from math import sqrt, atan2
+import thread
+from agv.msg import Num, carOdom 
+
+pub = rospy.Publisher('car_speed',carOdom,queue_size=20)
+#listener callback
+VX=0.0
+VY=0.0
+VZ=0.0
+
+def callback(msg):
+	global pub
+	global VX
+	global VY
+	global VZ
+	car_speed = carOdom()	
+	#rospy.loginfo("Received a /cmd_vel message!")  
+	#rospy.loginfo("Linear Components: [%f, %f, %f]"%(msg.linear.x, msg.linear.y, msg.linear.z))  
+	#rospy.loginfo("Angular Components: [%f, %f, %f]"%(msg.angular.x, msg.angular.y, msg.angular.z))  
+	
+	if msg.linear.x!=VX or msg.linear.y!=VY or msg.angular.z!=VZ:
+		VX=msg.linear.x
+		VY=msg.linear.y
+		VZ=msg.angular.z
+		print('speed set')
+#listener listen speed message on cmd_vel topic
+def listener():
+	global pub
+	rospy.Subscriber("/cmd_vel",Twist,callback)
+	rate=rospy.Rate(20)
+	msg=carOdom()
+	while not rospy.is_shutdown():
+		msg.vx=VX
+		msg.vy=VY
+		msg.vth=VZ
+		pub.publish(msg)
+		rate.sleep()		
+def nodeShutdown():
+	print('the fake robot driver is down!')
+if __name__ == '__main__':
+	rospy.init_node('robot_driver',anonymous=True)
+	rospy.on_shutdown(nodeShutdown)   		
+	listener()	

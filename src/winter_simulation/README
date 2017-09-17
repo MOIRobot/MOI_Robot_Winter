@@ -1,0 +1,13 @@
+机器人仿真包
+
+1, rviz/agv.rviz 四轮agv的rviz配置文件
+2, urdf/agv.urdf 四轮agv的urdf模型
+
+3, src/FakeBaseController
+	a,fake_base_controller.py
+	#接收cmdvel信息并发布速度到carspeed话题上
+	b,fake_controller.cpp
+	接收cmdvel速度信息 并按照该速度定时在odom话题上发布里程数据
+4 launch 文件
+	launch/fakeOdoPublisher.launch 机器人虚拟速度接受与里程计数据发布文件
+	launch/fakeOdoPublisher.launch

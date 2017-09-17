@@ -31,3 +31,7 @@ $source ~/.bashrc
 7, create a basic package
 catkin_create_pkg package_name std_msgs rospy roscpp
 
+8,推送分支
+  git config --global push.default matching 将推送和远程同名的所有本地分支。
+
+  git config --global push.default simple   只推送本地和远程关联的分支。

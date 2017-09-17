@@ -1,0 +1,11 @@
+winter_controller:
+    type: "diff_drive_controller/DiffDriveController"
+    left_wheel: "base_to_wheel_left_joint"
+    right_wheel: "base_to_wheel_right_joint"
+    wheel_separation: 0.2
+    wheel_radius: 0.04
+    publish_rate: 50.0 # defaults to 50
+    pose_covariance_diagonal: [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]
+    twist_covariance_diagonal: [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]
+    cmd_vel_timeout: 20.0 # we test this separately, give plenty for the other tests
+

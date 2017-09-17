@@ -378,6 +378,12 @@ winter_description_BINARY_DIR:STATIC=/home/jobsg/MOI_Robot_Winter/build/winter_d
 //Value Computed by CMake
 winter_description_SOURCE_DIR:STATIC=/home/jobsg/MOI_Robot_Winter/src/winter_description
 
+//Value Computed by CMake
+winter_voice_BINARY_DIR:STATIC=/home/jobsg/MOI_Robot_Winter/build/winter_voice
+
+//Value Computed by CMake
+winter_voice_SOURCE_DIR:STATIC=/home/jobsg/MOI_Robot_Winter/src/winter_voice
+
 //The directory containing a CMake configuration file for xmlrpcpp.
 xmlrpcpp_DIR:PATH=/opt/ros/indigo/share/xmlrpcpp/cmake
 
@@ -483,7 +489,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=4
+CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=5
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

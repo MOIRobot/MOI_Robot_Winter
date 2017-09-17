@@ -1215,6 +1215,21 @@ winter_description/preinstall:
 .PHONY : winter_description/preinstall
 
 #=============================================================================
+# Directory level rules for directory winter_voice
+
+# Convenience name for "all" pass in the directory.
+winter_voice/all:
+.PHONY : winter_voice/all
+
+# Convenience name for "clean" pass in the directory.
+winter_voice/clean:
+.PHONY : winter_voice/clean
+
+# Convenience name for "preinstall" pass in the directory.
+winter_voice/preinstall:
+.PHONY : winter_voice/preinstall
+
+#=============================================================================
 # Special targets to cleanup operation of make.
 
 # Special rule to run CMake to check the build system integrity.

@@ -8,8 +8,7 @@
 2，使用百度tts库合成语音文件
 	文件实例 src/下的tts_baidu.py文件
 3，使用开源包ttsx发音
-	a,使用TTSX 首先安装pyttsx包 解压目录下的pyttsx-1.1.tar.gz 安装该包 
-	b,python setup.py installs
-	c,文件实例 src/下的ttsx.py文件
+	a,使用TTSX 首先安装pyttsx包 解压目录下的pyttsx-1.1.tar.gz 安装该包 python setup.py install
+	b,文件实例 src/下的ttsx.py文件
 4，ros 发声节点
 	src 下voice_node.py 通过接受/robot_state 下机器人的状态来发出状态声音

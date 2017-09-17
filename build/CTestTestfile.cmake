@@ -7,3 +7,4 @@
 SUBDIRS(gtest)
 SUBDIRS(winter_bringup)
 SUBDIRS(winter_description)
+SUBDIRS(winter_voice)

@@ -119,6 +119,7 @@ IF(NOT CMAKE_INSTALL_LOCAL_ONLY)
   INCLUDE("/home/jobsg/MOI_Robot_Winter/build/gtest/cmake_install.cmake")
   INCLUDE("/home/jobsg/MOI_Robot_Winter/build/winter_bringup/cmake_install.cmake")
   INCLUDE("/home/jobsg/MOI_Robot_Winter/build/winter_description/cmake_install.cmake")
+  INCLUDE("/home/jobsg/MOI_Robot_Winter/build/winter_voice/cmake_install.cmake")
 
 ENDIF(NOT CMAKE_INSTALL_LOCAL_ONLY)
 

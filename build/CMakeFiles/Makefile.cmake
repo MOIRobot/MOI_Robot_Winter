@@ -17,11 +17,15 @@ SET(CMAKE_MAKEFILE_DEPENDS
   "winter_bringup/catkin_generated/package.cmake"
   "winter_description/catkin_generated/ordered_paths.cmake"
   "winter_description/catkin_generated/package.cmake"
+  "winter_voice/catkin_generated/ordered_paths.cmake"
+  "winter_voice/catkin_generated/package.cmake"
   "/home/jobsg/MOI_Robot_Winter/src/CMakeLists.txt"
   "/home/jobsg/MOI_Robot_Winter/src/winter_bringup/CMakeLists.txt"
   "/home/jobsg/MOI_Robot_Winter/src/winter_bringup/package.xml"
   "/home/jobsg/MOI_Robot_Winter/src/winter_description/CMakeLists.txt"
   "/home/jobsg/MOI_Robot_Winter/src/winter_description/package.xml"
+  "/home/jobsg/MOI_Robot_Winter/src/winter_voice/CMakeLists.txt"
+  "/home/jobsg/MOI_Robot_Winter/src/winter_voice/package.xml"
   "/opt/ros/indigo/share/actionlib/cmake/actionlib-msg-extras.cmake"
   "/opt/ros/indigo/share/actionlib/cmake/actionlibConfig-version.cmake"
   "/opt/ros/indigo/share/actionlib/cmake/actionlibConfig.cmake"
@@ -195,6 +199,7 @@ SET(CMAKE_MAKEFILE_PRODUCTS
   "gtest/CMakeFiles/CMakeDirectoryInformation.cmake"
   "winter_bringup/CMakeFiles/CMakeDirectoryInformation.cmake"
   "winter_description/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "winter_voice/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:

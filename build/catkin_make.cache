@@ -1,2 +1,2 @@
-winter_bringup:winter_description
+winter_bringup:winter_description:winter_voice
 -DCATKIN_DEVEL_PREFIX=/home/jobsg/MOI_Robot_Winter/devel -DCMAKE_INSTALL_PREFIX=/home/jobsg/MOI_Robot_Winter/install -G Unix Makefiles

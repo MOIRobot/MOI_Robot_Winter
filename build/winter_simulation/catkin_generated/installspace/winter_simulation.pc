@@ -1,8 +1,0 @@
-prefix=/home/jobs/MOI_Robot_Winter/install
-
-Name: winter_simulation
-Description: Description of winter_simulation
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/jobs/MOI_Robot_Winter/install/lib 
-Requires: 

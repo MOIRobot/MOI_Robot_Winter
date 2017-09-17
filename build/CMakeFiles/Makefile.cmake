@@ -218,6 +218,7 @@ SET(CMAKE_DEPEND_INFO_FILES
   "winter_bringup/CMakeFiles/actionlib_msgs_generate_messages_lisp.dir/DependInfo.cmake"
   "winter_bringup/CMakeFiles/actionlib_msgs_generate_messages_py.dir/DependInfo.cmake"
   "winter_bringup/CMakeFiles/base_control.dir/DependInfo.cmake"
+  "winter_bringup/CMakeFiles/fake_odom_publisher.dir/DependInfo.cmake"
   "winter_bringup/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/DependInfo.cmake"
   "winter_bringup/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/DependInfo.cmake"
   "winter_bringup/CMakeFiles/geometry_msgs_generate_messages_py.dir/DependInfo.cmake"

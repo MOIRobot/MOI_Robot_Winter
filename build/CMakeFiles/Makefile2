@@ -230,7 +230,7 @@ gtest/preinstall:
 gtest/CMakeFiles/gtest.dir/all:
 	$(MAKE) -f gtest/CMakeFiles/gtest.dir/build.make gtest/CMakeFiles/gtest.dir/depend
 	$(MAKE) -f gtest/CMakeFiles/gtest.dir/build.make gtest/CMakeFiles/gtest.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/jobsg/MOI_Robot_Winter/build/CMakeFiles  2
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/jobsg/MOI_Robot_Winter/build/CMakeFiles  3
 	@echo "Built target gtest"
 .PHONY : gtest/CMakeFiles/gtest.dir/all
 
@@ -261,7 +261,7 @@ clean: gtest/CMakeFiles/gtest.dir/clean
 gtest/CMakeFiles/gtest_main.dir/all: gtest/CMakeFiles/gtest.dir/all
 	$(MAKE) -f gtest/CMakeFiles/gtest_main.dir/build.make gtest/CMakeFiles/gtest_main.dir/depend
 	$(MAKE) -f gtest/CMakeFiles/gtest_main.dir/build.make gtest/CMakeFiles/gtest_main.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/jobsg/MOI_Robot_Winter/build/CMakeFiles  3
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/jobsg/MOI_Robot_Winter/build/CMakeFiles  4
 	@echo "Built target gtest_main"
 .PHONY : gtest/CMakeFiles/gtest_main.dir/all
 
@@ -290,6 +290,7 @@ clean: gtest/CMakeFiles/gtest_main.dir/clean
 
 # Convenience name for "all" pass in the directory.
 winter_bringup/all: winter_bringup/CMakeFiles/base_control.dir/all
+winter_bringup/all: winter_bringup/CMakeFiles/fake_odom_publisher.dir/all
 .PHONY : winter_bringup/all
 
 # Convenience name for "clean" pass in the directory.
@@ -300,6 +301,7 @@ winter_bringup/clean: winter_bringup/CMakeFiles/actionlib_msgs_generate_messages
 winter_bringup/clean: winter_bringup/CMakeFiles/actionlib_msgs_generate_messages_lisp.dir/clean
 winter_bringup/clean: winter_bringup/CMakeFiles/actionlib_msgs_generate_messages_py.dir/clean
 winter_bringup/clean: winter_bringup/CMakeFiles/base_control.dir/clean
+winter_bringup/clean: winter_bringup/CMakeFiles/fake_odom_publisher.dir/clean
 winter_bringup/clean: winter_bringup/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/clean
 winter_bringup/clean: winter_bringup/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/clean
 winter_bringup/clean: winter_bringup/CMakeFiles/geometry_msgs_generate_messages_py.dir/clean
@@ -546,6 +548,41 @@ winter_bringup/CMakeFiles/base_control.dir/clean:
 
 # clean rule for target.
 clean: winter_bringup/CMakeFiles/base_control.dir/clean
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target winter_bringup/CMakeFiles/fake_odom_publisher.dir
+
+# All Build rule for target.
+winter_bringup/CMakeFiles/fake_odom_publisher.dir/all:
+	$(MAKE) -f winter_bringup/CMakeFiles/fake_odom_publisher.dir/build.make winter_bringup/CMakeFiles/fake_odom_publisher.dir/depend
+	$(MAKE) -f winter_bringup/CMakeFiles/fake_odom_publisher.dir/build.make winter_bringup/CMakeFiles/fake_odom_publisher.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/jobsg/MOI_Robot_Winter/build/CMakeFiles  2
+	@echo "Built target fake_odom_publisher"
+.PHONY : winter_bringup/CMakeFiles/fake_odom_publisher.dir/all
+
+# Include target in all.
+all: winter_bringup/CMakeFiles/fake_odom_publisher.dir/all
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+winter_bringup/CMakeFiles/fake_odom_publisher.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jobsg/MOI_Robot_Winter/build/CMakeFiles 1
+	$(MAKE) -f CMakeFiles/Makefile2 winter_bringup/CMakeFiles/fake_odom_publisher.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jobsg/MOI_Robot_Winter/build/CMakeFiles 0
+.PHONY : winter_bringup/CMakeFiles/fake_odom_publisher.dir/rule
+
+# Convenience name for target.
+fake_odom_publisher: winter_bringup/CMakeFiles/fake_odom_publisher.dir/rule
+.PHONY : fake_odom_publisher
+
+# clean rule for target.
+winter_bringup/CMakeFiles/fake_odom_publisher.dir/clean:
+	$(MAKE) -f winter_bringup/CMakeFiles/fake_odom_publisher.dir/build.make winter_bringup/CMakeFiles/fake_odom_publisher.dir/clean
+.PHONY : winter_bringup/CMakeFiles/fake_odom_publisher.dir/clean
+
+# clean rule for target.
+clean: winter_bringup/CMakeFiles/fake_odom_publisher.dir/clean
 .PHONY : clean
 
 #=============================================================================

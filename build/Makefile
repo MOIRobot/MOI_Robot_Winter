@@ -332,6 +332,19 @@ base_control/fast:
 .PHONY : base_control/fast
 
 #=============================================================================
+# Target rules for targets named fake_odom_publisher
+
+# Build rule for target.
+fake_odom_publisher: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 fake_odom_publisher
+.PHONY : fake_odom_publisher
+
+# fast build rule for target.
+fake_odom_publisher/fast:
+	$(MAKE) -f winter_bringup/CMakeFiles/fake_odom_publisher.dir/build.make winter_bringup/CMakeFiles/fake_odom_publisher.dir/build
+.PHONY : fake_odom_publisher/fast
+
+#=============================================================================
 # Target rules for targets named geometry_msgs_generate_messages_cpp
 
 # Build rule for target.
@@ -631,6 +644,7 @@ help:
 	@echo "... actionlib_msgs_generate_messages_lisp"
 	@echo "... actionlib_msgs_generate_messages_py"
 	@echo "... base_control"
+	@echo "... fake_odom_publisher"
 	@echo "... geometry_msgs_generate_messages_cpp"
 	@echo "... geometry_msgs_generate_messages_lisp"
 	@echo "... geometry_msgs_generate_messages_py"

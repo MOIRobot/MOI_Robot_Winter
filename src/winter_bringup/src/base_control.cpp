@@ -12,15 +12,26 @@ BaseControl::BaseControl():
                timer(iosev),
               FistTime(true)
 {
+  ros::NodeHandle private_nh("~");
+
+  //<node_handle.h line:2038>
+  private_nh.param("usb_device", usb_device_, std::string("/dev/ttyUSB0"));
+  private_nh.param("deadline_time", deadline_time_, 19);
+  private_nh.param("baudrate", baudrate_, 115200);
+  private_nh.param("wheels_separation", wheels_separation_, 0.6);
+  private_nh.param("wheel_radius", wheel_radius_, 0.06);
+  private_nh.param("pulse_per_rotation", pulse_per_rotation_, 500);
+  private_nh.param("ratio", ratio_, 25);
+  private_nh.param("loop_rate", loop_rate_, 50);
+  
 
   cmd_sub = nh.subscribe("/smooth_cmd_vel", 1, &BaseControl::CmdCallback, this);
 
   odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 1);
 
-  str = "Hello Async Serial\n";
   memset(rec_buf, -1, 100);
 
-  ros::Rate loop_rate(50);
+  ros::Rate loop_rate(loop_rate_);
 
   try{
 
@@ -55,8 +66,8 @@ BaseControl::BaseControl():
 void BaseControl::InitSerial()
 {
 
-    sp.open(DEVICE);
-    sp.set_option(serial_port::baud_rate(BAUDRATE));
+    sp.open(usb_device_);
+    sp.set_option(serial_port::baud_rate(baudrate_));
     sp.set_option(serial_port::flow_control(serial_port::flow_control::none));
     sp.set_option(serial_port::parity(serial_port::parity::none));
     sp.set_option(serial_port::stop_bits(serial_port::stop_bits::one));
@@ -71,7 +82,7 @@ void BaseControl::InitSerial()
     async_read(sp, buffer(rec_buf), boost::bind(&BaseControl::HandleRead,  this, _1, _2));
 
     //TIMEms后超时
-    timer.expires_from_now(boost::posix_time::millisec(TIME));
+    timer.expires_from_now(boost::posix_time::millisec(deadline_time_));
 
     //超时后调用 sp 的 cancel()方法放弃读取更多字符
     timer.async_wait(boost::bind(&serial_port::cancel, boost::ref(sp)));
@@ -85,7 +96,7 @@ void BaseControl::HandleRead(boost::system::error_code ec, std::size_t bytes_tra
     //cout << string(rec_buf,bytes_transferred)<< endl;
     async_read(sp, buffer(rec_buf), boost::bind(&BaseControl::HandleRead, this,  _1, _2));
 
-    timer.expires_from_now(boost::posix_time::millisec(TIME));
+    timer.expires_from_now(boost::posix_time::millisec(deadline_time_));
 
     //超时后调用 sp 的 cancel()方法放弃读取更多字符
     timer.async_wait(boost::bind(&serial_port::cancel, boost::ref(sp)));
@@ -133,13 +144,13 @@ void BaseControl::SetSpeed()
 
     /*
     差速推导公式参考：COS495-Lecture5-Odometry.pdf
-    right_wheel_velocity = vx + WHEELS_SEPARATION * vth * 0.5;
-    leftWheel_velocity = vx - WHEELS_SEPARATION * vth * 0.5;
+    right_wheel_velocity = vx + wheels_separation_ * vth * 0.5;
+    leftWheel_velocity = vx - wheels_separation_ * vth * 0.5;
     */
 
     //两个轮子的速度mm/s,放大1000倍，精确到0.001m/s
-    right_wheel_velocity = 1000 * (cmd_msg.linear.x + WHEELS_SEPARATION * cmd_msg.angular.z * 0.5);
-    leftWheel_velocity = 1000 * (cmd_msg.linear.x - WHEELS_SEPARATION * cmd_msg.angular.z * 0.5);
+    right_wheel_velocity = 1000 * (cmd_msg.linear.x + wheels_separation_ * cmd_msg.angular.z * 0.5);
+    leftWheel_velocity = 1000 * (cmd_msg.linear.x - wheels_separation_ * cmd_msg.angular.z * 0.5);
 
     WL_H = ((int)(leftWheel_velocity) >> 8) & 0x08;
     WL_L = (int)(leftWheel_velocity) & 0x08;
@@ -167,7 +178,6 @@ void BaseControl::SetSpeed()
         SetSpeedCmd.push_back(stop[i]);
     write(sp, buffer(SetSpeedCmd, SetSpeedCmd.length()));
 #endif
-
 }
 
 void BaseControl::PublishOdom()
@@ -206,10 +216,10 @@ void BaseControl::PublishOdom()
 
     /*  
     vs = (right_wheel_velocity + leftWheel_velocity) / 2.0;
-    vth = (right_wheel_velocity - leftWheel_velocity) / (2.0 * WHEELS_SEPARATION);
+    vth = (right_wheel_velocity - leftWheel_velocity) / (2.0 * wheels_separation_);
     */
     delta_time = (current_time - last_time).toSec();
-    //delta_th = (encoder_dis[RightWheel] - encoder_dis[LeftWheel])/(2 * WHEELS_SEPARATION);
+    //delta_th = (encoder_dis[RightWheel] - encoder_dis[LeftWheel])/(2 * wheels_separation_);
     delta_th = angle_curr - angle_last;
     delta_s = (encoder_dis[LeftWheel] + encoder_dis[RightWheel]) * 0.5;
 

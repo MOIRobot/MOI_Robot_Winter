@@ -1,8 +1,0 @@
-prefix=/home/jobsg/MOI_Robot_Winter/devel
-
-Name: robot_winter
-Description: Description of robot_winter
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/jobsg/MOI_Robot_Winter/devel/lib 
-Requires: 

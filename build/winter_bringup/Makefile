@@ -248,6 +248,20 @@ base_control/fast:
 .PHONY : base_control/fast
 
 # Convenience name for target.
+winter_bringup/CMakeFiles/fake_odom_publisher.dir/rule:
+	cd /home/jobsg/MOI_Robot_Winter/build && $(MAKE) -f CMakeFiles/Makefile2 winter_bringup/CMakeFiles/fake_odom_publisher.dir/rule
+.PHONY : winter_bringup/CMakeFiles/fake_odom_publisher.dir/rule
+
+# Convenience name for target.
+fake_odom_publisher: winter_bringup/CMakeFiles/fake_odom_publisher.dir/rule
+.PHONY : fake_odom_publisher
+
+# fast build rule for target.
+fake_odom_publisher/fast:
+	cd /home/jobsg/MOI_Robot_Winter/build && $(MAKE) -f winter_bringup/CMakeFiles/fake_odom_publisher.dir/build.make winter_bringup/CMakeFiles/fake_odom_publisher.dir/build
+.PHONY : fake_odom_publisher/fast
+
+# Convenience name for target.
 winter_bringup/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule:
 	cd /home/jobsg/MOI_Robot_Winter/build && $(MAKE) -f CMakeFiles/Makefile2 winter_bringup/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule
 .PHONY : winter_bringup/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule
@@ -565,6 +579,30 @@ src/base_control.cpp.s:
 	cd /home/jobsg/MOI_Robot_Winter/build && $(MAKE) -f winter_bringup/CMakeFiles/base_control.dir/build.make winter_bringup/CMakeFiles/base_control.dir/src/base_control.cpp.s
 .PHONY : src/base_control.cpp.s
 
+src/fake_odom_publisher.o: src/fake_odom_publisher.cpp.o
+.PHONY : src/fake_odom_publisher.o
+
+# target to build an object file
+src/fake_odom_publisher.cpp.o:
+	cd /home/jobsg/MOI_Robot_Winter/build && $(MAKE) -f winter_bringup/CMakeFiles/fake_odom_publisher.dir/build.make winter_bringup/CMakeFiles/fake_odom_publisher.dir/src/fake_odom_publisher.cpp.o
+.PHONY : src/fake_odom_publisher.cpp.o
+
+src/fake_odom_publisher.i: src/fake_odom_publisher.cpp.i
+.PHONY : src/fake_odom_publisher.i
+
+# target to preprocess a source file
+src/fake_odom_publisher.cpp.i:
+	cd /home/jobsg/MOI_Robot_Winter/build && $(MAKE) -f winter_bringup/CMakeFiles/fake_odom_publisher.dir/build.make winter_bringup/CMakeFiles/fake_odom_publisher.dir/src/fake_odom_publisher.cpp.i
+.PHONY : src/fake_odom_publisher.cpp.i
+
+src/fake_odom_publisher.s: src/fake_odom_publisher.cpp.s
+.PHONY : src/fake_odom_publisher.s
+
+# target to generate assembly for a file
+src/fake_odom_publisher.cpp.s:
+	cd /home/jobsg/MOI_Robot_Winter/build && $(MAKE) -f winter_bringup/CMakeFiles/fake_odom_publisher.dir/build.make winter_bringup/CMakeFiles/fake_odom_publisher.dir/src/fake_odom_publisher.cpp.s
+.PHONY : src/fake_odom_publisher.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -579,6 +617,7 @@ help:
 	@echo "... actionlib_msgs_generate_messages_py"
 	@echo "... base_control"
 	@echo "... edit_cache"
+	@echo "... fake_odom_publisher"
 	@echo "... geometry_msgs_generate_messages_cpp"
 	@echo "... geometry_msgs_generate_messages_lisp"
 	@echo "... geometry_msgs_generate_messages_py"
@@ -609,6 +648,9 @@ help:
 	@echo "... src/base_control.o"
 	@echo "... src/base_control.i"
 	@echo "... src/base_control.s"
+	@echo "... src/fake_odom_publisher.o"
+	@echo "... src/fake_odom_publisher.i"
+	@echo "... src/fake_odom_publisher.s"
 .PHONY : help
 
 

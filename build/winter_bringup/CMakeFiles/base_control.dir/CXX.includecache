@@ -7,15 +7,19 @@
 #IncludeRegexTransform: 
 
 /home/jobsg/MOI_Robot_Winter/src/winter_bringup/include/winter_bringup/base_control.h
+unistd.h
+-
+math.h
+-
+string.h
+-
 iostream
 -
-unistd.h
+string
 -
 boost/asio.hpp
 -
 boost/bind.hpp
--
-string.h
 -
 ros/ros.h
 -
@@ -24,10 +28,6 @@ geometry_msgs/Twist.h
 nav_msgs/Odometry.h
 -
 tf/transform_broadcaster.h
--
-string
--
-math.h
 -
 
 /home/jobsg/MOI_Robot_Winter/src/winter_bringup/src/base_control.cpp

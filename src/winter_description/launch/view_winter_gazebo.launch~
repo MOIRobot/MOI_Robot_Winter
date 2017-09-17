@@ -9,6 +9,7 @@
 
   <!-- We resume the logic in empty_world.launch -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find winter_description)/worlds/room.world"/>
     <arg name="debug" value="$(arg debug)" />
     <arg name="gui" value="$(arg gui)" />
     <arg name="paused" value="$(arg paused)"/>
@@ -17,7 +18,7 @@
   </include>
 
   <!-- urdf xml robot description loaded on the Parameter Server-->
-  <param name="robot_description" command="$(find xacro)/xacro.py '$(find litebot_description)/urdf/litebot_gazebo.xacro'" /> 
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find winter_description)/urdf/winter_gazebo.urdf.xacro'" /> 
 
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node> 
 
@@ -28,6 +29,7 @@
 
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-	args="-urdf -model litebot -param robot_description"/> 
-
+	args="-urdf -model winter -param robot_description"/> 
+  <!-- fake odom published -->
+	<node name="fake_winter_base" pkg="winter_bringup" type="fake_odom_publisher"/>
 </launch>

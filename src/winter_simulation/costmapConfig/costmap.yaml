@@ -1,0 +1,15 @@
+update_frequency: 3.0
+publish_frequency: 1.0
+footprint: [[0.75, 0.60], [0.75, -0.60], [-0.75, -0.60], [-0.75, 0.60]]
+inflation_layer/inflation_radius: 1.5
+global_frame: /map
+robot_base_frame: /base_link
+rolling_window: true
+static_map/enabled: true
+resolution: 0.05
+transform_tolerance: 1.0
+map_type: costmap
+plugins:  
+      - {name: static_map,       type: "costmap_2d::StaticLayer"} 
+      - {name: inflation_layer,  type: "costmap_2d::InflationLayer"}  
+

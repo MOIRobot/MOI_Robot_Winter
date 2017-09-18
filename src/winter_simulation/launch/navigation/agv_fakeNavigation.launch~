@@ -1,0 +1,33 @@
+<launch>
+
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find winter_simulation)/maps/my_mapall.yaml"/>
+
+   <arg name="model" />  
+	<arg name="gui" default="True" />  
+	<param name="robot_description" textfile="$(find winter_simulation)/urdf/agv.urdf" />  
+	<param name="use_gui" value="$(arg gui)"/>  
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find winter_simulation)/rviz/agv_navigation.rviz" required="true" />  
+  
+   <!-- Run fake localization compatible with AMCL output -->
+   <node pkg="fake_localization" type="fake_localization" name="fake_localization" output="screen" /> 
+   
+   <rosparam file="$(find winter_simulation)/costmapConfig/minimal.yaml" command="load" ns="/globalplanner/costmap" />
+      
+  <node pkg="winter_globalplanner" type="globalplanner" name="globalplanner" output="screen" clear_params="true" >
+  <param name="~RATE"  value="20" />
+	<param name="~MAX_ANGULAR_Z"  value="0.8" />
+	<param name="~MIN_ANGULAR_Z"  value="0.25" />
+	<param name="~ACC_ANGULAR_Z"  value="1.0" />
+	<param name="~ANGULAR_Z_ERR"  value="0.05" />
+	
+	<param name="~MAX_LINEAR_X"  value="0.8" />
+	<param name="~MIN_LINEAR_X"  value="0.05" />
+	<param name="~ACC_LINEAR_X"  value="0.8" />
+	<param name="~LINEAR_X_ERR"  value="0.02" />
+  </node>
+   
+  
+   
+</launch>
+

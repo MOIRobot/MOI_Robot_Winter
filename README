@@ -1,6 +1,9 @@
 This is a project for robot! And this is an ROS workspace!
 The homepage is https://github.com/MOIRobot/MOI_Robot_Winter
+how to install ros? http://wiki.ros.org/indigo/Installation
 How to use this source code?
+
+
 
 1, first add your ssh secert password,just press ENTER until you finish the process
 $ssh-keygen -t rsa -C "your_email@example.com"

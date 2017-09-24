@@ -10,4 +10,4 @@
 	接收cmdvel速度信息 并按照该速度定时在odom话题上发布里程数据
 4 launch 文件
 	launch/fakeOdoPublisher.launch 机器人虚拟速度接受与里程计数据发布文件
-	launch/fakeOdoPublisher.launch
+

@@ -1,0 +1,49 @@
+<launch>
+
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find winter_simulation)/maps/map126.yaml"/>
+   
+  <rosparam file="$(find winter_simulation)/costmapConfig/fakestage.yaml" command="load" ns="/planner/costmap" />
+
+  <node pkg="winter_globalplanner" type="globalplanner" name="planner" output="screen" clear_params="true" >
+  <param name="~RATE"  value="20" />
+	<param name="~MAX_ANGULAR_Z"  value="0.8" />
+	<param name="~MIN_ANGULAR_Z"  value="0.25" />
+	<param name="~ACC_ANGULAR_Z"  value="1.0" />
+	<param name="~ANGULAR_Z_ERR"  value="0.05" />
+	
+	<param name="~MAX_LINEAR_X"  value="0.8" />
+	<param name="~MIN_LINEAR_X"  value="0.05" />
+	<param name="~ACC_LINEAR_X"  value="0.8" />
+	<param name="~LINEAR_X_ERR"  value="0.02" />
+  </node>
+   
+  
+  
+  <arg name="use_map_topic"   default="map"/>
+  <arg name="scan_topic"      default="scan"/> 
+  
+  <arg name="odom_frame_id"   default="robot_0/odom"/>
+  <arg name="base_frame_id"   default="robot_0/base_link"/>
+  <arg name="global_frame_id" default="map"/>
+
+  <node pkg="amcl" type="amcl" name="amcl">
+    <param name="use_map_topic"             value="$(arg use_map_topic)"/>
+    <!-- Publish scans from best pose at a max of 10 Hz -->
+    <param name="odom_model_type"           value="diff"/>
+    <param name="odom_frame_id"             value="$(arg odom_frame_id)"/> 
+    <param name="base_frame_id"             value="$(arg base_frame_id)"/> 
+    <param name="global_frame_id"           value="$(arg global_frame_id)"/>
+    <param name="initial_pose_x" value="0.0"/>
+    <param name="initial_pose_y" value="0.0"/>
+    <param name="initial_pose_a" value="0.0"/>
+    <remap from="scan"                      to="$(arg scan_topic)"/>
+  </node>
+  
+  <arg name="model" />  
+  <arg name="gui" default="True" />  
+  <param name="robot_description" textfile="$(find winter_simulation)/urdf/agv_stage.urdf" />  
+  <param name="use_gui" value="$(arg gui)"/>  
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find winter_simulation)/rviz/agv_stage.rviz" required="true" />
+   
+ </launch>

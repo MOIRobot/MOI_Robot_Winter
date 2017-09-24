@@ -1,0 +1,24 @@
+<!-- 
+  Turtlebot navigation simulation:
+  - stage
+  - map_server
+  - move_base
+  - static map
+  - amcl
+  - rviz view
+ -->
+<launch>
+
+  <arg name="world_file"     default=" $(find winter_simulation)/maps/stage/stage/mazerobots.world"/>
+
+ 
+  <node pkg="stage_ros" type="stageros" name="stageros" args="$(arg world_file)">
+    <param name="base_watchdog_timeout" value="0.5"/>
+    <remap from="robot_0/odom" to="odom"/>
+    <remap from="robot_0/cmd_vel" to="cmd_vel"/>
+    <remap from="base_pose_ground_truth" to="base_pose_ground_truth"/>
+    <remap from="robot_0/base_scan" to="scan"/>
+  </node>
+  <node pkg="winter_simualtion" type="stage_robots_motion_driver.py" name="stage_robots" />
+
+</launch>

@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
        xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
-       xmlns:xacro="http://www.ros.org/wiki/xacro" name="winter">
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:xacro="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       name="winter">
 	<!-- sensors -->
   	<xacro:include filename="$(find winter_description)/urdf/sensors/hokuyo_urg04_laser.urdf.xacro"/>
         <!-- gazebo -->
@@ -102,7 +104,10 @@
       		<material>Gazebo/White</material>
   	</gazebo>
 <!--laser_link-->
-        <link name="laser_link">
+<xacro:hokuyo_urg04_laser name="base_laser_front" parent="base" ros_topic="scan_front" update_rate="10" min_angle="-1.57" max_angle="1.57">
+    <origin xyz="0 0 ${body_height+wheel_radius+0.04}" rpy="0 0 0"/>
+  </xacro:hokuyo_urg04_laser>
+        <!-- <link name="laser_link">
 	<cylinder_inertial_matrix  m="${laser_mass}" r="${laser_radius}" h="${laser_height}" />
                 <visual>
                         <geometry>
@@ -127,7 +132,7 @@
             <parent link="base_link"/>
             <child link="laser_link"/>
             <origin xyz="0 0 ${body_height+wheel_radius}"/>
-        </joint>
+        </joint> -->
 
 <!-- left wheel-->
         <link name="left_wheel">

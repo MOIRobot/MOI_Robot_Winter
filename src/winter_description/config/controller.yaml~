@@ -1,4 +1,4 @@
-litebot_controller:
+winter_controller:
     type: "diff_drive_controller/DiffDriveController"
     left_wheel: "base_to_wheel_left_joint"
     right_wheel: "base_to_wheel_right_joint"

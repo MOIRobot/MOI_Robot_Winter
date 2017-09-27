@@ -30,6 +30,12 @@
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
 	args="-urdf -model winter -param robot_description"/> 
-  <!-- fake odom published -->
-	<node name="fake_winter_base" pkg="winter_bringup" type="fake_odom_publisher"/>
+  <!-- Load joint controller configurations from YAML file to parameter server -->
+  <rosparam file="$(find winter_description)/config/controller.yaml" command="load"/>
+
+  <!-- load the controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+	output="screen" args="winter_controller"/>
+  <node pkg="tf" type="static_transform_publisher" name="front_hokuyo_frame" 
+	args="0 0 0 0 0 0 /base_laser_front_link /laser 1" />
 </launch>

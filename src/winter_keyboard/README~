@@ -1,0 +1,3 @@
+本包使用键盘在cmd_vel上发布速度命令
+1，telecop_direct.py 直接控制发布速度命令
+2，telecop_withACC.py 发布带有加减速的速度命令

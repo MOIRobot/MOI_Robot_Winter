@@ -36,4 +36,6 @@
   <!-- load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
 	output="screen" args="winter_controller"/>
+ <!-- <node pkg="tf" type="static_transform_publisher" name="front_hokuyo_frame" 
+	args="0 0 0 0 0 0 /base_laser_front_link /laser 1" />-->
 </launch>

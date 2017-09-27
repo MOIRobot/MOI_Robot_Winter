@@ -104,7 +104,7 @@
       		<material>Gazebo/White</material>
   	</gazebo>
 <!--laser_link-->
-<xacro:hokuyo_urg04_laser name="base_laser_front" parent="base" ros_topic="scan_front" update_rate="10" min_angle="-1.57" max_angle="1.57">
+<xacro:hokuyo_urg04_laser name="base_laser_front" parent="base" ros_topic="scan_front" update_rate="10" min_angle="-3.14" max_angle="3.14">
     <origin xyz="0 0 ${body_height+wheel_radius+0.04}" rpy="0 0 0"/>
   </xacro:hokuyo_urg04_laser>
         <!-- <link name="laser_link">

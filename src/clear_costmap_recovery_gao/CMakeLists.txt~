@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(winter_globalplanner)
+project(clear_costmap_recovery_gao)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,19 +8,38 @@ project(winter_globalplanner)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  std_msgs
-  urdf
-  message_generation
-  tf
-  nav_msgs
+  cmake_modules
   costmap_2d
-  base_local_planner
-  global_planner
-  navfn
-  clear_costmap_recovery_gao
+  eigen
+  nav_core
+  pluginlib
+  roscpp
+  tf
 )
+
+find_package(Eigen REQUIRED)
+find_package(PCL REQUIRED)
+include_directories(
+    include
+    ${catkin_INCLUDE_DIRS}
+    ${EIGEN_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
+)
+add_definitions(${EIGEN_DEFINITIONS})
+
+catkin_package(
+    INCLUDE_DIRS include
+    LIBRARIES clear_costmap_recovery_gao
+    CATKIN_DEPENDS
+        costmap_2d
+        nav_core
+        pluginlib
+        roscpp
+        tf
+)
+
+add_library(clear_costmap_recovery_gao src/clear_costmap_recovery_gao.cpp)
+target_link_libraries(clear_costmap_recovery_gao ${catkin_LIBRARIES})
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -79,7 +98,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs
+#   std_msgs  # Or other packages containing msgs
 # )
 
 ################################################
@@ -111,31 +130,12 @@ find_package(catkin REQUIRED COMPONENTS
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-	INCLUDE_DIRS include
-	LIBRARIES ${PROJECT_NAME}
-	CATKIN_DEPENDS roscpp rospy std_msgs urdf message_runtime
-#  DEPENDS system_lib
-)
 
-###########
-## Build ##
-###########
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-)
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}
-	src/MoveBase/math_G.cpp
-	src/MoveBase/move_base_G.cpp
-	src/MoveBase/costmap_G.cpp
-	src/Costmap_Layer/clear_costmap_recovery.cpp
-)
+# add_library(${PROJECT_NAME}
+#   src/${PROJECT_NAME}/clear_costmap_recovery_gao.cpp
+# )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -145,7 +145,7 @@ add_library(${PROJECT_NAME}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/winter_globalplanner_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/clear_costmap_recovery_gao_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -196,14 +196,13 @@ add_library(${PROJECT_NAME}
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
-add_executable(globalplanner src/GlobalPlanner.cpp )
-target_link_libraries(globalplanner ${PROJECT_NAME} ${catkin_LIBRARIES})
+
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_winter_globalplanner.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_clear_costmap_recovery_gao.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

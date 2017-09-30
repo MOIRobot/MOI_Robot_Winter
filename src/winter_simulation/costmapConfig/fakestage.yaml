@@ -13,8 +13,12 @@ transform_tolerance: 1.0
 map_type: costmap
 plugins:  
       - {name: static_map,       type: "costmap_2d::StaticLayer"}  
-      - {name: obstacle_layer,   type: "costmap_2d::ObstacleLayer"}  
+      - {name: obstacle_layer,   type: "costmap_2d::ObstacleLayer"}
+      - {name: sonar,            type: "range_sensor_layer::RangeSensorLayer"}    
       - {name: inflation_layer,  type: "costmap_2d::InflationLayer"}    
 obstacle_layer:
     observation_sources: scan
     scan: {data_type: LaserScan, sensor_frame: /robot_0/base_laser_link, topic: /scan, marking: true, clearing: true}
+sonar:
+     topics: ["/UltraSoundPublisher"]
+     no_readings_timeout: 0.0

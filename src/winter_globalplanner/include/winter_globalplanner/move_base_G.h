@@ -19,6 +19,7 @@
 #include <winter_globalplanner/costmap_G.h>
 #include <winter_globalplanner/clear_costmap_recovery.h>
 #include <navfn/MakeNavPlan.h>
+#include <clear_costmap_recovery_gao/clear_costmap_recovery_gao.h>
 #include <pthread.h>
 namespace agv
 {
@@ -110,6 +111,8 @@ namespace agv
 			ros::ServiceClient gobalpathClient;
 			//创建一个清除地图的对象
 			MClearCostmapRecovery ccr;
+			
+			clear_costmap_recovery_gao::ClearCostmapRecoveryGao mapLayerClearer;
 		};
 }
 

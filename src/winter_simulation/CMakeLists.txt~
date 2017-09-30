@@ -188,6 +188,9 @@ include_directories(
 # )
 add_executable(fake_odo_publiser src/FakeBaseController/fake_controller.cpp)
 target_link_libraries(fake_odo_publiser ${catkin_LIBRARIES})
+
+add_executable(fake_ultrosonicdata src/fake_ultrosonicData/fake_ultrosonicdata.cpp)
+target_link_libraries(fake_ultrosonicdata ${catkin_LIBRARIES})
 #############
 ## Testing ##
 #############

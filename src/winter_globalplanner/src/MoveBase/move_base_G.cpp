@@ -137,6 +137,13 @@ LocalMoveBase::LocalMoveBase(costmap_2d::Costmap2DROS* global_costmap,
 	//初始化清除地图的对象　clear_costmap_recovery
 	ccr.initialize("my_clear_costmap_recovery", tf, global_costmap);
 	
+	//初始化可以清除任何层的clear_costmap_recovery_gao 的对象
+	n.setParam("my_clear_costmap_recovery_gao/reset_distance", 0.1);//设置清除多少m以外的障碍物
+	std::vector<std::string> clearable_layers;
+	clearable_layers.push_back( std::string("sonar") );//添加第一层要清除的层 这个名字在movebase costmap参数里配置
+	n.setParam("my_clear_costmap_recovery_gao/layer_names", clearable_layers);//在参数空间设置名称
+	mapLayerClearer.initialize("my_clear_costmap_recovery_gao", tf, global_costmap,NULL);
+	
 	//创建一个判断机器人轨迹预测会不会碰撞的对象
 	mLocalCostmap=new agv::LocalMap_G(global_costmap->getCostmap(),footprint_spec);
 	//下面是机器人运动主方程
@@ -704,6 +711,9 @@ void LocalMoveBase::movebase(void)
 				{
 					PublishState("GoalReachedZ");
 					ccr.runBehavior();
+					
+					//清除超声波障碍物层
+					mapLayerClearer.clearOnelayer("sonar",0.1);
 				}
 				
 			}

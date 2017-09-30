@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /Grid1
+        - /TF1
         - /TF1/Frames1
         - /RobotModel1
         - /Odometry1
@@ -77,6 +78,8 @@ Visualization Manager:
           Value: true
         odom:
           Value: true
+        ultrasound:
+          Value: true
         wheel_1:
           Value: true
         wheel_2:
@@ -97,6 +100,8 @@ Visualization Manager:
               base_laser_link:
                 {}
               gyro_link:
+                {}
+              ultrasound:
                 {}
               wheel_1:
                 {}
@@ -129,6 +134,11 @@ Visualization Manager:
           Show Trail: false
           Value: true
         gyro_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ultrasound:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -379,6 +389,16 @@ Visualization Manager:
       Topic: /localplanner/localplanner/plan
       Unreliable: false
       Value: true
+    - Alpha: 0.5
+      Buffer Length: 1
+      Class: rviz/Range
+      Color: 255; 255; 255
+      Enabled: true
+      Name: Range
+      Queue Size: 100
+      Topic: /UltraSoundPublisher
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 0; 0; 0
@@ -403,22 +423,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 43.8282
+      Distance: 17.5243
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 10.5091
-        Y: 9.69769
-        Z: 0.002491
+        X: 0.389788
+        Y: -0.084868
+        Z: 0.00738907
       Name: Current View
       Near Clip Distance: 0.01
       Pitch: 1.5698
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.11853
+      Yaw: 3.12833
     Saved: ~
 Window Geometry:
   Displays:

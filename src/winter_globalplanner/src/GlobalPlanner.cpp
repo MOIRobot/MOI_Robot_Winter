@@ -3,6 +3,7 @@
 #include <boost/shared_ptr.hpp>
 #include <costmap_2d/costmap_2d_ros.h>
 #include <winter_globalplanner/move_base_G.h>
+
 namespace cm = costmap_2d;
 namespace rm = geometry_msgs;
 

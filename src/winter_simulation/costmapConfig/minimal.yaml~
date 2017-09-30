@@ -20,5 +20,5 @@ obstacle_layer:
     observation_sources: scan
     scan: {data_type: LaserScan, sensor_frame: /base_laser_link, topic: /scan, marking: true, clearing: true}
 sonar:
-     topics: ["/UltraSoundPublisher"]
+	 topics: ["/UltraSoundPublisher"]#注意替换成自己的topic名字
      no_readings_timeout: 0.0

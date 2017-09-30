@@ -1,0 +1,3 @@
+这个是对movebase 里面clear_costmap_recovery 的升级版 可以指定清除哪个层的数据
+1,首先将clear_costmap_recovery_gao 包放入工作空间/src目录下 然后catkin_make 确定可以roscd 到这个目录
+2,打开move_base.cpp 搜索与 "超声波清除" 关键字有关的片段 添加到你的代码里 

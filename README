@@ -70,7 +70,7 @@ and how to learn ros?  :http://wiki.ros.org/cn/ROS/Tutorials/
 	3.2 It's convenient if the ROS environment variables are automatically added to your bash session every time a new shell is launched:
 	$echo "source /your.path/MOI_Robot_Winter/devel/setup.bash" >> ~/.bashrc
 	$source ~/.bashrc
-5,how to use git to make a new branch and merge brance
+5,how to use git to make a new branch and merge branch
 	5.1, first pull the newest project to your computer
 		$git pull master origin/master
 	5.2, make a new branch

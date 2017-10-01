@@ -9,7 +9,11 @@ import  sys
 import  tty, termios
 import time    
 cmd = Twist()
+<<<<<<< HEAD
 pub = rospy.Publisher('cmd_vel',Twist,queue_size=20)
+=======
+pub = rospy.Publisher('/winter_controller/cmd_vel',Twist,queue_size=20)
+>>>>>>> e32ec2a7b903f8597fdda949196191462bef90d0
 
 def moveForward(speed):
 	cmd.linear.x=speed
@@ -60,9 +64,15 @@ j  k  l
 			termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)  
 			#print 'error'
 		if ch=='i':
+<<<<<<< HEAD
 			moveForward(0.8)
 		elif ch=='m':
 			moveForward(-0.8)
+=======
+			moveForward(0.3)
+		elif ch=='m':
+			moveForward(-0.3)
+>>>>>>> e32ec2a7b903f8597fdda949196191462bef90d0
 		elif ch=='j':
 			moveLeft(0.8)
 			print "turn left!"
@@ -70,10 +80,17 @@ j  k  l
 			moveLeft(-0.8)
 			print "turn right!"
 		elif ch=='u':
+<<<<<<< HEAD
 			rotateRobot(0.6)
 			print "turn right!"
 		elif ch=='o':
 			rotateRobot(-0.6)
+=======
+			rotateRobot(0.5)
+			print "turn right!"
+		elif ch=='o':
+			rotateRobot(-0.5)
+>>>>>>> e32ec2a7b903f8597fdda949196191462bef90d0
 			print "turn right!"
 		elif ch=='k':
 			stop_robot()

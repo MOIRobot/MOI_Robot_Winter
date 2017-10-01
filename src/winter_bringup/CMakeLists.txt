@@ -202,5 +202,5 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(base_control src/base_control.cpp)
 target_link_libraries(base_control ${catkin_LIBRARIES} libboost_system.so)
 
-#This makes sure message headers of this package are generated before being used. 
-add_dependencies(base_control winter_bringup_generate_messages_cpp)
+add_executable(fake_odom_publisher src/fake_odom_publisher.cpp)
+target_link_libraries(fake_odom_publisher ${catkin_LIBRARIES})

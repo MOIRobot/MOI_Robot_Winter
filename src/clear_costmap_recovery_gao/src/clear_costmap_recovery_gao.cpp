@@ -17,7 +17,7 @@ void ClearCostmapRecoveryGao::initialize(std::string name, tf::TransformListener
     name_ = name;
     tf_ = tf;
     global_costmap_ = global_costmap;
-
+    local_costmap_    = local_costmap;
     //get some parameters from the parameter server
     ros::NodeHandle private_nh("~/" + name_);
 
@@ -45,12 +45,27 @@ void ClearCostmapRecoveryGao::runBehavior(){
     return;
   }
 
-  if(global_costmap_ == NULL){
+  if(global_costmap_ != NULL){
+    ROS_WARN("Clearing costmap to unstuck robot (%fm).", reset_distance_);
+    clear(global_costmap_);
+  }
+  else
+  {
     ROS_ERROR("The costmaps passed to the ClearCostmapRecovery object cannot be NULL. Doing nothing.");
     return;
   }
-  ROS_WARN("Clearing costmap to unstuck robot (%fm).", reset_distance_);
-  clear(global_costmap_);
+  
+  if(local_costmap_ != NULL){
+    ROS_WARN("Clearing costmap to unstuck robot (%fm).", reset_distance_);
+    clear(local_costmap_);
+  }
+  else
+  {
+    ROS_ERROR("The costmaps passed to the ClearCostmapRecovery object cannot be NULL. Doing nothing.");
+    return;
+  }
+  
+  
 }
 
 //选择要清除的层 以及要清除的多少距离以外的地图
@@ -60,13 +75,27 @@ void ClearCostmapRecoveryGao::clearOnelayer(const char* name, double distance_){
     return;
   }
 
-  if(global_costmap_ == NULL){
-    ROS_ERROR("The costmaps passed to the ClearCostmapRecovery object cannot be NULL. Doing nothing.");
-    return;
-  }
-  ROS_WARN("Clearing costmap to unstuck robot (%fm).", reset_distance_);
   reset_distance_=distance_;
-  clear(global_costmap_,name);
+  if(global_costmap_ != NULL){
+    clear(global_costmap_,name);
+    ROS_WARN("Clearing costmap to unstuck robot (%fm).", reset_distance_);
+   }
+   else
+   {
+    ROS_ERROR("The costmaps passed to the ClearCostmapRecovery object cannot be NULL. Doing nothing.");
+    }
+    
+    if(local_costmap_ != NULL){
+    clear(local_costmap_,name);
+    ROS_WARN("Clearing costmap to unstuck robot (%fm).", reset_distance_);
+   }
+   else
+   {
+    ROS_ERROR("The costmaps passed to the ClearCostmapRecovery object cannot be NULL. Doing nothing.");
+    }
+    
+    
+  
 }
 
 void ClearCostmapRecoveryGao::clear(costmap_2d::Costmap2DROS* costmap){

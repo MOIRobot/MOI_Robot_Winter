@@ -1,27 +1,20 @@
 #ifndef BASE_CONTROL_H
 #define BASE_CONTROL_H
 
-#include <iostream>
 #include <unistd.h>
+#include <math.h>
+#include <string.h> //for memset
+
+#include <iostream>
+#include <string> //for string
+
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <string.h> //for memset
+
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h> // for tf
-#include <string> //for string
-#include <math.h>
-
-//速度发布50HZ的情况下，应低于20ms
-#define TIME 19
-
-#define DEVICE  "/dev/ttyUSB0"
-
-#define BAUDRATE  115200
-
-//轮子的间距m
-#define WHEELS_SEPARATION 0.6
 
 //脉冲数目转换为距离的系数
 #define PULSE_K 10
@@ -50,12 +43,6 @@ private:
     /*定时器*/
     deadline_timer timer;
 
-    string str;
-
-    char rec_buf[100];
-    
-    geometry_msgs::Twist cmd_msg;
-
     ros::NodeHandle nh;
 
     ros::Publisher odom_pub;
@@ -65,6 +52,12 @@ private:
     ros::Time current_time, last_time;
 
     tf::TransformBroadcaster odom_broadcaster;
+        
+    geometry_msgs::Twist cmd_msg;
+
+    string str;
+
+    char rec_buf[100];
 
     int encoder_curr[2];
 
@@ -81,6 +74,24 @@ private:
     float y_pos;
 
     float th_pos;
+
+    std::string usb_device_;
+
+    //速度发布50HZ的情况下，应低于20ms
+    //数据类型由launch文件决定，是std::string,double,int，不能用unsigned int ,float,etc
+    int deadline_time_;
+
+    int baudrate_;
+
+    int pulse_per_rotation_;
+
+    int ratio_;
+
+    int loop_rate_;
+
+    double wheel_radius_;
+
+    double wheels_separation_;
 
 public:
 

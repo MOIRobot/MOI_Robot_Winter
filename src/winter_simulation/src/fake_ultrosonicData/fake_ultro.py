@@ -24,7 +24,7 @@ class PublishUnltro():
 			ran_quat = Quaternion()
 			ran_quat = quaternion_from_euler(0, 0, 0)	
 			#发布TF关系
-			ran_broadcaster.sendTransform((0.6,0.00,0.1),ran_quat,rospy.Time.now(),"ultrasound","base_link")
+			ran_broadcaster.sendTransform((0.2,0.0,0.2),ran_quat,rospy.Time.now(),"ultrasound","base_link")
 			#定义一个超声波消息
 			ran = Range()
 			ran.header.stamp = rospy.Time.now()
@@ -32,7 +32,7 @@ class PublishUnltro():
 			ran.field_of_view = 1;
 			ran.min_range = 0;
 			ran.max_range = 5;
-			ran.range = 1;
+			ran.range = 0.5;
 			ultrasound_pub.publish(ran)
 			rate.sleep()
         

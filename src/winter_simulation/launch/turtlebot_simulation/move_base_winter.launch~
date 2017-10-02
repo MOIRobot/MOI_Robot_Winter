@@ -1,0 +1,12 @@
+<launch>
+
+  <node pkg="winter_move_base" type="winter_move_base_node" respawn="false" name="move_base" output="screen" clear_params="true"> 
+    <rosparam file="$(find winter_simulation)/costmapConfig_turtlebot/fake/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find winter_simulation)/costmapConfig_turtlebot/fake/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find winter_simulation)/costmapConfig_turtlebot/fake/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find winter_simulation)/costmapConfig_turtlebot/fake/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find winter_simulation)/costmapConfig_turtlebot/fake/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find winter_simulation)/costmapConfig_turtlebot/nav_obstacles_params.yaml" command="load" />
+  </node>
+  
+</launch>

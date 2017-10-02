@@ -104,7 +104,7 @@ namespace move_base {
     private_nh.param("local_costmap/inscribed_radius", inscribed_radius_, 0.325);
     private_nh.param("local_costmap/circumscribed_radius", circumscribed_radius_, 0.46);
     private_nh.param("clearing_radius", clearing_radius_, circumscribed_radius_);
-    private_nh.param("conservative_reset_dist", conservative_reset_dist_, 3.0);
+    private_nh.param("conservative_reset_dist", conservative_reset_dist_, 0.1);
 
     private_nh.param("shutdown_costmaps", shutdown_costmaps_, false);
     private_nh.param("clearing_rotation_allowed", clearing_rotation_allowed_, true);
@@ -917,7 +917,7 @@ namespace move_base {
 
     //the move_base state machine, handles the control logic for navigation
     switch(state_){
-      //if we are in a planning state, then we'll attempt to make a plan
+      //if we are in a planning state, then we'll attempt to make a plan 
       case PLANNING:
         {
           boost::recursive_mutex::scoped_lock lock(planner_mutex_);
@@ -930,14 +930,11 @@ namespace move_base {
       //if we're controlling, we'll attempt to find valid velocity commands
       case CONTROLLING:
         ROS_DEBUG_NAMED("move_base","In controlling state.");
-
+         
         //check to see if we've reached our goal
         if(tc_->isGoalReached()){
           ROS_DEBUG_NAMED("move_base","Goal reached!");
-          
-          //在此清除超声波层的障碍物 因为我们是第一个添加的这个recovery行为 所以index 是0   超声波清除
-          recovery_behaviors_[0]->runBehavior();
-          
+             
           resetState();
 
           //disable the planner thread
@@ -946,6 +943,14 @@ namespace move_base {
           lock.unlock();
 
           as_->setSucceeded(move_base_msgs::MoveBaseResult(), "Goal reached.");
+          
+            //在此清除超声波层的障碍物 参数 静态层的名字 要清除层 的名字 要清除距离机器人中兴多远以外的障碍物区域
+         mapLayerClearer.clearOnelayer("static_map","sonar",2);
+         //清除激光雷达所在层的障碍物
+         //mapLayerClearer.clearOnelayer("static_map","obstacle_layer",2);
+         
+          
+         
           return true;
         }
 
@@ -1151,20 +1156,10 @@ namespace move_base {
       ros::NodeHandle n("~");
       n.setParam("conservative_reset/reset_distance", conservative_reset_dist_);
       n.setParam("aggressive_reset/reset_distance", circumscribed_radius_ * 4);
-
 		
 	 //添加一个可用于实时清除地图障碍物层数据或者超声波层数据的恢复的behaviors_  以下  “超声波清除”
-	 
-	  n.setParam("clear_costmap_gao_reset/reset_distance", 0.1);//设置清除多少m以外的障碍物
-	  std::vector<std::string> clearable_layers;
-	  clearable_layers.push_back( std::string("sonar") );//添加第一层要清除的层 这个名字在movebase costmap参数里配置
-	  //clearable_layers.push_back( std::string("obstacles") );//添加要清除的层
-	  n.setParam("clear_costmap_gao_reset/layer_names", clearable_layers);//在参数空间设置名称
-	  
-	  //添加新建的这个recovery行为
-      boost::shared_ptr<nav_core::RecoveryBehavior> costmap_clear_gao(recovery_loader_.createInstance("clear_costmap_recovery_gao/ClearCostmapRecoveryGao"));
-      costmap_clear_gao->initialize("clear_costmap_gao_reset", &tf_, planner_costmap_ros_, controller_costmap_ros_);
-      recovery_behaviors_.push_back(costmap_clear_gao);
+      
+	  mapLayerClearer.initialize("my_clear_costmap_recovery_gao", &tf_, planner_costmap_ros_,controller_costmap_ros_);
       
       // 以上 添加一个可用于实时清除地图障碍物层数据或者超声波层数据的恢复的behaviors_
 		
@@ -1201,7 +1196,7 @@ namespace move_base {
     boost::unique_lock<boost::recursive_mutex> lock(planner_mutex_);
     runPlanner_ = false;
     lock.unlock();
-
+    
     // Reset statemachine
     state_ = PLANNING;
     recovery_index_ = 0;

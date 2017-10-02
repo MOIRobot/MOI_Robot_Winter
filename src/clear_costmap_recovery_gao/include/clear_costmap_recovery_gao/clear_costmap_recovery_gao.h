@@ -73,11 +73,12 @@ namespace clear_costmap_recovery_gao{
       //清除添加的所有层的costmap信息
       void runBehavior();
       //清除单层的costmap信息
-      void clearOnelayer(const char* name, double distance_);
+      void clearOnelayer(const char * staticlayer_name,const char* name, double distance_);
     private:
       
       void clear(costmap_2d::Costmap2DROS* costmap);      
-      void clear(costmap_2d::Costmap2DROS* costmap,const char* layer_name);
+      void clear(costmap_2d::Costmap2DROS* costmap,const char * staticlayer_name,const char* layer_name);
+      
       void clearMap(boost::shared_ptr<costmap_2d::CostmapLayer> costmap, double pose_x, double pose_y);
       costmap_2d::Costmap2DROS* global_costmap_, *local_costmap_;
       std::string name_;

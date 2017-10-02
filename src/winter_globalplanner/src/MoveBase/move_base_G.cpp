@@ -713,7 +713,7 @@ void LocalMoveBase::movebase(void)
 					ccr.runBehavior();
 					
 					//清除超声波障碍物层
-					mapLayerClearer.clearOnelayer("sonar",0.1);
+					mapLayerClearer.clearOnelayer("static_map","sonar",0.1);
 				}
 				
 			}

@@ -80,7 +80,6 @@
     <run_depend>rospy</run_depend>
     <run_depend>std_srvs</run_depend>
     <run_depend>tf</run_depend>
-    <run_depend>clear_costmap_recovery_gao</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

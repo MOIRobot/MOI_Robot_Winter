@@ -6,6 +6,7 @@
 PLUGINLIB_DECLARE_CLASS(clear_costmap_recovery_gao, ClearCostmapRecoveryGao, clear_costmap_recovery_gao::ClearCostmapRecoveryGao, nav_core::RecoveryBehavior)
 
 using costmap_2d::NO_INFORMATION;
+using costmap_2d::FREE_SPACE;
 
 namespace clear_costmap_recovery_gao {
 ClearCostmapRecoveryGao::ClearCostmapRecoveryGao(): global_costmap_(NULL), 
@@ -22,7 +23,6 @@ void ClearCostmapRecoveryGao::initialize(std::string name, tf::TransformListener
     ros::NodeHandle private_nh("~/" + name_);
 
     private_nh.param("reset_distance", reset_distance_, 3.0);
-    
     std::vector<std::string> clearable_layers_default, clearable_layers;
     private_nh.param("layer_names", clearable_layers, clearable_layers_default);
 
@@ -46,7 +46,7 @@ void ClearCostmapRecoveryGao::runBehavior(){
   }
 
   if(global_costmap_ != NULL){
-    ROS_WARN("Clearing costmap to unstuck robot (%fm).", reset_distance_);
+    ROS_INFO("Clearing global costmap to unstuck robot (%fm).", reset_distance_);
     clear(global_costmap_);
   }
   else
@@ -56,7 +56,7 @@ void ClearCostmapRecoveryGao::runBehavior(){
   }
   
   if(local_costmap_ != NULL){
-    ROS_WARN("Clearing costmap to unstuck robot (%fm).", reset_distance_);
+    ROS_INFO("Clearing local costmap to unstuck robot (%fm).", reset_distance_);
     clear(local_costmap_);
   }
   else
@@ -69,16 +69,16 @@ void ClearCostmapRecoveryGao::runBehavior(){
 }
 
 //选择要清除的层 以及要清除的多少距离以外的地图
-void ClearCostmapRecoveryGao::clearOnelayer(const char* name, double distance_){
+void ClearCostmapRecoveryGao::clearOnelayer(const char * staticlayer_name,const char* name, double distance_){
   if(!initialized_){
     ROS_ERROR("This object must be initialized before runBehavior is called");
     return;
   }
 
-  reset_distance_=distance_;
+	reset_distance_=distance_;
   if(global_costmap_ != NULL){
-    clear(global_costmap_,name);
-    ROS_WARN("Clearing costmap to unstuck robot (%fm).", reset_distance_);
+    clear(global_costmap_,staticlayer_name,name);
+    ROS_INFO("Clearing GLOBAL costmap to unstuck robot (%fm).", reset_distance_);
    }
    else
    {
@@ -86,8 +86,8 @@ void ClearCostmapRecoveryGao::clearOnelayer(const char* name, double distance_){
     }
     
     if(local_costmap_ != NULL){
-    clear(local_costmap_,name);
-    ROS_WARN("Clearing costmap to unstuck robot (%fm).", reset_distance_);
+    clear(local_costmap_,staticlayer_name,name);
+    ROS_INFO("Clearing LOCAL costmap to unstuck robot (%fm).", reset_distance_);
    }
    else
    {
@@ -130,7 +130,8 @@ void ClearCostmapRecoveryGao::clear(costmap_2d::Costmap2DROS* costmap){
     }
   }
 }
-void ClearCostmapRecoveryGao::clear(costmap_2d::Costmap2DROS* costmap,const char* layer_name){
+// 参数 静态层的名字 要清除层的名字 要清除距离机器人中兴多远以外的障碍物区域
+void ClearCostmapRecoveryGao::clear(costmap_2d::Costmap2DROS* costmap,const char * staticlayer_name,const char* layer_name){
   std::vector<boost::shared_ptr<costmap_2d::Layer> >* plugins = costmap->getLayeredCostmap()->getPlugins();
 
   tf::Stamped<tf::Pose> pose;
@@ -152,16 +153,24 @@ void ClearCostmapRecoveryGao::clear(costmap_2d::Costmap2DROS* costmap,const char
     if( slash != std::string::npos ){
         name = name.substr(slash+1);
     }
+   
    const char *p=name.data();
+   
 	//清除指定的层
     if(std::strcmp(p,layer_name)==0){
 		
-		//对比是不是我们添加的要清除的层 如果是 则进行以下清除操作
+		//对比是不是我们添加的要清除的层 如果是 则进行以下清除操作	
       boost::shared_ptr<costmap_2d::CostmapLayer> costmap;
       costmap = boost::static_pointer_cast<costmap_2d::CostmapLayer>(plugin);
+      //当前plugin清空数据
       clearMap(costmap, x, y);
-      return ;
     }
+    else
+    {
+		//清除静态地图层来使地图强制刷新
+		if(std::strcmp(p,staticlayer_name)==0)
+		  plugin->reset();
+	}
   }
 }
 
@@ -187,7 +196,8 @@ void ClearCostmapRecoveryGao::clearMap(boost::shared_ptr<costmap_2d::CostmapLaye
         continue;
       int index = costmap->getIndex(x,y);
       if(grid[index]!=NO_INFORMATION){
-        grid[index] = NO_INFORMATION;
+        //grid[index] = NO_INFORMATION;
+        grid[index] =FREE_SPACE;
       }
     }
   }

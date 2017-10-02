@@ -21,6 +21,7 @@ find_package(catkin REQUIRED
         rotate_recovery
         std_srvs
         tf
+        clear_costmap_recovery_gao
 )
 find_package(Eigen REQUIRED)
 add_definitions(${EIGEN_DEFINITIONS})
@@ -55,9 +56,7 @@ target_link_libraries(winter_move_base
     )
 add_dependencies(winter_move_base ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_executable(winter_move_base_node
-  src/winter_move_base_node.cpp
-)
+add_executable(winter_move_base_node  src/winter_move_base_node.cpp)
 add_dependencies(winter_move_base_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(winter_move_base_node winter_move_base)
 set_target_properties(winter_move_base_node PROPERTIES OUTPUT_NAME winter_move_base)

@@ -185,9 +185,7 @@ namespace move_base {
 
       
       //添加一个可用于实时清除地图障碍物层数据或者超声波层数据的恢复的behaviors_
-      std::vector<boost::shared_ptr<nav_core::RecoveryBehavior> > recovery_behaviors_;
-      
-      
+       
       std::vector<boost::shared_ptr<nav_core::RecoveryBehavior> > recovery_behaviors_;
       
       
@@ -236,6 +234,8 @@ namespace move_base {
       move_base::MoveBaseConfig default_config_;
       bool setup_, p_freq_change_, c_freq_change_;
       bool new_global_plan_;
+      
+      clear_costmap_recovery_gao::ClearCostmapRecoveryGao mapLayerClearer;
   };
 };
 #endif

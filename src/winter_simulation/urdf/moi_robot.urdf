@@ -62,7 +62,7 @@
   <joint name="left_wheel_to_base_link" type="fixed">
     <parent link="base_link"/>
     <child link="left_wheel"/>
-    <origin xyz="0.0 0.25 0.075"/>
+    <origin xyz="0.0 0.20 0.075"/>
     <axis xyz="0 1 0"/>
   </joint>
   <!-- right wheel-->
@@ -80,7 +80,7 @@
   <joint name="right_wheel_to_base_link" type="fixed">
     <parent link="base_link"/>
     <child link="right_wheel"/>
-    <origin xyz="0.0 -0.25 0.075"/>
+    <origin xyz="0.0 -0.20 0.075"/>
     <axis xyz="0 1 0"/>
   </joint>
   

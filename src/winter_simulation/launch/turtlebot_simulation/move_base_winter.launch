@@ -6,7 +6,6 @@
     <rosparam file="$(find winter_simulation)/costmapConfig_turtlebot/fake/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find winter_simulation)/costmapConfig_turtlebot/fake/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find winter_simulation)/costmapConfig_turtlebot/fake/base_local_planner_params.yaml" command="load" />
-    <rosparam file="$(find winter_simulation)/costmapConfig_turtlebot/nav_obstacles_params.yaml" command="load" />
   </node>
   
 </launch>

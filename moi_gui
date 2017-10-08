@@ -1,0 +1,72 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+from Tkinter import *           # 导入 Tkinter 库
+#from ttk import *           # 导入 Tkinter 库
+import thread
+import time
+import os
+class MessageShow:
+	def __init__(self):	
+		
+		#传入参数　消息内容　和这条消息显示的时间
+		
+		#消息显示的时间
+		#self.WaitTime=time
+		self.root = Tk()                     # 创建窗口对象的背景色
+		self.root.wm_title("机器人控制主窗口")#title
+		#居中显示
+		self.root.resizable(False,False)
+		self.root.update() # update window ,must do
+		curWidth = self.root.winfo_reqwidth() # get current width
+		curHeight = self.root.winfo_height() # get current height
+		scnWidth,scnHeight = self.root.maxsize() # get screen width and height
+		tmpcnf = '%dx%d+%d+%d'%(400,600,(scnWidth-curWidth)/2,(scnHeight-curHeight)/2)
+		self.root.geometry(tmpcnf)
+		
+		#l1=Label(self.root,text=message,background="yellow")
+		#font=("宋体", 12, "normal")
+		#l1=Label(self.root,text=message,foreground="red")
+		#l1.pack(side=TOP,expand=YES)
+		
+		#按键添加如下
+		self.b1=Button(self.root,text="moi robot  roscore",height=3,command=self.b0Command).pack(fill=X)
+		self.b1=Button(self.root,text="moi robot  fakeOdoPublisher",height=3,command=self.b1Command).pack(fill=X)
+		self.b2=Button(self.root,text="moi robot agv_fakeNavigation",height=3,command=self.b2Command).pack(fill=X)
+		self.b3=Button(self.root,text="moi robot move_base simulation",height=3,command=self.b3Command).pack(fill=X)
+		self.b4=Button(self.root,text="moi keyboard control ",height=3,command=self.b4Command).pack(fill=X)
+		self.b5=Button(self.root,text="moi fake ultrosonic data",height=3,command=self.b5Command).pack(fill=X)
+		self.b6=Button(self.root,text="moi 镭神激光雷达驱动",height=3,command=self.b6Command).pack(fill=X)
+		
+		'''
+		self.b7=Button(self.root,text="保存地图",height=3,command=self.b7Command).pack(fill=X)
+		self.b8=Button(self.root,text="清除地图",height=3,command=self.b8Command).pack(fill=X)
+		'''
+		self.quit=Button(self.root,text="退出",height=3,command=self.autoDestory).pack(fill=X)
+		
+		#thread.start_new_thread(self.autoDestory,())
+		self.root.mainloop()                 # 进入消息循环
+	def b0Command(self):
+		os.system("gnome-terminal -x bash -c \"roscore\"")
+	def b1Command(self):
+		os.system("gnome-terminal -x bash -c \"roslaunch winter_simulation fakeOdoPublisher.launch\"")
+	def b2Command(self):
+		os.system("gnome-terminal -x bash -c \"roslaunch winter_simulation agv_fakeNavigation.launch \"")
+	def b3Command(self):
+		os.system("gnome-terminal -x bash -c \"roslaunch winter_simulation fake_move_base_winter.launch\"")
+	
+	def b4Command(self):
+		os.system("gnome-terminal -x bash -c \"rosrun winter_keyboard telecop_direct.py\"")
+	
+	def b5Command(self):
+		os.system("gnome-terminal -x bash -c \" rosrun winter_simulation fake_ultro.py\"")
+	def b6Command(self):
+		os.system("gnome-terminal -x bash -c \"roslaunch winter_laser moi_laser_lslidar_n301.launch \"")
+	def b7Command(self):
+		os.system("gnome-terminal -x bash -c \"rosrun map_server map_saver -f ~/turtlebot\"")
+	def b8Command(self):
+		os.system("gnome-terminal -x bash -c \"rm -f ~/turtlebot.*\"")
+	def autoDestory(self):
+		self.root.destroy()
+if __name__=='__main__':
+	MessageShow()
+	

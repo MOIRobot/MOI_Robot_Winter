@@ -945,7 +945,7 @@ namespace move_base {
           as_->setSucceeded(move_base_msgs::MoveBaseResult(), "Goal reached.");
           
             //在此清除超声波层的障碍物 参数 静态层的名字 要清除层 的名字 要清除距离机器人中心多远以外的障碍物区域
-         mapLayerClearer.clearOnelayer("static_map","sonar",2);
+         mapLayerClearer.clearOnelayer("static_map","sonar",0.1);
          //清除激光雷达所在层的障碍物
          //mapLayerClearer.clearOnelayer("static_map","obstacle_layer",2);
          //recovery_behaviors_[0]->runBehavior();

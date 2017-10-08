@@ -78,7 +78,7 @@ void ClearCostmapRecoveryGao::clearOnelayer(const char * staticlayer_name,const 
 	reset_distance_=distance_;
   if(global_costmap_ != NULL){
     clear(global_costmap_,staticlayer_name,name);
-    ROS_INFO("Clearing GLOBAL costmap to unstuck robot (%fm).", reset_distance_);
+    ROS_INFO("Clearing GLOBAL costmap to unstuck robot (%fm).", distance_);
    }
    else
    {
@@ -87,7 +87,7 @@ void ClearCostmapRecoveryGao::clearOnelayer(const char * staticlayer_name,const 
     
     if(local_costmap_ != NULL){
     clear(local_costmap_,staticlayer_name,name);
-    ROS_INFO("Clearing LOCAL costmap to unstuck robot (%fm).", reset_distance_);
+    ROS_INFO("Clearing LOCAL costmap to unstuck robot (%fm).", distance_);
    }
    else
    {

@@ -3,40 +3,40 @@ recovery_behavior_enabled: true
 clearing_rotation_allowed: true
 
 TrajectoryPlannerROS:
-   max_vel_x: 0.8
-   min_vel_x: 0.1
-   max_vel_y: 0  # zero for a differential drive robot
-   min_vel_y: 0
-   max_vel_theta: 1.0
-   min_vel_theta: -1.0
-   min_in_place_vel_theta: 0.2
-   escape_vel: -0.1
-   acc_lim_x: 0.3
-   acc_lim_y: 0  # zero for a differential drive robot
-   acc_lim_theta: 3.2
+   max_vel_x: 1.2
+   min_vel_x: 0.02             
+   max_vel_y: 0                # 
+   min_vel_y: 0                #
+   max_vel_theta: 1.0          # 57.2 degree
+   min_vel_theta: -1.0         #
+   min_in_place_vel_theta: 0.4 #
+   escape_vel: -0.1            #
+   acc_lim_x: 2.6              # 
+   acc_lim_y: 0.0              #
+   acc_lim_theta: 4.0          #229degree 
 
-   holonomic_robot: false
-   yaw_goal_tolerance: 0.5 # about 6 degrees
-   xy_goal_tolerance: 0.2  # 5 cm
-   latch_xy_goal_tolerance: false
-   pdist_scale: 0.9
-   gdist_scale: 0.4
-   occdist_scale: 0.1
-   meter_scoring: true
+   holonomic_robot: false      #
+   yaw_goal_tolerance: 0.1     # 5.72degree
+   xy_goal_tolerance: 0.05      #
+   latch_xy_goal_tolerance: false # 
+   pdist_scale: 0.8            #
+   gdist_scale: 0.6            #
+   occdist_scale: 0.1          #
+   meter_scoring: true         #
 
-   heading_lookahead: 0.325
-   heading_scoring: false
-   heading_scoring_timestep: 0.8
-   occdist_scale: 0.05
-   oscillation_reset_dist: 0.05
-   publish_cost_grid_pc: false
-   prune_plan: true
+   heading_lookahead: 0.325    #
+   heading_scoring: false      #
+   heading_scoring_timestep: 0.8 #
+   occdist_scale: 0.1          #
+   oscillation_reset_dist: 0.05#
+   publish_cost_grid_pc: false #
+   prune_plan: true            #
 
-   sim_time: 5.0
-   sim_granularity: 0.05
-   angular_sim_granularity: 0.1
-   vx_samples: 15
-   vy_samples: 8  # zero for a differential drive robot
-   vtheta_samples: 20
-   dwa: true
-   simple_attractor: false
+   sim_time: 2.0               #
+   sim_granularity: 0.025      #
+   angular_sim_granularity: 0.025 #
+   vx_samples: 8               #
+   vy_samples: 0               #
+   vtheta_samples: 20          #
+   dwa: true                   #
+   simple_attractor: false     #

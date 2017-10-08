@@ -1,23 +1,27 @@
 <launch>
-
+  <include file="$(find winter_description)/launch/view_winter_gazebo.launch" />
   <param name="use_sim_time" value="false" />
+  <remap from="/scan_front" to="/scan"/>
 
   <!-- Set the name of the map yaml file: can be overridden on the command line. -->
-  <arg name="map" default="test_map.yaml" />
+  <arg name="map" default="map.yaml" />
 
   <!-- Run the map server with the desired map -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(find winter_navigation)/maps/$(arg map)"/>
 
   <!-- The move_base node -->
   <include file="$(find winter_navigation)/launch/fake_move_base.launch" />
-  
+
   <!-- Run fake localization compatible with AMCL output -->
-  <node pkg="fake_localization" type="fake_localization" name="fake_localization" output="screen" />
+  <!-- <node pkg="fake_localization" type="fake_localization" name="fake_localization" output="screen" /> -->
 
   <!-- For fake localization we need a static transform between /odom and /map -->
-  <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster" args="0 0 0 0 0 0 /map /odom 100" />
+  <!-- <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster" args="0 0 0 0 0 0 /map /odom 100" /> -->
 
   <!-- rviz view /-->
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find winter_navigation)/config/nav.rviz"/>
+  <node pkg="rviz" type="rviz" name="rviz">
+
+  <include file="$(find winter_navigation)/launch/amcl.launch" />
+
 
 </launch>

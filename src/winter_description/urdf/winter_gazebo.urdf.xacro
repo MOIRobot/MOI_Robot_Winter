@@ -84,6 +84,29 @@
       <!-- caster Definitions -->
       <caster fb="front"  caster_joint_origin_x="${body_radius}" />
       <caster fb="back"  caster_joint_origin_x="-${body_radius}" />
+
+      <!-- base_footprint -->
+      <link name="base_footprint">
+          <inertial>
+              <mass value="0.0001" />
+              <origin xyz="0 0 0" />
+              <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
+                  iyy="0.0001" iyz="0.0"
+                  izz="0.0001" />
+          </inertial>
+          <visual>
+              <origin xyz="0 0 0" rpy="0 0 0" />
+              <geometry>
+                  <box size="0.001 0.001 0.001" />
+              </geometry>
+          </visual>
+      </link>
+
+      <joint name="base_footprint_joint" type="fixed">
+          <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0" />
+          <parent link="base_footprint"/>
+          <child link="base_link" />
+      </joint>
 <!--base_link-->
         <link name="base_link">
 	<cylinder_inertial_matrix  m="${body_mass}" r="${body_radius}" h="${body_height}" />
@@ -214,6 +237,9 @@
       </transmission>
 
 <gazebo>
-    <plugin name="gazebo_ros_controller" filename="libgazebo_ros_control.so" />
+    <plugin name="gazebo_ros_controller" filename="libgazebo_ros_control.so" >
+      <robotNamespace>/</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
   </gazebo>
 </robot>

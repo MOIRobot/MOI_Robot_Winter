@@ -129,36 +129,10 @@
 <!--laser_link-->
 <xacro:hokuyo_urg04_laser name="base_laser_front" parent="base" ros_topic="scan_front" update_rate="10" min_angle="-3.14" max_angle="3.14">
     <origin xyz="0 0 ${body_height+wheel_radius+0.04}" rpy="0 0 0"/>
-  </xacro:hokuyo_urg04_laser>
-        <!-- <link name="laser_link">
-	<cylinder_inertial_matrix  m="${laser_mass}" r="${laser_radius}" h="${laser_height}" />
-                <visual>
-                        <geometry>
-                                <cylinder length="${laser_height}" radius="${laser_radius}"/>
-                        </geometry>
-                        <material name="green">
-                                <color rgba="0 0.8 0 1"/>
-                        </material>
-                        <origin xyz="0 0 ${laser_height/2}"/>
-                </visual>
-                <collision>
-                        <geometry>
-                                <cylinder length="${laser_height}" radius="${laser_radius}"/>
-                        </geometry>
-                        <origin xyz="0 0 ${laser_height/2}"/>
-                </collision>
-        </link>
-  <gazebo reference="laser_link">
-      <material>Gazebo/Black</material>
-  </gazebo>
-        <joint name="laser_link_to_base_link" type="fixed">
-            <parent link="base_link"/>
-            <child link="laser_link"/>
-            <origin xyz="0 0 ${body_height+wheel_radius}"/>
-        </joint> -->
+</xacro:hokuyo_urg04_laser>
 
 <!-- left wheel-->
-        <link name="left_wheel">
+<link name="left_wheel">
 	<cylinder_inertial_matrix  m="${wheel_mass}" r="${wheel_radius}" h="${wheel_length}" />
                 <visual>
                         <geometry>

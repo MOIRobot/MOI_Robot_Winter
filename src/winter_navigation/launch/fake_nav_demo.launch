@@ -1,7 +1,7 @@
 <launch>
   <include file="$(find winter_description)/launch/view_winter_gazebo.launch" />
   <param name="use_sim_time" value="false" />
-  <remap from="/scan_front" to="/scan"/>
+
 
   <!-- Set the name of the map yaml file: can be overridden on the command line. -->
   <arg name="map" default="map.yaml" />

@@ -24,6 +24,6 @@ observation_sources: scan bump
 # Our lasers (Xtion and fake) either needs to publish a height, or set min_obstacle_height to 0.0:
 # http://wiki.ros.org/navigation/Troubleshooting#Missing_Obstacles_in_Costmap2D
 # Note taht the max_obstacle_height is very important too!
-scan: {data_type: LaserScan, topic: scan, marking: true, clearing: true, min_obstacle_height: 0.0, max_obstacle_height: 3}
+scan: {data_type: LaserScan, topic: scan_front, marking: true, clearing: true, min_obstacle_height: 0.0, max_obstacle_height: 3}
 # Can we just set up two of these here?
 bump: {data_type: PointCloud2, topic: mobile_base/sensors/bumper_pointcloud, marking: true, clearing: false, min_obstacle_height: 0.0, max_obstacle_height: 0.15}

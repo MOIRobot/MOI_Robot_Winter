@@ -1,6 +1,6 @@
 <launch>
   <include file="$(find winter_description)/launch/view_winter_gazebo.launch" />
-  <param name="use_sim_time" value="false" />
+  <!-- <param name="use_sim_time" value="false" /> -->
 
 
   <!-- Set the name of the map yaml file: can be overridden on the command line. -->

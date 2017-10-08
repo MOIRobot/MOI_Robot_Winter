@@ -19,7 +19,7 @@
   <!-- <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster" args="0 0 0 0 0 0 /map /odom 100" /> -->
 
   <!-- rviz view /-->
-  <node pkg="rviz" type="rviz" name="rviz">
+  <node pkg="rviz" type="rviz" name="rviz"/>
 
   <include file="$(find winter_navigation)/launch/amcl.launch" />
 

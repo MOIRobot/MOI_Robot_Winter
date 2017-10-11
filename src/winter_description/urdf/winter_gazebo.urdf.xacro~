@@ -81,11 +81,13 @@
           <origin xyz="${caster_joint_origin_x} 0 ${caster_radius}" rpy="0 0 0" />
       </joint>
         </xacro:macro>
+
       <!-- caster Definitions -->
       <caster fb="front"  caster_joint_origin_x="${body_radius}" />
       <caster fb="back"  caster_joint_origin_x="-${body_radius}" />
-<!--base_link-->
-        <link name="base_link">
+
+  <!--base_link-->
+	<link name="base_link">
 	<cylinder_inertial_matrix  m="${body_mass}" r="${body_radius}" h="${body_height}" />
                 <visual>
                         <geometry>
@@ -103,38 +105,13 @@
 	<gazebo reference="base_link">
       		<material>Gazebo/White</material>
   	</gazebo>
-<!--laser_link-->
-<xacro:hokuyo_urg04_laser name="base_laser_front" parent="base" ros_topic="scan_front" update_rate="10" min_angle="-3.14" max_angle="3.14">
+
+  <!--laser_link-->
+  <xacro:hokuyo_urg04_laser name="base_laser_front" parent="base" ros_topic="scan_front" update_rate="10" min_angle="-3.14" max_angle="3.14">
     <origin xyz="0 0 ${body_height+wheel_radius+0.04}" rpy="0 0 0"/>
   </xacro:hokuyo_urg04_laser>
-        <!-- <link name="laser_link">
-	<cylinder_inertial_matrix  m="${laser_mass}" r="${laser_radius}" h="${laser_height}" />
-                <visual>
-                        <geometry>
-                                <cylinder length="${laser_height}" radius="${laser_radius}"/>
-                        </geometry>
-                        <material name="green">
-                                <color rgba="0 0.8 0 1"/>
-                        </material>
-                        <origin xyz="0 0 ${laser_height/2}"/>
-                </visual>
-                <collision>
-                        <geometry>
-                                <cylinder length="${laser_height}" radius="${laser_radius}"/>
-                        </geometry>
-                        <origin xyz="0 0 ${laser_height/2}"/>
-                </collision>
-        </link>
-  <gazebo reference="laser_link">
-      <material>Gazebo/Black</material>
-  </gazebo>
-        <joint name="laser_link_to_base_link" type="fixed">
-            <parent link="base_link"/>
-            <child link="laser_link"/>
-            <origin xyz="0 0 ${body_height+wheel_radius}"/>
-        </joint> -->
 
-<!-- left wheel-->
+  <!-- left wheel-->
         <link name="left_wheel">
 	<cylinder_inertial_matrix  m="${wheel_mass}" r="${wheel_radius}" h="${wheel_length}" />
                 <visual>
@@ -162,7 +139,7 @@
                 <origin xyz="0.0 ${wheel_separation/2} ${wheel_radius}"/>
                 <axis xyz="0 1 0"/>
         </joint>
-<!-- Transmission is important to link the joints and the controller -->
+  <!-- Transmission is important to link the joints and the controller -->
       <transmission name="wheel_left_joint_trans">
 		<type>transmission_interface/SimpleTransmission</type>
 		<joint name="base_to_wheel_left_joint">
@@ -173,9 +150,9 @@
 		  <mechanicalReduction>1</mechanicalReduction>
 		</actuator>
       </transmission>
-<!-- right wheel-->
+  <!-- right wheel-->
         <link name="right_wheel">
-<cylinder_inertial_matrix  m="${wheel_mass}" r="${wheel_radius}" h="${wheel_length}" />
+	<cylinder_inertial_matrix  m="${wheel_mass}" r="${wheel_radius}" h="${wheel_length}" />
                 <visual>
                         <geometry>
                                 <cylinder length="${wheel_length}" radius="${wheel_radius}"/>
@@ -217,6 +194,10 @@
     <plugin name="gazebo_ros_controller" filename="libgazebo_ros_control.so" >
 	<robotNamespace>/</robotNamespace>
       	<robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+	<commandTopic>cmd_vel</commandTopic> 
+	<odometryTopic>odom</odometryTopic> 
+	<odometryFrame>odom</odometryFrame> 
+	<broadcastTF>true</broadcastTF>  
     </plugin>
   </gazebo>
 </robot>

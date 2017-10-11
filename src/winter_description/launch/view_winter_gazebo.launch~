@@ -9,7 +9,7 @@
 
   <!-- We resume the logic in empty_world.launch -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find winter_description)/worlds/room.world"/>
+    <arg name="world_name" value="$(find winter_description)/worlds/playground.world"/>
     <arg name="debug" value="$(arg debug)" />
     <arg name="gui" value="$(arg gui)" />
     <arg name="paused" value="$(arg paused)"/>
@@ -36,6 +36,6 @@
   <!-- load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
 	output="screen" args="winter_controller"/>
-  <node pkg="tf" type="static_transform_publisher" name="front_hokuyo_frame" 
-	args="0 0 0 0 0 0 /base_laser_front_link /laser 1" />
+ <!-- <node pkg="tf" type="static_transform_publisher" name="front_hokuyo_frame" 
+	args="0 0 0 0 0 0 /base_laser_front_link /laser 1" />-->
 </launch>

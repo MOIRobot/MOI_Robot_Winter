@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-  <param name="use_sim_time" value="false" />
+  <!-- <param name="use_sim_time" value="false" /> -->
 
   <!-- Set the name of the map yaml file: can be overridden on the command line. -->
   <arg name="map" default="map.yaml" />
@@ -11,12 +11,8 @@
 
   <!-- The move_base node -->
   <include file="$(find winter_navigation)/launch/fake_move_base.launch" />
-  
-  <!-- Run fake localization compatible with AMCL output -->
-  <node pkg="fake_localization" type="fake_localization" name="fake_localization" output="screen" />
 
-  <!-- For fake localization we need a static transform between /odom and /map -->
-  <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster" args="0 0 0 0 0 0 /map /odom 100" /> 
+<include file="$(find winter_navigation)/launch/amcl.launch" />
 
   <!-- rviz view /-->
   <node pkg="rviz" type="rviz" name="rviz" />

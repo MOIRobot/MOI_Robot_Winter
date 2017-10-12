@@ -77,11 +77,15 @@ namespace clear_costmap_recovery_gao{
     private:
       
       void clear(costmap_2d::Costmap2DROS* costmap);      
-      void clear(costmap_2d::Costmap2DROS* costmap,const char* staticlayer_name,const char* layer_name);
+      void clear(costmap_2d::Costmap2DROS* costmap,const char * staticlayer_name,const char* layer_name);
       
       void clearMap(boost::shared_ptr<costmap_2d::CostmapLayer> costmap, double pose_x, double pose_y);
       costmap_2d::Costmap2DROS* global_costmap_, *local_costmap_;
       std::string name_;
+      
+      const char* static_layer_name;
+      const char* sonar_layer_name;
+      
       tf::TransformListener* tf_;
       bool initialized_;
       double reset_distance_;

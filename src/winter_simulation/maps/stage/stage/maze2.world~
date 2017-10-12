@@ -22,15 +22,15 @@ interval_sim 100  # simulation timestep in milliseconds
 window
 (
   size [ 507 520 ]
-  center [ 0.221 0.845 ]
+  center [ 0.144 0.764 ]
   rotate [ 0.000 0.000 ]
-  scale 40.701
+  scale 37.001
 )
 
 floorplan
 (
   name "maze"
-  bitmap "../maze.png"
+  bitmap "../maze2.png"
   size [ 10.000 10.000 2.000 ]
   pose [  -0.063  1.260 0.000 0.000 ]
 )
@@ -38,7 +38,7 @@ floorplan
 # throw in a robot
 turtlebot
 (
-  pose [ 0.072 0.468 0.000 0.000 ]
+  pose [ -2.336 -2.996 0.000 0.000 ]
   name "turtlebot"
-  color "yellow"
+  color "black"
 )

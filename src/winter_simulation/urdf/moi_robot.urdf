@@ -25,7 +25,7 @@
     </collision>
   </link>
   <!--laser_link-->
-  <link name="laser_link">
+  <link name="base_laser_link">
     <visual>
       <geometry>
         <cylinder length="0.08" radius="0.05"/>
@@ -44,7 +44,7 @@
   </link>
   <joint name="laser_link_to_base_link" type="fixed">
     <parent link="base_link"/>
-    <child link="laser_link"/>
+    <child link="base_laser_link"/>
     <origin xyz="0 0 0.202"/>
   </joint>
   <!-- left wheel-->

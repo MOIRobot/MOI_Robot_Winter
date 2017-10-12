@@ -1,10 +1,10 @@
 <launch>
 
   <!-- Run the map server with a blank map + obstacle -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find winter_simulation)/maps/mapmap1207.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find winter_simulation)/maps/my_map.yaml"/>
  
   <!-- Run a static transform between /odom and /map -->
-  <node pkg="tf" type="static_transform_publisher" name="odom_map_broadcaster" args="0 0 0 0 0 0 /map /odom 100" />
+  <!--node pkg="tf" type="static_transform_publisher" name="odom_map_broadcaster" args="0 0 0 0 0 0 /map /odom 100" /-->
   
   <!-- Run fake localization compatible with AMCL output -->
   <node pkg="fake_localization" type="fake_localization" name="fake_localization" output="screen" />

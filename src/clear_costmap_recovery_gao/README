@@ -1,11 +1,16 @@
 这个是对movebase 里面clear_costmap_recovery 的升级版 可以指定清除哪个层的数据
 1,首先将clear_costmap_recovery_gao 包放入工作空间/src目录下 然后catkin_make 确定可以roscd 到这个目录
-2,打开move_base.h  里面 添加一个类 clear_costmap_recovery_gao::ClearCostmapRecoveryGao mapLayerClearer;
-3,在move_base.cpp 里面初始化这个类
+2,在move_base.cpp 里面初始化这个类
 	在 MoveBase::loadDefaultRecoveryBehaviors() 这个函数里 初始化这个类
 	//添加一个可用于实时清除地图障碍物层数据或者超声波层数据的恢复的behaviors_  以下  “超声波清除”
-    mapLayerClearer.initialize("my_clear_costmap_recovery_gao", &tf_, planner_costmap_ros_,controller_costmap_ros_);
-4，使用这个类的清除函数
+      //放在第一个位置 push_back
+      n.setParam("sonar_clear/reset_distance",  0.1);
+      n.setParam("sonar_clear/static_layer_name", "static_map");
+      n.setParam("sonar_clear/sonar_layer_name", "sonar");
+      boost::shared_ptr<nav_core::RecoveryBehavior> sonar_clear(recovery_loader_.createInstance("clear_costmap_recovery_gao/ClearCostmapRecoveryGao"));
+      sonar_clear->initialize("sonar_clear", &tf_, planner_costmap_ros_, controller_costmap_ros_);
+      recovery_behaviors_.push_back(sonar_clear);
+3，使用这个类的清除函数
 	在MoveBase::executeCycle 里面找到如下片段
 	 //if we're controlling, we'll attempt to find valid velocity commands
       case CONTROLLING:
@@ -25,11 +30,9 @@
           as_->setSucceeded(move_base_msgs::MoveBaseResult(), "Goal reached.");
           
           在这里添加这个函数 就可以实现清除了
+          //因为放在第一个位置 所以编号为0
           //在此清除超声波层的障碍物 参数 静态层的名字 要清除层 的名字 要清除距离机器人中兴多远以外的障碍物区域
-          mapLayerClearer.clearOnelayer("static_map","sonar",2);
-          //清除激光雷达所在层的障碍物
-          //mapLayerClearer.clearOnelayer("static_map","obstacle_layer",2);
-         
+          recovery_behaviors_[0]->runBehavior();
           
          
           return true;

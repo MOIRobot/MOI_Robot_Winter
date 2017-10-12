@@ -22,8 +22,16 @@ void ClearCostmapRecoveryGao::initialize(std::string name, tf::TransformListener
     //get some parameters from the parameter server
     ros::NodeHandle private_nh("~/" + name_);
 
-    private_nh.param("reset_distance", reset_distance_, 3.0);
+	
+	
+    private_nh.param("reset_distance", reset_distance_, 0.1);
+    
+    private_nh.param("static_layer_name", static_layer_name, std::string("static_layer"));
+    private_nh.param("sonar_layer_name", sonar_layer_name, std::string("sonar"));
+    
+    
     std::vector<std::string> clearable_layers_default, clearable_layers;
+    clearable_layers_default.push_back("sonar");
     private_nh.param("layer_names", clearable_layers, clearable_layers_default);
 
     for(unsigned i=0; i < clearable_layers.size(); i++) {
@@ -44,26 +52,8 @@ void ClearCostmapRecoveryGao::runBehavior(){
     ROS_ERROR("This object must be initialized before runBehavior is called");
     return;
   }
-
-  if(global_costmap_ != NULL){
-    ROS_INFO("Clearing global costmap to unstuck robot (%fm).", reset_distance_);
-    clear(global_costmap_);
-  }
-  else
-  {
-    ROS_ERROR("The costmaps passed to the ClearCostmapRecovery object cannot be NULL. Doing nothing.");
-    return;
-  }
+	clearOnelayer(static_layer_name.data(),sonar_layer_name.data(),reset_distance_);
   
-  if(local_costmap_ != NULL){
-    ROS_INFO("Clearing local costmap to unstuck robot (%fm).", reset_distance_);
-    clear(local_costmap_);
-  }
-  else
-  {
-    ROS_ERROR("The costmaps passed to the ClearCostmapRecovery object cannot be NULL. Doing nothing.");
-    return;
-  }
   
   
 }

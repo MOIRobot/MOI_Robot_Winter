@@ -1,9 +1,9 @@
-controller_frequency: 3.0
+controller_frequency: 5.0
 recovery_behavior_enabled: true
 clearing_rotation_allowed: true
 
 TrajectoryPlannerROS:
-   max_vel_x: 2.0
+   max_vel_x: 1.2
    min_vel_x: 0.02             
    max_vel_y: 0                # 
    min_vel_y: 0                #
@@ -20,21 +20,20 @@ TrajectoryPlannerROS:
    xy_goal_tolerance: 0.05      #
    latch_xy_goal_tolerance: false # 
    pdist_scale: 0.8            #
-   gdist_scale: 0.6            #
+   gdist_scale: 0.4            #
    occdist_scale: 0.1          #
    meter_scoring: true         #
 
    heading_lookahead: 0.325    #
    heading_scoring: false      #
    heading_scoring_timestep: 0.8 #
-   occdist_scale: 0.1          #
    oscillation_reset_dist: 0.05#
    publish_cost_grid_pc: false #
    prune_plan: true            #
 
-   sim_time: 2.0               #
-   sim_granularity: 0.025      #
-   angular_sim_granularity: 0.025 #
+   sim_time: 1.5               #
+   sim_granularity: 0.025       #
+   angular_sim_granularity: 0.1 #0.025
    vx_samples: 8               #
    vy_samples: 0               #
    vtheta_samples: 20          #

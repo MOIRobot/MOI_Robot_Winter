@@ -945,10 +945,10 @@ namespace move_base {
           as_->setSucceeded(move_base_msgs::MoveBaseResult(), "Goal reached.");
           
             //在此清除超声波层的障碍物 参数 静态层的名字 要清除层 的名字 要清除距离机器人中心多远以外的障碍物区域
-         mapLayerClearer.clearOnelayer("static_map","sonar",0.1);
+         //mapLayerClearer.clearOnelayer("static_map","sonar",0.1);
          //清除激光雷达所在层的障碍物
          //mapLayerClearer.clearOnelayer("static_map","obstacle_layer",2);
-         //recovery_behaviors_[0]->runBehavior();
+         recovery_behaviors_[0]->runBehavior();
          
           
          
@@ -1163,7 +1163,15 @@ namespace move_base {
 	  mapLayerClearer.initialize("my_clear_costmap_recovery_gao", &tf_, planner_costmap_ros_,controller_costmap_ros_);
       
       // 以上 添加一个可用于实时清除地图障碍物层数据或者超声波层数据的恢复的behaviors_
-		
+	
+	  //添加一个可以清除sonar层的recovery	
+      
+      n.setParam("sonar_clear/reset_distance",  0.1);
+      n.setParam("sonar_clear/static_layer_name", "static_map");
+      n.setParam("sonar_clear/sonar_layer_name", "sonar");
+      boost::shared_ptr<nav_core::RecoveryBehavior> sonar_clear(recovery_loader_.createInstance("clear_costmap_recovery_gao/ClearCostmapRecoveryGao"));
+      sonar_clear->initialize("sonar_clear", &tf_, planner_costmap_ros_, controller_costmap_ros_);
+      recovery_behaviors_.push_back(sonar_clear);
       
       boost::shared_ptr<nav_core::RecoveryBehavior> cons_clear(recovery_loader_.createInstance("clear_costmap_recovery/ClearCostmapRecovery"));
       cons_clear->initialize("conservative_reset", &tf_, planner_costmap_ros_, controller_costmap_ros_);

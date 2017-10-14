@@ -1,0 +1,25 @@
+		
+'''	
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+while True:  
+	try:    
+		s.connect(address)  
+		break  
+	except Exception, e:  
+		time.sleep(0.1)  
+		continue  
+    
+s.send(
+'''
+'''
+POST /devices/4070770/datapoints?type=5
+Host:api.heclouds.com
+api-key:RwvM=JUR4ylFW6fpM9T3ZIitat4=
+Conteng-Length:8
+,;tem,20
+''')
+'''
+data = s.recv(1024)  	
+print data
+s.close()
+'''

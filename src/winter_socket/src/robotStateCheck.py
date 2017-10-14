@@ -17,6 +17,7 @@ while True:
 	try: 
 		data, addr = udpSerSock.recvfrom(BUFSIZE)  
 		print 'Robot Online!'
+		print'received message from %s >> %s' % (addr, data)  
 		udpSerSock.sendto("Confirmed!",addr)  
 	except Exception:
 		print 'Robot Off'

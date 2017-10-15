@@ -4,6 +4,16 @@ g++ base_control.cpp -lboost_system
 通过ROS参数设置：
 设备名称：/dev/USB0
 波特率：115200
+
+通讯协议：服务机器人通信格式_4.xlsx
+*/
+
+/*
+本来是24的字节的数据，可是有时候会读到3+21,有时候会读到0+24,有时候是12+12,等等，我感觉是不是timeout了，然后放弃读后面的数据了，
+我通过将一个USB串口的TX和RX连接到一起，然后调整timeout的时间，发现计算是将时间间隔调整到1ms，也不会出现读到0bytes的情况，都是稳定的，都是15bytes，
+我的发送频率是20ms间隔，因此timeout最大只能设置为19ms，大于19ms的时候会出现两次一次读的情况30bytes
+
+
 */
 #include "winter_bringup/base_control.h"
 
@@ -16,7 +26,7 @@ BaseControl::BaseControl():
 
   //<node_handle.h line:2038>
   private_nh.param("usb_device", usb_device_, std::string("/dev/ttyUSB0"));
-  private_nh.param("deadline_time", deadline_time_, 19);
+  private_nh.param("deadline_time", deadline_time_, 1);
   private_nh.param("baudrate", baudrate_, 115200);
   private_nh.param("wheels_separation", wheels_separation_, 0.6);
   private_nh.param("wheel_radius", wheel_radius_, 0.06);
@@ -29,7 +39,7 @@ BaseControl::BaseControl():
 
   odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 1);
 
-  memset(rec_buf, -1, 100);
+  memset(rec_buf, 0, sizeof(rec_buf));
 
   ros::Rate loop_rate(loop_rate_);
 
@@ -39,20 +49,22 @@ BaseControl::BaseControl():
 
     while(ros::ok()){
 
-        //执行所有准备好的handler
-        iosev.poll();///区别poll_one() usr/include/boost/asio/io_service.hpp
-
-        ParseSerial();
-
         GetPoseData();
 
-        SetSpeed();
+        SetSpeed();   
+        //执行所有准备好的handler
+        size_t handler_num = iosev.poll();///区别poll_one() usr/include/boost/asio/io_service.hpp
+        // cout << "handler_num: " << handler_num << endl;
+
+        ParseSerial();                          
 
         //PublishOdom();
 
         ros::spinOnce();
 
         loop_rate.sleep();
+
+        //usleep(20000);
     }
 
     sp.close();
@@ -79,55 +91,41 @@ void BaseControl::InitSerial()
         cout << "Open Serial Error" << endl;
     
     //读数据
-    async_read(sp, buffer(rec_buf), boost::bind(&BaseControl::HandleRead,  this, _1, _2));
-
-    //TIMEms后超时
-    timer.expires_from_now(boost::posix_time::millisec(deadline_time_));
-
-    //超时后调用 sp 的 cancel()方法放弃读取更多字符
-    timer.async_wait(boost::bind(&serial_port::cancel, boost::ref(sp)));
+    //boost::asio::read_until(sp, buffer(rec_buf), '#');
+    //read_until(sp, buffer(rec_buf), '#');
+    //boost::asio::async_read(sp, buffer(rec_buf), boost::bind(&BaseControl::HandleRead, this,  _1, _2));
 
 }
 
 void BaseControl::HandleRead(boost::system::error_code ec, std::size_t bytes_transferred)
 {
     //cout.write(rec_buf, bytes_transferred);
-    cout<<"Read " << bytes_transferred << " bytes" << endl;
-    //cout << string(rec_buf,bytes_transferred)<< endl;
-    async_read(sp, buffer(rec_buf), boost::bind(&BaseControl::HandleRead, this,  _1, _2));
+    for(int i = 0 ; i < bytes_transferred; i++)
+        printf("%x ",rec_buf[i]);
+    cout<<"--Read " << bytes_transferred << " bytes" << endl;
 
-    timer.expires_from_now(boost::posix_time::millisec(deadline_time_));
+    bytes_read = bytes_transferred;
 
-    //超时后调用 sp 的 cancel()方法放弃读取更多字符
-    timer.async_wait(boost::bind(&serial_port::cancel, boost::ref(sp)));
-
-    /*写数据*/
-    //write(sp, buffer(str, str.length()));
+    //boost::asio::async_read_until(sp, buffer(rec_buf), '#', boost::bind(&BaseControl::HandleRead, this,  _1, _2));
+    boost::asio::async_read(sp, buffer(rec_buf), boost::bind(&BaseControl::HandleRead, this,  _1, _2));
 }
 
 void BaseControl::ParseSerial()
 {
     //处理接受到的数据
-    for(int i = 0; i < sizeof(rec_buf); i++){
-        //SS指令
-        if((rec_buf[i] == 0x54) && (rec_buf[i+1] == 0x45) && (rec_buf[i+2] == 0x0B) && (rec_buf[i+3] == 'S') && (rec_buf[i+4] == 'S')){
-            cout << "Set Speed Succeed " << endl;
-        }
-        //Pose Data数据
-        else if((rec_buf[i] == 0x45) && (rec_buf[i+1] == 0x54) && (rec_buf[i+2] == 0x09) && (rec_buf[i+3] == 'G') && (rec_buf[i+4] == 'P')){
-            //check sum
-            if(((rec_buf[i+5] + rec_buf[i+6] + rec_buf[i+7] + rec_buf[i+8] + rec_buf[i+9] + rec_buf[i+10]) & 0x3F + 0x30) == rec_buf[i+11]){
-                encoder_curr[LeftWheel] = (rec_buf[i+5] << 8) | rec_buf[i+6];
-                encoder_curr[LeftWheel] = (rec_buf[i+7] << 8) | rec_buf[i+8];
-                angle_curr = ((rec_buf[i+9] << 8) | rec_buf[i+10]) * ANGLE_K;
-                cout << "Get Pose Succeed " << endl;
-            }
-        }
-        //读到-1则跳出循环
-        else if(rec_buf[i] == -1){
-            break;
-        }
-    }//for
+    //std::size_t recv_size = sizeof(rec_buf);
+
+    //Pose Data数据
+    if((rec_buf[0] == 0x45) && (rec_buf[1] == 0x54) && (rec_buf[2] == 0x09) && (rec_buf[3] == 'G') && (rec_buf[4] == 'P')){
+        //check sum
+        /*if((((rec_buf[5] + rec_buf[6] + rec_buf[7] + rec_buf[8] + rec_buf[9] + rec_buf[10]) & 0x3F) + 0x30) == rec_buf[11]){
+            velocity[LeftWheel] = (rec_vec[5] << 8) | rec_vec[6];
+            velocity[RightWheel] = (rec_vec[7] << 8) | rec_vec[8];
+            angle_curr = ((rec_buf[9] << 8) | rec_buf[10]) * ANGLE_K;
+            cout << "Get Pose Succeed " << endl;
+        }*/
+    }
+    //memset(rec_buf, -1, sizeof(rec_buf));
 }
 
 void BaseControl::CmdCallback(const geometry_msgs::TwistConstPtr& msg)
@@ -140,7 +138,7 @@ void BaseControl::SetSpeed()
     string SetSpeedCmd;
     float right_wheel_velocity = 0.0;
     float leftWheel_velocity = 0.0;
-    int WL_H, WL_L, WR_H, WR_L, SUM;
+    char WL_H, WL_L, WR_H, WR_L, SUM;
 
     /*
     差速推导公式参考：COS495-Lecture5-Odometry.pdf
@@ -152,13 +150,16 @@ void BaseControl::SetSpeed()
     right_wheel_velocity = 1000 * (cmd_msg.linear.x + wheels_separation_ * cmd_msg.angular.z * 0.5);
     leftWheel_velocity = 1000 * (cmd_msg.linear.x - wheels_separation_ * cmd_msg.angular.z * 0.5);
 
-    WL_H = ((int)(leftWheel_velocity) >> 8) & 0x08;
-    WL_L = (int)(leftWheel_velocity) & 0x08;
-    WR_H = ((int)(right_wheel_velocity) >> 8) & 0x08;
-    WR_L = (int)(right_wheel_velocity) & 0x08;
-    SUM = (WL_H + WL_L + WR_H + WR_L) & 0x3F + 0x30;
+    std::cout << "right_speed: "<< right_wheel_velocity << " left_speed: " << leftWheel_velocity << std::endl;
+
+    WL_H = (char)(((int)(leftWheel_velocity) >> 8) & 0xFF);
+    WL_L = (char)((int)(leftWheel_velocity) & 0xFF);
+    WR_H = (char)(((int)(right_wheel_velocity) >> 8) & 0xFF);
+    WR_L = (char)((int)(right_wheel_velocity) & 0xFF);
+    SUM = (char)(((WL_H + WL_L + WR_H + WR_L) & 0x3F) + 0x30);
 
 #if 1
+    SetSpeedCmd.clear();
     SetSpeedCmd.push_back(0x54);
     SetSpeedCmd.push_back(0x45);
     SetSpeedCmd.push_back(0x07);
@@ -169,14 +170,24 @@ void BaseControl::SetSpeed()
     SetSpeedCmd.push_back(WR_H);
     SetSpeedCmd.push_back(WR_L);
     SetSpeedCmd.push_back(SUM);
+    SetSpeedCmd.push_back('#');
 
+    
+    /*for(int i = 0 ; i < 11; i++)
+        printf("0x%x ",SetSpeedCmd[i]);
+    printf("\n");
+    */
     write(sp, buffer(SetSpeedCmd, SetSpeedCmd.length()));
+    //cout << "SetSpeedCmd: " << SetSpeedCmd << "size: " << SetSpeedCmd.size() << endl;
+
 #else
     SetSpeedCmd.clear();
-    char stop[] = {0x54, 0x45,  0x0B, 'S', 'S', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x30};
+    char stop[] = {0x54, 0x45,  0x07, 'S', 'S', 0x00, 0xc8, 0x00, 0xc8, 0x40, '#'};
+    //char stop[] = {0x54, 0x45,  0x07, 'S', 'S', 0x00, 0x00, 0x00, 0x00, 0x30, '#'};
     for(int i = 0; i < sizeof(stop); i++)
         SetSpeedCmd.push_back(stop[i]);
     write(sp, buffer(SetSpeedCmd, SetSpeedCmd.length()));
+    //cout << "buffer: " << SetSpeedCmd.length() << endl;
 #endif
 }
 
@@ -189,39 +200,26 @@ void BaseControl::PublishOdom()
     float delta_s = 0.0;
     float delta_x = 0.0;
     float delta_y = 0.0;
-    int encoder_diff[2];
-    float encoder_dis[2];
-
-    if(FistTime){
-        encoder_curr[LeftWheel] = encoder_last[LeftWheel];
-        encoder_curr[RightWheel] = encoder_last[RightWheel];
-        angle_curr = angle_last;
-        last_time = ros::Time::now();
-        current_time = last_time;
-    }else{
-        encoder_diff[LeftWheel] = encoder_curr[LeftWheel] - encoder_last[LeftWheel];
-        encoder_diff[RightWheel] = encoder_curr[RightWheel] - encoder_last[RightWheel];
-
-        encoder_diff[LeftWheel] = (encoder_diff[LeftWheel] < -10000) ? (encoder_diff[LeftWheel] + 60000) : encoder_diff[LeftWheel];
-        encoder_diff[LeftWheel] = (encoder_diff[LeftWheel] > 10000) ? (encoder_diff[LeftWheel] - 60000) : encoder_diff[LeftWheel];
-        encoder_diff[RightWheel] = (encoder_diff[RightWheel] < -10000) ? (encoder_diff[RightWheel] + 60000) : encoder_diff[RightWheel];
-        encoder_diff[RightWheel] = (encoder_diff[RightWheel] > 10000) ? (encoder_diff[RightWheel] - 60000) : encoder_diff[RightWheel];
-
-        //根据脉冲数计算距离
-        encoder_dis[LeftWheel] = encoder_diff[LeftWheel] * PULSE_K;
-        encoder_dis[RightWheel] = encoder_diff[RightWheel] * PULSE_K;
-
-        current_time = ros::Time::now();
-    }
+    float dis[2];//单位m
 
     /*  
     vs = (right_wheel_velocity + leftWheel_velocity) / 2.0;
     vth = (right_wheel_velocity - leftWheel_velocity) / (2.0 * wheels_separation_);
     */
+    current_time = ros::Time::now();
+    if(FistTime){
+        last_time = current_time;
+    }
+
     delta_time = (current_time - last_time).toSec();
+
+    //计算每个轮子行走的距离
+    dis[LeftWheel] = (delta_time * velocity[LeftWheel]) / 1000.0;
+    dis[RightWheel] = (delta_time * velocity[RightWheel]) / 1000.0;
+
     //delta_th = (encoder_dis[RightWheel] - encoder_dis[LeftWheel])/(2 * wheels_separation_);
     delta_th = angle_curr - angle_last;
-    delta_s = (encoder_dis[LeftWheel] + encoder_dis[RightWheel]) * 0.5;
+    delta_s = (dis[LeftWheel] + dis[RightWheel]) * 0.5;
 
     if(FistTime){
         vx = 0.0;
@@ -238,8 +236,6 @@ void BaseControl::PublishOdom()
     y_pos += delta_s * sin(th_pos + th_pos/2.0);
 
     //递归
-    encoder_last[LeftWheel] = encoder_curr[LeftWheel];
-    encoder_last[RightWheel] = encoder_curr[RightWheel];
     angle_last = angle_curr;
     last_time = current_time;
 
@@ -290,6 +286,7 @@ void BaseControl::GetPoseData()
     GetPoseCmd.push_back(0x02);
     GetPoseCmd.push_back('G');
     GetPoseCmd.push_back('P');
+    GetPoseCmd.push_back('#');
 
     write(sp, buffer(GetPoseCmd, GetPoseCmd.length()));
 }

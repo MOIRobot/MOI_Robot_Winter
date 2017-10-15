@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string> //for string
+#include <queue>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -57,11 +58,9 @@ private:
 
     string str;
 
-    char rec_buf[100];
+    char rec_buf[20];
 
-    int encoder_curr[2];
-
-    int encoder_last[2];
+    int velocity[2];//mm
 
     float angle_curr;
 
@@ -76,6 +75,10 @@ private:
     float th_pos;
 
     std::string usb_device_;
+
+    vector<char> rec_vec;
+
+    std::size_t bytes_read;
 
     //速度发布50HZ的情况下，应低于20ms
     //数据类型由launch文件决定，是std::string,double,int，不能用unsigned int ,float,etc
@@ -92,6 +95,8 @@ private:
     double wheel_radius_;
 
     double wheels_separation_;
+
+
 
 public:
 

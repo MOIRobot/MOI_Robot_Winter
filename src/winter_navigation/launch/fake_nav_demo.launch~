@@ -4,7 +4,7 @@
   <!-- <param name="use_sim_time" value="false" /> -->
 
   <!-- Set the name of the map yaml file: can be overridden on the command line. -->
-  <arg name="map" default="hard_room.yaml" />
+  <arg name="map" default="easy_room.yaml" />
 
   <!-- Run the map server with the desired map -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(find winter_navigation)/maps/$(arg map)"/>

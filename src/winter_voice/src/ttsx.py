@@ -17,5 +17,5 @@ class TSpeakOnce:
 		self.engine.runAndWait()
 man=TSpeak()
 man.say("Jobs is happy now")
-man.say("hello,would you like some water")
+man.say("hello,would you like some tea")
 man.wait()

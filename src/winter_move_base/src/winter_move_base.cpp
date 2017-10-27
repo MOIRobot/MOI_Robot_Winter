@@ -201,6 +201,8 @@ namespace move_base {
     dsrv_ = new dynamic_reconfigure::Server<move_base::MoveBaseConfig>(ros::NodeHandle("~"));
     dynamic_reconfigure::Server<move_base::MoveBaseConfig>::CallbackType cb = boost::bind(&MoveBase::reconfigureCB, this, _1, _2);
     dsrv_->setCallback(cb);
+    //#机器人计算速度过程中多少次连续旋转  RotaingTimeCount/controller_frequency_  等于旋转时间
+    RotaingTimeCount=0;
   }
 
   void MoveBase::reconfigureCB(move_base::MoveBaseConfig &config, uint32_t level){
@@ -970,7 +972,36 @@ namespace move_base {
         if(tc_->computeVelocityCommands(cmd_vel)){
           ROS_DEBUG_NAMED( "move_base", "Got a valid command from the local planner: %.3lf, %.3lf, %.3lf",
                            cmd_vel.linear.x, cmd_vel.linear.y, cmd_vel.angular.z );
-          last_valid_control_ = ros::Time::now();
+          
+          //# 判断是否原地旋转太久
+          if((cmd_vel.linear.x==0.0) &&( cmd_vel.linear.y==0.0)&&(cmd_vel.angular.z!=0.0))
+          {
+				RotaingTimeCount++;
+				if(RotaingTimeCount>5)
+				{
+					float RotatingTime=(float)RotaingTimeCount/controller_frequency_;
+					ROS_INFO("Rotating in Place for %f seconds",RotatingTime);
+					if(RotatingTime>15.0)
+					{
+						//ROS_INFO("Rotating in Place too long");
+						          //disable the planner thread
+						boost::unique_lock<boost::recursive_mutex> lock(planner_mutex_);
+						runPlanner_ = false;
+						lock.unlock();
+						ROS_ERROR("Aborting because the robot Rotating in Place too long");
+						as_->setAborted(move_base_msgs::MoveBaseResult(), "Robot is oscillating. Even after executing recovery behaviors.");
+						RotaingTimeCount=0;
+						resetState();
+						return true;
+					}
+				}
+		  }
+          else
+          {
+			  RotaingTimeCount=0;
+			  last_valid_control_ = ros::Time::now();
+		  }
+          //last_valid_control_ = ros::Time::now(); 原来是在这个位置 为了判断一直旋转是错的 就拿到了上面
           //make sure that we send the velocity command to the base
           vel_pub_.publish(cmd_vel);
           if(recovery_trigger_ == CONTROLLING_R)

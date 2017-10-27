@@ -18,7 +18,7 @@ class PublishUnltro():
         
         ran_broadcaster = tf.TransformBroadcaster()
         
-        rate=rospy.Rate(20)
+        rate=rospy.Rate(1)
         
         while not rospy.is_shutdown():
 			ran_quat = Quaternion()

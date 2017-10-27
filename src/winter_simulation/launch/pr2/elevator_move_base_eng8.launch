@@ -1,0 +1,11 @@
+<launch>
+  <!-- this launch is not tested -->
+  <node name="elevator_move_base" pkg="roseus" type="roseus"
+	output="screen" respawn="true"
+	args="$(find elevator_move_base_pr2)/src/elevator-move-base.l"/>
+
+  <include file="$(find winter_simulation)/launch/pr2/elevator_move_base_modules.xml">
+    <arg name="scene" value="eng8" />
+  </include>
+
+</launch>

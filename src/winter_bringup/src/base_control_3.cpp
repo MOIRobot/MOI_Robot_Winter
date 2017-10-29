@@ -5,15 +5,15 @@ g++ base_control.cpp -lboost_system
 设备名称：/dev/USB0
 波特率：115200
 
-通讯协议：服务机器人通信格式_4.xlsx
-*/
+通讯协议：服务机器人通信格式_5.xlsx
 
-/*
+改为单片机向上发送编码脉冲数信息。
+
 本来是24的字节的数据，可是有时候会读到3+21,有时候会读到0+24,有时候是12+12,等等，我感觉是不是timeout了，然后放弃读后面的数据了，
 我通过将一个USB串口的TX和RX连接到一起，然后调整timeout的时间，发现计算是将时间间隔调整到1ms，也不会出现读到0bytes的情况，都是稳定的，都是15bytes，
 我的发送频率是20ms间隔，因此timeout最大只能设置为19ms，大于19ms的时候会出现两次一次读的情况30bytes
 */
-#include "winter_bringup/base_control.h"
+#include "winter_bringup/base_control_3.h"
 
 BaseControl::BaseControl():
                   sp(iosev),
@@ -43,6 +43,11 @@ BaseControl::BaseControl():
   signal(SIGINT, &BaseControl::SigHandler);
 
   sig_flag = false;
+
+  //encoder_sum[0] = 1;
+
+  left_temp = 0; 
+  right_temp = 0;
 
   try{
 
@@ -135,11 +140,31 @@ void BaseControl::ParseSerial()
             //check sum
             if((((recv_data[i+5] + recv_data[i+6] + recv_data[i+7] + recv_data[i+8] + recv_data[i+9] + recv_data[i+10]) & 0x3F) + 0x30) == recv_data[i+11])
             {
-                velocity[LeftWheel] = ((recv_data[i+5] << 8) | recv_data[i+6]) / 1000.0;
-                velocity[RightWheel] = ((recv_data[i+7] << 8) | recv_data[i+8]) / 1000.0;
+                
+		//ROS_INFO("high is %d low is %d",(unsigned char)recv_data[i+5],(unsigned char)recv_data[i+6]);
+		if((unsigned char)(recv_data[i+5])>0x80)
+		{
+		//	ROS_INFO("high is %d low is %d",recv_data[i+5],recv_data[i+6]);
+		
+		//	ROS_INFO("high is %d low is %d",recv_data[i+5],recv_data[i+6]);
+
+			encoder_curr[LeftWheel]=((unsigned char)recv_data[i+5]-256)*256+(unsigned char)recv_data[i+6];
+		}
+		else
+		{
+			encoder_curr[LeftWheel] = ((recv_data[i+5] << 8) | recv_data[i+6]);
+                }
+		if((unsigned char)recv_data[i+7]>0x80)
+		{
+			encoder_curr[RightWheel]=((unsigned char)recv_data[i+7]-256)*256+(unsigned char)recv_data[i+8];
+		}
+		else
+		{
+                	encoder_curr[RightWheel] = ((recv_data[i+7] << 8) | recv_data[i+8]);
+		}
                 angle_curr = (((unsigned char)recv_data[i+9] << 8) | (unsigned char)recv_data[i+10]) * ANGLE_K;
                 //std::cout << "Get Pose Succeed " << "angle_curr: " << angle_curr<< std::endl;
-                //std::cout << "left:"<< velocity[LeftWheel] << " right:" << velocity[RightWheel] << " angle_curr: " << angle_curr << std::endl;
+                std::cout << "left:"<< encoder_curr[LeftWheel] << " right:" << encoder_curr[RightWheel] << " angle_curr: " << angle_curr <<" ";
                 data_ready_flag = true;
             }
         }
@@ -189,7 +214,7 @@ void BaseControl::SetSpeed()
     right_wheel_velocity = 1000 * (cmd_msg.linear.x + wheels_separation_ * cmd_msg.angular.z * 0.5);
     leftWheel_velocity = 1000 * (cmd_msg.linear.x - wheels_separation_ * cmd_msg.angular.z * 0.5);
 
-    std::cout << "right_speed: "<< right_wheel_velocity << " left_speed: " << leftWheel_velocity << std::endl;
+    //std::cout << "right_speed: "<< right_wheel_velocity << " left_speed: " << leftWheel_velocity << std::endl;
 
     WL_H = (char)(((int)(leftWheel_velocity) >> 8) & 0xFF);
     WL_L = (char)((int)(leftWheel_velocity) & 0xFF);
@@ -227,6 +252,8 @@ void BaseControl::PublishOdom()
     float delta_x = 0.0;
     float delta_y = 0.0;
     float dis[2];//单位m
+    int encoder_diff[2];
+
 
     //数据准备好了
     if(!data_ready_flag){
@@ -241,21 +268,36 @@ void BaseControl::PublishOdom()
     if(FistTime){
         last_time = current_time;
         angle_last = angle_curr;
+        encoder_last[LeftWheel] = encoder_curr[LeftWheel];
+        encoder_last[RightWheel] = encoder_curr[RightWheel];
     }
+
+    //计算差值
+    encoder_diff[LeftWheel] = encoder_curr[LeftWheel] - encoder_last[LeftWheel];
+    encoder_diff[RightWheel] = encoder_curr[RightWheel] - encoder_last[RightWheel];
+
+    if(encoder_diff[LeftWheel] < -10000)
+       encoder_diff[LeftWheel] = encoder_diff[LeftWheel] + 60000;
+    else if(encoder_diff[LeftWheel] > 10000)
+       encoder_diff[LeftWheel] = encoder_diff[LeftWheel] - 60000;
+
+    if(encoder_diff[RightWheel] < -10000)
+        encoder_diff[RightWheel] = encoder_diff[RightWheel] + 60000;
+    else if(encoder_diff[RightWheel] > 10000)
+        encoder_diff[RightWheel] = encoder_diff[RightWheel] - 60000;
 
     delta_time = (current_time - last_time).toSec();
     
-
     //计算每个轮子行走的距离
-    dis[LeftWheel] = (delta_time * velocity[LeftWheel]) * ODOM_K;
-    dis[RightWheel] = (delta_time * velocity[RightWheel]) * ODOM_K;
+    dis[LeftWheel] = encoder_diff[LeftWheel] * ODOM_K;
+    dis[RightWheel] = encoder_diff[RightWheel] * ODOM_K;
 
-    left_temp += dis[LeftWheel];
-    right_temp += dis[RightWheel];
+    left_temp += encoder_diff[LeftWheel];
+    right_temp += encoder_diff[RightWheel];
 
-    //std::cout << "left_temp: " << left_temp <<" right_temp: " <<right_temp <<" delta_time:" << delta_time << std::endl;
+    std::cout << "left_temp: " << left_temp <<" right_temp:" << right_temp << std::endl;
+    //std::cout << "l:" << encoder_diff[LeftWheel] << " r:" << encoder_diff[RightWheel] << std::endl;
 
-    //delta_th = (encoder_dis[RightWheel] - encoder_dis[LeftWheel])/(2 * wheels_separation_);
     delta_th = angle_curr - angle_last;
     delta_s = (dis[LeftWheel] + dis[RightWheel]) / 2.0;
 
@@ -282,13 +324,14 @@ void BaseControl::PublishOdom()
     x_pos += delta_x;
     y_pos += delta_y;
 
-
     //std::cout << "x_pos: " << x_pos << " y_pos:" << y_pos << " th_pos: " << th_pos << std::endl;
     //std::cout << " delta_s: "<< delta_s << std::endl;
 
     //递归
     angle_last = angle_curr;
     last_time = current_time;
+    encoder_last[LeftWheel] = encoder_curr[LeftWheel];
+    encoder_last[RightWheel] = encoder_curr[RightWheel];
 
     //send TF
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th_pos);

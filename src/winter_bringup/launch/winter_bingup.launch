@@ -7,7 +7,7 @@
 		<param name="wheel_radius" value="0.06"/>
 		<param name="pulse_per_rotation" value="500"/>
 		<param name="ratio" value="3"/>
-		<param name="loop_rate" value="50"/>
+		<param name="loop_rate" value="20"/>
 		<!--rosparam file="$(find winter_bringup)/param/winter_bringup.yaml" command="load"/-->
 	</node>
 </launch>

@@ -48,7 +48,6 @@ BaseControl::BaseControl():
 
   left_temp = 0; 
   right_temp = 0;
-
   try{
 
     InitSerial();
@@ -152,15 +151,21 @@ void BaseControl::ParseSerial()
 		}
 		else
 		{
-				encoder_curr[LeftWheel] = ((recv_data[i+5] << 8) | recv_data[i+6]);
-        }
+				//encoder_curr[LeftWheel] = ((recv_data[i+5] << 8) | recv_data[i+6]);
+				encoder_curr[LeftWheel] = (unsigned char)recv_data[i+5] *256 +(unsigned char)recv_data[i+6];
+				
+				
+        	}
+		ROS_INFO("encoder is %d",encoder_curr[LeftWheel]);
 		if((unsigned char)recv_data[i+7]>0x80)
 		{
 			encoder_curr[RightWheel]=((unsigned char)recv_data[i+7]-256)*256+(unsigned char)recv_data[i+8];
 		}
 		else
 		{
-                	encoder_curr[RightWheel] = ((recv_data[i+7] << 8) | recv_data[i+8]);
+			encoder_curr[RightWheel] = (unsigned char)recv_data[i+7] *256 +(unsigned char)recv_data[i+8];
+			
+                	//encoder_curr[RightWheel] = ((recv_data[i+7] << 8) | recv_data[i+8]);
 		}
                 angle_curr = (((unsigned char)recv_data[i+9] << 8) | (unsigned char)recv_data[i+10]) * ANGLE_K;
                 //std::cout << "Get Pose Succeed " << "angle_curr: " << angle_curr<< std::endl;
@@ -395,8 +400,12 @@ void BaseControl::SigHandler(int sig)
 int main(int argc ,char* argv[])
 {
   ros::init(argc, argv, "base_control_node");
-
-  BaseControl base_control;
-
+  BaseControl base_Control;
   return 0;
 }
+
+
+
+
+
+

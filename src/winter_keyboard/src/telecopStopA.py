@@ -39,7 +39,6 @@ def moveX(speed):
 		cmd.linear.x+=ACC/ControllerFrequecny
 		if(cmd.linear.x>=speed):
 			cmd.linear.x=speed
-			print 'MAX SPEED'
 		cmd.linear.y=0.0
 		cmd.angular.z=0.0
 		pub.publish(cmd)
@@ -49,7 +48,6 @@ def moveX(speed):
 		cmd.linear.x-=ACC/ControllerFrequecny
 		if(cmd.linear.x<=speed):
 			cmd.linear.x=speed
-			print 'MAX SPEED'
 		cmd.linear.y=0.0
 		cmd.angular.z=0.0
 		pub.publish(cmd)
@@ -57,7 +55,6 @@ def moveX(speed):
 		print "move back!"
 	else:
 		return
-	print 'X speed now: %f'%cmd.linear.x
 def moveY(speed):
 	global ControllerFrequecny
 	global ACC
@@ -65,7 +62,6 @@ def moveY(speed):
 		cmd.linear.y+=ACC/ControllerFrequecny
 		if(cmd.linear.y>=speed):
 			cmd.linear.y=speed
-			print 'MAX SPEED'
 		cmd.linear.x=0.0
 		cmd.angular.z=0.0
 		pub.publish(cmd)
@@ -75,7 +71,6 @@ def moveY(speed):
 		cmd.linear.y-=ACC/ControllerFrequecny
 		if(cmd.linear.y<=speed):
 			cmd.linear.y=speed
-			print 'MAX SPEED'
 		cmd.linear.x=0.0
 		cmd.angular.z=0.0
 		pub.publish(cmd)
@@ -87,36 +82,26 @@ def stop_robot():
 	global ControllerFrequecny
 	global ACC
 	global RotateAcc
-	fx=False
-	fy=False
-	fz=False
-	while True:
-		if(cmd.linear.x>0):
-			cmd.linear.x-=ACC/ControllerFrequecny
-		elif(cmd.linear.x<0):
-			cmd.linear.x+=ACC/ControllerFrequecny
-		if(cmd.linear.y>0):
-			cmd.linear.y-=ACC/ControllerFrequecny
-		elif (cmd.linear.y<0):
-			cmd.linear.y+=ACC/ControllerFrequecny
-		if (cmd.angular.z>0):
-			cmd.angular.z-=RotateAcc/ControllerFrequecny
-		elif(cmd.angular.z<0):
-			cmd.angular.z+=RotateAcc/ControllerFrequecny
-		if(abs(cmd.linear.x)<(2*ACC/ControllerFrequecny)):
-			cmd.linear.x=0.0
-			fx=True
-		if(abs(cmd.linear.y)<(2*ACC/ControllerFrequecny)):
-			cmd.linear.y=0.0
-			fy=True
-		if(abs(cmd.angular.z)<(2*RotateAcc/ControllerFrequecny)):
-			cmd.angular.z=0.0
-			fz=True
-		pub.publish(cmd)
-		time.sleep(1.0/ControllerFrequecny)
-		print 'stoping robot now'
-		if fx and fy and fz:
-			return
+	if(cmd.linear.x>0):
+		cmd.linear.x-=ACC/ControllerFrequecny
+	elif(cmd.linear.x<0):
+		cmd.linear.x+=ACC/ControllerFrequecny
+	if(cmd.linear.y>0):
+		cmd.linear.y-=ACC/ControllerFrequecny
+	elif (cmd.linear.y<0):
+		cmd.linear.y+=ACC/ControllerFrequecny
+	if (cmd.angular.z>0):
+		cmd.angular.z-=RotateAcc/ControllerFrequecny
+	elif(cmd.angular.z<0):
+		cmd.angular.z+=RotateAcc/ControllerFrequecny
+	if(abs(cmd.linear.x)<(2*ACC/ControllerFrequecny)):
+		cmd.linear.x=0.0
+	if(abs(cmd.linear.y)<(2*ACC/ControllerFrequecny)):
+		cmd.linear.y=0.0
+	if(abs(cmd.angular.z)<(2*RotateAcc/ControllerFrequecny)):
+		cmd.angular.z=0.0
+	pub.publish(cmd)
+	time.sleep(1.0/ControllerFrequecny)
 def rotateRobot(speed):
 	global ControllerFrequecny
 	global RotateAcc
@@ -124,7 +109,6 @@ def rotateRobot(speed):
 		cmd.angular.z+=RotateAcc/ControllerFrequecny
 		if(cmd.angular.z>=speed):
 			cmd.angular.z=speed
-			print 'MAX SPEED'
 		cmd.linear.x=0.0
 		cmd.angular.y=0.0
 		pub.publish(cmd)
@@ -134,7 +118,6 @@ def rotateRobot(speed):
 		cmd.angular.z-=RotateAcc/ControllerFrequecny
 		if(cmd.angular.z<=speed):
 			cmd.angular.z=speed
-			print 'MAX SPEED'
 		cmd.linear.x=0.0
 		cmd.angular.y=0.0
 		pub.publish(cmd)
@@ -182,8 +165,7 @@ j  k  l
 			print "shutdown!"
 			break
 		else:
-			cmd.linear.x=0.0
-			cmd.angular.z=0.0
+			stop_robot()
 		print "Reading form keybord"
 		print """   i
 j  k  l

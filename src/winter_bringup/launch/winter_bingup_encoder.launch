@@ -1,0 +1,13 @@
+<launch>
+	<node name="base_control_3" pkg="winter_bringup" type="base_control_3">
+		<param name="usb_device" value="/dev/ttyUSB0"/>
+		<param name="deadline_time" value="19"/>
+		<param name="baudrate" value="115200"/>
+		<param name="wheels_separation" value="0.6"/>
+		<param name="wheel_radius" value="0.06"/>
+		<param name="pulse_per_rotation" value="500"/>
+		<param name="ratio" value="3"/>
+		<param name="loop_rate" value="20"/>
+		<!--rosparam file="$(find winter_bringup)/param/winter_bringup.yaml" command="load"/-->
+	</node>
+</launch>

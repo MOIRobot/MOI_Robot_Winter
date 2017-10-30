@@ -9,7 +9,7 @@ import  sys
 import  tty, termios
 import time    
 cmd = Twist()
-pub = rospy.Publisher('cmd_vel',Twist,queue_size=20)
+pub = rospy.Publisher('smooth_cmd_vel',Twist,queue_size=20)
 
 
 global CurrentSpeedX
@@ -154,9 +154,9 @@ j  k  l
 			termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)  
 			#print 'error'
 		if ch=='i':
-			moveX(0.4)
+			moveX(0.3)
 		elif ch=='m':
-			moveX(-0.4)
+			moveX(-0.3)
 		elif ch=='j':
 			moveY(0.3)
 		elif ch=='l':

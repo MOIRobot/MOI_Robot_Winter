@@ -1,0 +1,9 @@
+http://blog.csdn.net/hongliang2009/article/details/77916000
+
+cd /opt/ros/kinetic/lib/gmapping
+sudo rm slam_gmapping
+sudo rm slam_gmapping_replay
+拷贝重新编译的可执行文件：
+cd ~/catkin_rikirobot/devel/lib/gmapping
+sudo cp slam_gmapping /opt/ros/kinetic/lib/gmapping
+sudo cp slam_gmapping_replay /opt/ros/kinetic/lib/gmapping

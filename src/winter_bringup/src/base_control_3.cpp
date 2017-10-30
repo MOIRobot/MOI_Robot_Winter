@@ -140,20 +140,15 @@ void BaseControl::ParseSerial()
             //check sum
             if((((recv_data[i+5] + recv_data[i+6] + recv_data[i+7] + recv_data[i+8] + recv_data[i+9] + recv_data[i+10]) & 0x3F) + 0x30) == recv_data[i+11])
             {
-                
-		//ROS_INFO("high is %d low is %d",(unsigned char)recv_data[i+5],(unsigned char)recv_data[i+6]);
-		if((unsigned char)(recv_data[i+5])>0x80)
-		{
-		//	ROS_INFO("high is %d low is %d",recv_data[i+5],recv_data[i+6]);
-		
-		//	ROS_INFO("high is %d low is %d",recv_data[i+5],recv_data[i+6]);
-
-			encoder_curr[LeftWheel]=((unsigned char)recv_data[i+5]-256)*256+(unsigned char)recv_data[i+6];
-		}
-		else
-		{
+				if((unsigned char)(recv_data[i+5])>0x80)
+				{
+				encoder_curr[LeftWheel]=((unsigned char)recv_data[i+5]-256)*256+(unsigned char)recv_data[i+6];
+				}
+				else
+				{
 				encoder_curr[LeftWheel] = ((recv_data[i+5] << 8) | recv_data[i+6]);
-        }
+				}
+		ROS_INFO("encoder")
 		if((unsigned char)recv_data[i+7]>0x80)
 		{
 			encoder_curr[RightWheel]=((unsigned char)recv_data[i+7]-256)*256+(unsigned char)recv_data[i+8];

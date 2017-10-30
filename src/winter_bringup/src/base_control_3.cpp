@@ -145,7 +145,7 @@ void BaseControl::ParseSerial()
 		}
 		else
 		{
-			encoder_curr[LeftWheel] = ((recv_data[i+5] << 8) | recv_data[i+6]);
+			encoder_curr[LeftWheel]=(unsigned char)recv_data[i+5]*256+(unsigned char)recv_data[i+6];
 		}
 		if((unsigned char)recv_data[i+7]>0x80)
 		{

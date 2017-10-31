@@ -293,7 +293,7 @@ void BaseControl::PublishOdom()
     float r_y = delta_s * sin(delta_th / 2.0);
 
     delta_x = r_x * cos(th_pos) + r_y * sin(th_pos);
-    delta_y = -1.0 * r_x * sin(th_pos) + r_y * cos(th_pos);
+    delta_y = r_x * sin(th_pos) - r_y * cos(th_pos);
     
     //delta_x = delta_s * cos(th_pos + delta_th/2.0);
     //delta_y = delta_s * sin(th_pos + delta_th/2.0);

@@ -205,7 +205,7 @@ void LslidarN301Decoder::publishScan()
 
 }
 
-point_struct LslidarN301Decoder::getMeans(std::vector<point_struct> clusters)
+  int_struct LslidarN301Decoder::getMeans(std::vector<point_struct> clusters)
 {
   int num = clusters.size();
 

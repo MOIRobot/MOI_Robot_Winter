@@ -27,7 +27,7 @@
 轮子的半径：2 * M_PI * R = 0.4823
 odom_k = 2*M_PI*R
 */
-#define ODOM_K (0.4823/2400.0)
+#define ODOM_K (1.063 * 0.4823 / 2400.0)
 
 using namespace std;
 using namespace boost::asio;

@@ -5,7 +5,6 @@
    <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot.urdf" />  
    <param name="use_gui" value="$(arg gui)"/>  
    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
-   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find winter_simulation)/rviz/rviz_turtlebot/amcl.rviz" required="true" />
   
   
   <arg name="scan_topic"  default="scan" />
@@ -35,7 +34,7 @@
     <param name="angularUpdate" value="0.436"/>
     <param name="temporalUpdate" value="-1.0"/>
     <param name="resampleThreshold" value="0.5"/>
-    <param name="particles" value="30"/>
+    <param name="particles" value="80"/>
   	<!--
     <param name="xmin" value="-50.0"/>
     <param name="ymin" value="-50.0"/>

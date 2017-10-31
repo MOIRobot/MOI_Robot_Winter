@@ -52,8 +52,8 @@ bool LslidarN301Decoder::createRosIO() {
       "lslidar_sweep", 10);
   point_cloud_pub = nh.advertise<sensor_msgs::PointCloud2>(
       "lslidar_point_cloud", 10);
-  scan_pub = nh.advertise<sensor_msgs::LaserScan>(
-        "scan", 100);
+  //scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 100);
+  scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 10);
    //求被裁剪的激光束的大小数目 并除以2 来确定被裁剪的数组大小的范围
    if(max_angle==360.0)
    {
@@ -150,13 +150,13 @@ void LslidarN301Decoder::publishScan()
 		return;
 
 	scan->header.frame_id = child_frame_id;
-	scan->header.stamp = ros::Time::now();
+	
 	scan->angle_max = 0.0;
 	scan->angle_min = 2.0*M_PI;
 	scan->angle_increment = (scan->angle_max-scan->angle_min)/3600;
 
 	//	scan->time_increment = motor_speed_/1e8;
-	scan->range_min = 0.3;
+	scan->range_min = 0.05;
 	scan->range_max = 100.0;
 	scan->ranges.reserve(3600);
 	scan->intensities.reserve(3600);
@@ -203,7 +203,7 @@ void LslidarN301Decoder::publishScan()
     scan->ranges.push_back(mean_point.distance);
     scan->intensities.push_back(mean_point.intensity);
 	}
-
+	scan->header.stamp = ros::Time::now();
 	scan_pub.publish(scan);
 
 }

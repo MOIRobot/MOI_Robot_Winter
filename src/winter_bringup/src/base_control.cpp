@@ -247,6 +247,9 @@ void BaseControl::PublishOdom()
     encoder_diff[LeftWheel] = encoder_curr[LeftWheel] - encoder_last[LeftWheel];
     encoder_diff[RightWheel] = encoder_curr[RightWheel] - encoder_last[RightWheel];
 
+    //std::cout << "curr_left: " << encoder_curr[LeftWheel] <<" last_left: "<< encoder_last[LeftWheel] <<" diff_left:"<<encoder_diff[LeftWheel] <<  std::endl;
+   // std::cout << "curr_right: " << encoder_curr[RightWheel] <<" last_right: "<< encoder_last[RightWheel] <<" diff_right:"<<encoder_diff[RightWheel] <<  std::endl;
+   
     if(encoder_diff[LeftWheel] < -10000)
        encoder_diff[LeftWheel] = encoder_diff[LeftWheel] + 60000;
     else if(encoder_diff[LeftWheel] > 10000)
@@ -263,10 +266,10 @@ void BaseControl::PublishOdom()
     dis[LeftWheel] = encoder_diff[LeftWheel] * ODOM_K;
     dis[RightWheel] = encoder_diff[RightWheel] * ODOM_K;
 
-    left_temp += encoder_diff[LeftWheel];
-    right_temp += encoder_diff[RightWheel];
+   // left_temp += encoder_diff[LeftWheel];
+    //right_temp += encoder_diff[RightWheel];
 
-    std::cout << "left_temp: " << left_temp <<" right_temp:" << right_temp << std::endl;
+   // std::cout << "left: " << encoder_diff[LeftWheel] <<" right:" << encoder_diff[RightWheel] << std::endl;
 
     delta_th = angle_curr - angle_last;
     delta_s = (dis[LeftWheel] + dis[RightWheel]) / 2.0;
@@ -279,6 +282,9 @@ void BaseControl::PublishOdom()
         vs = delta_s / delta_time;
         vth = delta_th / delta_time;
     }
+
+    std::cout << "diff_right: " << encoder_diff[RightWheel] <<" diff_left: "<< encoder_diff[LeftWheel] <<" diff_time:"<< delta_time \
+              << "curr_left: " << encoder_curr[LeftWheel] <<" last_left: "<< encoder_last[LeftWheel]  <<  std::endl;
 
     //累计坐标
     th_pos += delta_th;

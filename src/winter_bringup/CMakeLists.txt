@@ -199,10 +199,9 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 #include_directories(include ${catkin_INCLUDE_DIRS})
-#add_executable(base_control src/base_control.cpp)
-include_directories(include ${catkin_INCLUDE_DIRS}/base_control_3.h)
-add_executable(base_control_3 src/base_control_3.cpp)
-target_link_libraries(base_control_3 ${catkin_LIBRARIES} libboost_system.so)
+include_directories(include ${catkin_INCLUDE_DIRS}/base_control.h)
+add_executable(base_control src/base_control.cpp)
+target_link_libraries(base_control ${catkin_LIBRARIES} libboost_system.so)
 
 add_executable(fake_odom_publisher src/fake_odom_publisher.cpp)
 target_link_libraries(fake_odom_publisher ${catkin_LIBRARIES})

@@ -20,7 +20,14 @@
 //角度数据常数
 #define ANGLE_K M_PI/(180.0*10)
 
-#define ODOM_K 1.0
+/*
+一个脉冲走多远的距离(m/pulse)：
+编码器一圈的脉冲数目：pulse=600
+电机和编码器的转速比 4:3
+轮子的半径：2 * M_PI * R = 0.4823
+odom_k = 2*M_PI*R
+*/
+#define ODOM_K (0.4823/2400.0)
 
 using namespace std;
 using namespace boost::asio;
@@ -64,13 +71,15 @@ private:
 
     float velocity[2];//m/s
 
+    int encoder_curr[2];
+
+    int encoder_last[2];
+
     float angle_curr;
 
     float angle_last;
 
     bool FistTime;
-
-    bool data_ready_flag;
 
     float x_pos;
 
@@ -100,7 +109,9 @@ private:
 
     double wheels_separation_;
 
-    float left_temp, right_temp;
+    int encoder_sum[2];
+
+    int left_temp, right_temp;
 
 public:
 

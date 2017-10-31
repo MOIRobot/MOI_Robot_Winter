@@ -172,7 +172,7 @@ void LslidarN301Decoder::publishScan()
     if((degree<(1800+laser_number))&&(degree>(1800-laser_number)))				
 	{
 		
-    		//ROS_INFO("degree = %d", degree);
+    		ROS_INFO("degree = %d", degree);
 		temp_point.distance=std::numeric_limits<float>::infinity();
 		temp_point.intensity = 0;
 	}

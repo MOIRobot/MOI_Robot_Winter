@@ -169,19 +169,8 @@ void LslidarN301Decoder::publishScan()
     //ROS_INFO("degree = %d", degree);
     if (degree >= 3600) degree = 0;
     if (degree < 0) degree = 3599;
-    if((degree<(1800+laser_number))&&(degree>(1800-laser_number)))				
-	{
-		
-    		//ROS_INFO("degree = %d", degree);
-		temp_point.distance=std::numeric_limits<float>::infinity();
-		temp_point.intensity = 0;
-	}
-	else
-	{
-		
-		temp_point.distance = sweep_data->scans[0].points[i].distance;
-		temp_point.intensity = sweep_data->scans[0].points[i].intensity;
-	}
+    temp_point.distance = sweep_data->scans[0].points[i].distance;
+    temp_point.intensity = sweep_data->scans[0].points[i].intensity;
 	
     mean_points[degree].push_back(temp_point);
   }

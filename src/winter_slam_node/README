@@ -1,0 +1,9 @@
+针对360度激光雷达的opem slam节点
+如果想把他替换之前安装的可执行文件进行如下操作:
+cd /opt/ros/kinetic/lib/gmapping
+sudo rm slam_gmapping
+sudo rm slam_gmapping_replay
+拷贝重新编译的可执行文件：
+cd ~/catkin_rikirobot/devel/lib/gmapping
+sudo cp slam_gmapping /opt/ros/kinetic/lib/gmapping
+sudo cp slam_gmapping_replay /opt/ros/kinetic/lib/gmapping

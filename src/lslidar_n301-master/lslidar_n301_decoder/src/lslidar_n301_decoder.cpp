@@ -38,7 +38,8 @@ bool LslidarN301Decoder::loadParameters() {
   pnh.param<double>("max_range", max_range, 100.0);
   pnh.param<double>("frequency", frequency, 20.0);
   pnh.param<bool>("publish_point_cloud", publish_point_cloud, true);
-
+  //使用多少角度的激光雷达 最大可以使用360 机器人正前方为0
+  pnh.param<double>("max_angle", max_angle, 360.0);
   pnh.param<string>("fixed_frame_id", fixed_frame_id, "map");
   pnh.param<string>("child_frame_id", child_frame_id, "lslidar");
   return true;
@@ -53,6 +54,15 @@ bool LslidarN301Decoder::createRosIO() {
       "lslidar_point_cloud", 10);
   scan_pub = nh.advertise<sensor_msgs::LaserScan>(
         "scan", 100);
+   //求被裁剪的激光束的大小数目 并除以2 来确定被裁剪的数组大小的范围
+   if(max_angle==360.0)
+   {
+	   laser_number=0;
+	}
+	else
+	{
+		laser_number=(int)((float)1800/(360-max_angle));
+	}
   return true;
 }
 
@@ -141,15 +151,15 @@ void LslidarN301Decoder::publishScan()
 
 	scan->header.frame_id = child_frame_id;
 	scan->header.stamp = ros::Time::now();
-  scan->angle_max = 0.0;
-  scan->angle_min = 2.0*M_PI;
-  scan->angle_increment = (scan->angle_max-scan->angle_min)/3600;
+	scan->angle_max = 0.0;
+	scan->angle_min = 2.0*M_PI;
+	scan->angle_increment = (scan->angle_max-scan->angle_min)/3600;
 
-//	scan->time_increment = motor_speed_/1e8;
+	//	scan->time_increment = motor_speed_/1e8;
 	scan->range_min = 0.3;
 	scan->range_max = 100.0;
-  scan->ranges.reserve(3600);
-  scan->intensities.reserve(3600);
+	scan->ranges.reserve(3600);
+	scan->intensities.reserve(3600);
 
   std::vector<point_struct> mean_points[3600] = {};
   point_struct temp_point;
@@ -159,8 +169,17 @@ void LslidarN301Decoder::publishScan()
 //    ROS_INFO("degree = %d", degree);
     if (degree >= 3600) degree = 0;
     if (degree < 0) degree = 3599;
-    temp_point.distance = sweep_data->scans[0].points[i].distance;
-    temp_point.intensity = sweep_data->scans[0].points[i].intensity;
+    
+    if((laser_number>0)&&(degree>(900-laser_number))&&(degree>(900+laser_number)))
+    {
+		temp_point.distance=std::numeric_limits<float>::infinity();
+		temp_point.intensity = 0;
+	}
+	else
+	{
+		temp_point.distance = sweep_data->scans[0].points[i].distance;
+		temp_point.intensity = sweep_data->scans[0].points[i].intensity;
+	}
     mean_points[degree].push_back(temp_point);
   }
 

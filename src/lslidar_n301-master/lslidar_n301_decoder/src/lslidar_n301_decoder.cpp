@@ -170,7 +170,7 @@ void LslidarN301Decoder::publishScan()
     if (degree >= 3600) degree = 0;
     if (degree < 0) degree = 3599;
     
-    if((laser_number>0)&&(degree>(900-laser_number))&&(degree>(900+laser_number)))
+    if((laser_number>0)&&(degree>(900-laser_number))&&(degree<(900+laser_number)))
     {
 		temp_point.distance=std::numeric_limits<float>::infinity();
 		temp_point.intensity = 0;

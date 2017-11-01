@@ -45,7 +45,7 @@
   <joint name="laser_link_to_base_link" type="fixed">
     <parent link="base_link"/>
     <child link="base_laser_link"/>
-    <origin xyz="0 0 0.202"/>
+    <origin xyz="0.2 0 0.202"/>
   </joint>
   <link name="camera_link">
     <visual>
@@ -66,7 +66,7 @@
   </link>
   <joint name="kinect_link_to_base_link" type="fixed">
     <parent link="base_link"/>
-    <child link="camera"/>
+    <child link="camera_link"/>
     <origin xyz="0 0 0.402"/>
   </joint>
   <!-- left wheel-->

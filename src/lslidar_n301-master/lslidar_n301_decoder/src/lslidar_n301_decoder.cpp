@@ -40,7 +40,7 @@ bool LslidarN301Decoder::loadParameters() {
   pnh.param<bool>("publish_point_cloud", publish_point_cloud, true);
   //使用多少角度的激光雷达 最大可以使用360 机器人正前方为0
   pnh.param<double>("max_angle", max_angle, 360.0);
-  pnh.param<string>("fixed_frame_id", fixed_frame_id, "map");
+  pnh.param<string>("fixed_frame_id", fixed_frame_idfixed_frame_id, "map");
   pnh.param<string>("child_frame_id", child_frame_id, "lslidar");
   return true;
 }

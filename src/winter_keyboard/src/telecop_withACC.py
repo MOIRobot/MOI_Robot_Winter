@@ -23,8 +23,8 @@ global MAXROTATESPEED
 MAXSPEED=0.3
 MAXROTATESPEED=1.4
 
-ACC=0.3
-RotateAcc=0.3
+ACC=0.4
+RotateAcc=0.5
 #控制频率
 global ControllerFrequecny
 ControllerFrequecny=10

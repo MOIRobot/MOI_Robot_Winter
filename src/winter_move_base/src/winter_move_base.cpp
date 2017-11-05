@@ -99,6 +99,10 @@ namespace move_base {
     //like nav_view and rviz
     ros::NodeHandle simple_nh("move_base_simple");
     goal_sub_ = simple_nh.subscribe<geometry_msgs::PoseStamped>("goal", 1, boost::bind(&MoveBase::goalCB, this, _1));
+    
+    //#这里订阅一个超声波数据　当机器人与障碍物小于15cm的时候　中断机器人的运动控制　让机器人向后退10cm
+    ultrosonic_sub_=nh.subscribe<sensor_msgs::Range>("/UltraSoundPublisher", 1, boost::bind(&MoveBase::ultrosonicdata, this, _1));
+    
 
     //we'll assume the radius of the robot to be consistent with what's specified for the costmaps
     private_nh.param("local_costmap/inscribed_radius", inscribed_radius_, 0.325);
@@ -331,8 +335,11 @@ namespace move_base {
 
     action_goal_pub_.publish(action_goal);
   }
-
-  void MoveBase::clearCostmapWindows(double size_x, double size_y){
+ void MoveBase::ultrosonicdata(const sensor_msgs::Range::ConstPtr& ultrosonicdata)
+{
+	ROS_INFO("get ulrtosonic data range: %f",ultrosonicdata->range);
+}
+void MoveBase::clearCostmapWindows(double size_x, double size_y){
     tf::Stamped<tf::Pose> global_pose;
 
     //clear the planner's costmap

@@ -1,0 +1,118 @@
+#!/usr/bin/env python
+#coding=utf-8
+
+import rospy
+from sensor_msgs.msg import Joy
+from geometry_msgs.msg import Twist
+from std_msgs.msg import Bool
+"""
+ math.copysign(x, y)
+ 若y<0，返回-1乘以x的绝对值；否则，返回x的绝对值
+ >>> math.copysign(5.2, -1)
+ >>> -5.2
+"""
+from math import copysign
+
+class IncrementalTeleop:
+
+    def __init__(self):
+        rospy.init_node('yun_incr_teleop')
+        #速度刻度
+        self.turn_scale = rospy.get_param('~turn_scale')
+        self.drive_scale = rospy.get_param('~drive_scale')
+        #降速比例
+        self.slow_scale = rospy.get_param('~slow_scale',3.0)
+        #急停按钮
+        self.estop_button1 = rospy.get_param('~estop_button1', 1)
+        self.estop_button2 = rospy.get_param('~estop_button2', 2)
+        #朝向
+        self.fwd_axis1 = rospy.get_param('~fwd_axis1', 3)#前后
+        self.fwd_axis2 = rospy.get_param('~fwd_axis2', 6)#左右
+        #转向
+        self.turn_left_button = rospy.get_param('~turn_left_button', 6)
+        self.turn_right_button = rospy.get_param('~turn_right_button', 7)
+        #死人开关
+        self.deadman_button = rospy.get_param('~deadman', 0)
+
+        #是否发送非0速度指令
+        self.cmd_target  = None
+        self.cmd_control = Twist()
+        self.cmd_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+        
+        delta_x = 0.02 #20*0.02 = 0.4m/s^2
+        delta_y = 0.02
+        delta_z = 0.05
+
+        rospy.Subscriber("joy", Joy, self.callback)
+        rate = rospy.Rate(rospy.get_param('~hz', 5))
+
+        rospy.on_shutdown(self.nodeShutdown)
+
+        while not rospy.is_shutdown():
+            rate.sleep()
+            if self.cmd_target:
+                # 速度缓冲
+                #X
+                if self.cmd_target.linear.x > self.cmd_control.linear.x:
+                    self.cmd_control.linear.x = min(self.cmd_target.linear.x, self.cmd_control.linear.x + delta_x)
+                elif self.cmd_target.linear.x < self.cmd_control.linear.x:
+                    self.cmd_control.linear.x = max(self.cmd_target.linear.x, self.cmd_control.linear.x - delta_x)
+                else:
+                    self.cmd_control.linear.x = self.cmd_target.linear.x
+                #Y
+                if self.cmd_target.linear.y > self.cmd_control.linear.y:
+                    self.cmd_control.linear.y = min(self.cmd_target.linear.y, self.cmd_control.linear.y + delta_y)
+                elif self.cmd_target.linear.y < self.cmd_control.linear.y:
+                    self.cmd_control.linear.y = max(self.cmd_target.linear.y, self.cmd_control.linear.y - delta_y)
+                else:
+                    self.cmd_control.linear.y = self.cmd_target.linear.y
+                #Z
+                if self.cmd_target.angular.z > self.cmd_control.angular.z:
+                    self.cmd_control.angular.z = min(self.cmd_target.angular.z, self.cmd_control.angular.z + delta_z)
+                elif self.cmd_target.angular.z < self.cmd_control.angular.z:
+                    self.cmd_control.angular.z = max(self.cmd_target.angular.z, self.cmd_control.angular.z - delta_z)
+                else:
+                    self.cmd_control.angular.z = self.cmd_target.angular.z
+
+                self.cmd_pub.publish(self.cmd_control)
+
+    def callback(self, data):
+        """ Receive joystick data, formulate Twist message. """
+        cmd = Twist()
+
+        #如果摁下急停按钮
+        if data.buttons[self.deadman_button] == 1:
+            cmd.linear.x  = data.axes[self.fwd_axis1] * self.drive_scale / self.slow_scale
+            cmd.linear.y  = data.axes[self.fwd_axis2] * self.drive_scale / self.slow_scale
+            cmd.angular.z = (-1) * ( (-1) * (data.buttons[self.turn_left_button]) +
+                              data.buttons[self.turn_right_button] ) * self.turn_scale / self.slow_scale
+
+            self.cmd_target = cmd               
+            
+        elif data.buttons[self.deadman_button] == 0:
+            self.cmd_target = Twist()
+            self.cmd_control = Twist()
+            
+        else:
+            self.cmd_target = None
+
+        #紧急停止
+        if data.buttons[self.estop_button1] == 1 or data.buttons[self.estop_button2] == 1:
+            self.cmd_target = Twist()
+            self.cmd_control = Twist()
+
+    def nodeShutdown(self):
+        #节点停止前，让机器人停下来
+        self.cmd = Twist()
+        self.cmd_pub.publish(self.cmd)
+        self.cmd_pub.publish(self.cmd)
+        self.cmd_pub.publish(self.cmd)
+
+if __name__ == "__main__":
+    try:
+        IncrementalTeleop()
+    except:
+        rospy.loginfo("yun_incr_teleop terminated")
+
+
+

@@ -46,6 +46,7 @@
     <build_depend>costmap_2d</build_depend>
     <build_depend>dynamic_reconfigure</build_depend>
     <build_depend>geometry_msgs</build_depend>
+    <build_depend>sensor_msgs</build_depend>
     <build_depend>message_generation</build_depend>
     <build_depend>move_base_msgs</build_depend>
     <build_depend>nav_core</build_depend>
@@ -71,6 +72,7 @@
     <run_depend>costmap_2d</run_depend>
     <run_depend>dynamic_reconfigure</run_depend>
     <run_depend>geometry_msgs</run_depend>
+    <run_depend>sensro_msgs</run_depend>
     <run_depend>message_runtime</run_depend>
     <run_depend>move_base_msgs</run_depend>
     <run_depend>nav_core</run_depend>
@@ -80,6 +82,7 @@
     <run_depend>rospy</run_depend>
     <run_depend>std_srvs</run_depend>
     <run_depend>tf</run_depend>
+    <run_depend>clear_costmap_recovery_gao</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

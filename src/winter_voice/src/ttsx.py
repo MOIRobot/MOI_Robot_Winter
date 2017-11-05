@@ -15,7 +15,16 @@ class TSpeakOnce:
 		self.engine.setProperty('rate', 150)
 		self.engine.say(words)
 		self.engine.runAndWait()
+'''
+engine = pyttsx.init()
+voices = engine.getProperty('voices')
+for voice in voices:
+   engine.setProperty('voice', voice.id)
+   engine.say('The quick brown fox jumped over the lazy dog.')
+engine.runAndWait()
+'''
 man=TSpeak()
 man.say("Jobs is happy now")
 man.say("hello,would you like some tea")
 man.wait()
+print 'hello'

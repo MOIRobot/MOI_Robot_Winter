@@ -1,4 +1,4 @@
-<library path="lib/libtrajectory_planner_ros">
+<library path="lib/libwinter_trajectory_planner_ros">
     <class name="base_local_planner/Winter_TrajectoryPlannerROS" type="base_local_planner::Winter_TrajectoryPlannerROS" base_class_type="nav_core::BaseLocalPlanner">
     <description>
       A implementation of a local planner using either a DWA or Trajectory Rollout approach based on configuration parameters.

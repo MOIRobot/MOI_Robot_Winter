@@ -237,6 +237,8 @@ namespace move_base {
       bool new_global_plan_;
       
       clear_costmap_recovery_gao::ClearCostmapRecoveryGao mapLayerClearer;
+      
+      int RotaingTimeCount;
   };
 };
 #endif

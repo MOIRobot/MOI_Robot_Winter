@@ -87,10 +87,13 @@ namespace base_local_planner {
       costmap_2d::Costmap2DROS* costmap_ros){
     if (! isInitialized()) {
 
+      ros::NodeHandle n;
       ros::NodeHandle private_nh("~/" + name);
       g_plan_pub_ = private_nh.advertise<nav_msgs::Path>("global_plan", 1);
       l_plan_pub_ = private_nh.advertise<nav_msgs::Path>("local_plan", 1);
-
+      ultrosonicdata_sub_ = n.subscribe<sensor_msgs::Range>("UltraSoundPublisher", 1, boost::bind(&Winter_TrajectoryPlannerROS::ultrosonicdata_callback, this, _1));
+      //初始化超声波距离
+      ultro_distance=10.0;
 
       tf_ = tf;
       costmap_ros_ = costmap_ros;
@@ -290,6 +293,7 @@ namespace base_local_planner {
   bool Winter_TrajectoryPlannerROS::stopWithAccLimits(const tf::Stamped<tf::Pose>& global_pose, const tf::Stamped<tf::Pose>& robot_vel, geometry_msgs::Twist& cmd_vel){
     //slow down with the maximum possible acceleration... we should really use the frequency that we're running at to determine what is feasible
     //but we'll use a tenth of a second to be consistent with the implementation of the local planner.
+    //tag仿真速度
     double vx = sign(robot_vel.getOrigin().x()) * std::max(0.0, (fabs(robot_vel.getOrigin().x()) - acc_lim_x_ * sim_period_));
     double vy = sign(robot_vel.getOrigin().y()) * std::max(0.0, (fabs(robot_vel.getOrigin().y()) - acc_lim_y_ * sim_period_));
 
@@ -314,6 +318,10 @@ namespace base_local_planner {
     cmd_vel.linear.y = 0.0;
     cmd_vel.angular.z = 0.0;
     return false;
+  }
+  void  Winter_TrajectoryPlannerROS::ultrosonicdata_callback(const sensor_msgs::Range::ConstPtr& data)
+  {
+	ultro_distance=data->range;
   }
 
   bool Winter_TrajectoryPlannerROS::rotateToGoal(const tf::Stamped<tf::Pose>& global_pose, const tf::Stamped<tf::Pose>& robot_vel, double goal_th, geometry_msgs::Twist& cmd_vel){
@@ -384,6 +392,7 @@ namespace base_local_planner {
 
     std::vector<geometry_msgs::PoseStamped> local_plan;
     tf::Stamped<tf::Pose> global_pose;
+    //获得机器人的全局坐标
     if (!costmap_ros_->getRobotPose(global_pose)) {
       return false;
     }
@@ -402,9 +411,27 @@ namespace base_local_planner {
     tf::Stamped<tf::Pose> drive_cmds;
     drive_cmds.frame_id_ = robot_base_frame_;
 
+	//tag得到机器人的速度
     tf::Stamped<tf::Pose> robot_vel;
     odom_helper_.getRobotVel(robot_vel);
-
+    
+    if(ultro_distance<0.6)
+    {
+			ROS_INFO("get ultrosonic data %f robtot will stop here",ultro_distance) ;
+			if ( ! stopWithAccLimits(global_pose, robot_vel, cmd_vel)) {
+            return false;
+          }
+          else
+          {
+			  return true;
+		  }
+	  }
+	  
+	  
+	//得到机器人的速度
+	//vel 机器人的速度
+    //Eigen::Vector3f vel(global_vel.getOrigin().getX(), global_vel.getOrigin().getY(), tf::getYaw(global_vel.getRotation()));
+    
     /* For timing uncomment
     struct timeval start, end;
     double start_t, end_t, t_diff;
@@ -426,6 +453,7 @@ namespace base_local_planner {
     double goal_th = yaw;
 
     //check to see if we've reached the goal position
+    /*****************以下是到达目的地的动作**************************************/
     if (xy_tolerance_latch_ || (getGoalPositionDistance(global_pose, goal_x, goal_y) <= xy_goal_tolerance_)) {
 
       //if the user wants to latch goal tolerance, if we ever reach the goal location, we'll
@@ -448,6 +476,7 @@ namespace base_local_planner {
         //we need to call the next two lines to make sure that the trajectory
         //planner updates its path distance and goal distance grids
         tc_->updatePlan(transformed_plan);
+        //#tag得到速度的入口
         Trajectory path = tc_->findBestPath(global_pose, robot_vel, drive_cmds);
         map_viz_.publishCostCloud(costmap_);
 
@@ -478,6 +507,8 @@ namespace base_local_planner {
       //we don't actually want to run the controller when we're just rotating to goal
       return true;
     }
+    
+    /**************以上是到达目的地的动作*****************************************/
 
     tc_->updatePlan(transformed_plan);
 

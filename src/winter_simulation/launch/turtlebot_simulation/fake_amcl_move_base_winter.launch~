@@ -18,8 +18,8 @@
     <param name="odom_frame_id"             value="$(arg odom_frame_id)"/> 
     <param name="base_frame_id"             value="$(arg base_frame_id)"/> 
     <param name="global_frame_id"           value="$(arg global_frame_id)"/>
-    <param name="initial_pose_x" value="-12.0"/>
-    <param name="initial_pose_y" value="-1.0"/>
+    <param name="initial_pose_x" value="0.0"/>
+    <param name="initial_pose_y" value="0.0"/>
     <param name="initial_pose_a" value="0.0"/>
     <remap from="scan"                      to="$(arg scan_topic)"/>
   </node>

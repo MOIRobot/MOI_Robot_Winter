@@ -8,6 +8,7 @@ find_package(catkin REQUIRED
             costmap_2d
             dynamic_reconfigure
             geometry_msgs
+            sensor_msgs
             message_generation
             nav_core
             nav_msgs
@@ -65,6 +66,7 @@ catkin_package(
         costmap_2d
         dynamic_reconfigure
         geometry_msgs
+        sensor_msgs
         message_runtime
         nav_core
         nav_msgs
@@ -120,36 +122,4 @@ add_executable(point_grid src/point_grid.cpp)
 add_dependencies(point_grid ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(point_grid ${catkin_LIBRARIES})
 
-#install(TARGETS
-#            winter_base_local_planner
-#            trajectory_planner_ros
-#       ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#       LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#       )
 
-#install(FILES blp_plugin.xml
-#    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-#)
-
-#install(DIRECTORY include/${PROJECT_NAME}/
-#  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#  PATTERN ".svn" EXCLUDE
-#)
-
-if(CATKIN_ENABLE_TESTING)
-  find_package(rostest)
-  catkin_add_gtest(winter_base_local_planner_utest
-    test/gtest_main.cpp
-    test/utest.cpp
-    test/velocity_iterator_test.cpp
-    test/footprint_helper_test.cpp
-    test/trajectory_generator_test.cpp
-    test/map_grid_test.cpp)
-  target_link_libraries(winter_base_local_planner_utest
-      winter_base_local_planner winter_trajectory_planner_ros
-      )
-
-
-  catkin_add_gtest(line_iterator
-      test/line_iterator_test.cpp)
-endif()

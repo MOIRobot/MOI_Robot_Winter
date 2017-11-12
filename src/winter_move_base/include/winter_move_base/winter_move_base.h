@@ -49,6 +49,7 @@
 #include <nav_core/base_global_planner.h>
 #include <nav_core/recovery_behavior.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <sensor_msgs/Range.h>
 #include <costmap_2d/costmap_2d_ros.h>
 #include <costmap_2d/costmap_2d.h>
 #include <nav_msgs/GetPlan.h>

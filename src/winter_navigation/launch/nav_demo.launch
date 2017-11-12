@@ -1,9 +1,15 @@
 <?xml version="1.0"?>
 <launch>
+<<<<<<< HEAD
   <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot.urdf" />
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
   <!-- Set the name of the map yaml file: can be overridden on the command line. -->
   <arg name="map" default="office.yaml" />
+=======
+
+  <!-- Set the name of the map yaml file: can be overridden on the command line. -->
+  <arg name="map" default="middle_room.yaml" />
+>>>>>>> 53bbca895b8b1e257465748ae84cb74df138cfbc
 
   <!-- Run the map server with the desired map -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(find winter_navigation)/maps/$(arg map)"/>

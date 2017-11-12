@@ -1,7 +1,7 @@
 <launch>
 
 <node pkg="amcl" type="amcl" name="amcl">
-  <remap from="scan" to="scan_front"/>
+ 
 
   <param name="odom_model_type" value="diff"/>
   

@@ -1,0 +1,73 @@
+controller_frequency:更新规划的频率，建议3~5
+
+max_vel_x：最大线速度，单位m/s。Create的turtlebot限制速度为0.5m/s，一般建议室内在0.3m/s以内。
+
+min_vel_x：最小线速度，单位同上。
+
+max_vel_y，min_vel_y：不知道是什么速度，官方解释差速轮驱动这两个值为0。个人理解应该对于两个差速轮，只有x方向的一个线速度。而像麦克纳姆轮多个轮，可以有y方向的线速度
+
+max_vel_theta: 最大角速度，单位rad/s。这个值不要设置太高。默认1.0rad/s。
+
+min_vel_theta:最小角速度，单位rad/s。默认-1.0rad/s。（上面两个速度我的rbx1包中竟然没有）
+
+ min_in_place_vel_theta：原地旋转角速度的最小值，单位rad/s，默认0.5rad/s。
+
+ escape_vel：逃逸速度，单位m/s默认-0.1m/s。为什么叫逃逸速度呢？反正这个速度是反转，姑且算是‘逃逸’速度吧。
+
+    
+
+acc_lim_x：x方向的最大线速度的加速度，单位m/s2。默认2.5m/s2。
+acc_lim_y:同上，只是y方向的加速度。故对于两轮差速驱动，该值为0。
+acc_lim_theta：角速度加速度限值，单位rad/s2。默认为3.2rad/s2。
+
+ 
+
+holonomic_robot：全方向机器人。对于两轮差速，该值为false。
+
+yaw_goal_tolerance:允许机器人缩到目标的方向（弧度）偏差，该值设置小可能导致机器人接近目标振荡。默认为0.1。
+
+xy_goal_tolerance：允许机器人所到目标的坐标（以米为单位）偏差，该值过小可能导致机器人在目标位置附近不断调整到精确的目标位置。默认为0.1。
+
+latch_xy_goal_tolerance:目标坐标偏差锁存，如果上锁，机器人到达过坐标后只进行简单的方向调整，即使在公差外。默认为false。
+
+pdist_scale：（path distance）地图单元格的路径距离系数，默认为0.6。决定有多接近路径。
+
+gdist_scale:（goal distance）地图单元格两点距离的系数，默认为0.6。决定有多接近局部目标。
+
+occdist_scale：沿障碍物轨迹最大距离系数
+
+cost =  pdist_scale * (distance to path from the endpoint of the trajectory in map cells or meters depending on the meter_scoring parameter)  + gdist_scale * (distance to local goal from the endpoint of the trajectory in map cells or meters depending on the meter_scoring parameter) + occdist_scale * (maximum obstacle cost along the trajectory in obstacle cost (0-254))
+
+meter_scoring: true   以米为单位
+
+ 
+
+heading_lookahead:原地旋转时向前看多少米，默认0.35
+
+heading_scoring: 通过机器人航向计算还是通过路径计算距离，默认false     heading_scoring_timestep: 航向计算距离时，沿着模拟轨迹向前看的时间，默认0.8
+
+occdist_scale:控制器应该避开障碍物的的轻易程度，默认0.1
+
+oscillation_reset_dist: 在振荡标志被清零前，机器人必须在出行多远。默认0.05.
+
+publish_cost_grid_pc:是否使用cost_grid发布。如果为true，在/ cost_cloud话题生成sensor_msgs/ PointCloud2。
+
+prune_plan: 设置为true，机器人行走1m后，结束动作。
+
+ 
+
+sim_time: 模拟轨迹的时间，默认1.0s
+
+sim_granularity: 给定轨迹的步长，默认0.025米
+
+angular_sim_granularity: 给定角度轨迹的弧长，默认0.025弧度
+
+vx_samples: x方向速度的样本数，默认为8
+
+vy_samples: y方向速度的样本数，两轮差速为0.
+
+vtheta_samples: 角速度的样本数，默认为20
+
+dwa:是否使用动态窗口方法（DWA），或者是否使用轨迹。默认为true
+
+simple_attractor: false  不知道是什么作用

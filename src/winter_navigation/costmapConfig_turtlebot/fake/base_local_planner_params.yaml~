@@ -3,38 +3,37 @@ recovery_behavior_enabled: true
 clearing_rotation_allowed: true
 
 TrajectoryPlannerROS:
-   max_vel_x: 0.45
+   max_vel_x: 1.2
    min_vel_x: 0.02             
    max_vel_y: 0                # 
    min_vel_y: 0                #
-   max_vel_theta: 1.2          # 57.2 degree
-   min_vel_theta: -1.2         #
-   min_in_place_vel_theta: 0.3 #
+   max_vel_theta: 1.0          # 57.2 degree
+   min_vel_theta: -1.0         #
+   min_in_place_vel_theta: 0.1 #
    escape_vel: -0.1            #
-   acc_lim_x: 0.8              # 
+   acc_lim_x: 2.6              # 
    acc_lim_y: 0.0              #
-   acc_lim_theta: 2.5          #229degree 
+   acc_lim_theta: 4.0          #229degree 
 
    holonomic_robot: false      #
-   yaw_goal_tolerance: 0.2     # 5.72degree
-   xy_goal_tolerance: 0.15      #
+   yaw_goal_tolerance: 0.1     # 5.72degree
+   xy_goal_tolerance: 0.05      #
    latch_xy_goal_tolerance: false # 
-   pdist_scale: 0.6            #
-   gdist_scale: 0.6            #
+   pdist_scale: 0.8            #
+   gdist_scale: 0.4            #
    occdist_scale: 0.1          #
    meter_scoring: true         #
 
    heading_lookahead: 0.325    #
    heading_scoring: false      #
    heading_scoring_timestep: 0.8 #
-   occdist_scale: 0.1          #
    oscillation_reset_dist: 0.05#
    publish_cost_grid_pc: false #
    prune_plan: true            #
 
-   sim_time: 2.5               #
-   sim_granularity: 0.025      #
-   angular_sim_granularity: 0.025 #
+   sim_time: 1.5               #
+   sim_granularity: 0.05       #
+   angular_sim_granularity: 0.1 #0.025
    vx_samples: 8               #
    vy_samples: 0               #
    vtheta_samples: 20          #

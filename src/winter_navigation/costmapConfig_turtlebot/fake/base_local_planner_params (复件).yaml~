@@ -1,0 +1,42 @@
+controller_frequency: 3.0
+recovery_behavior_enabled: true
+clearing_rotation_allowed: true
+
+TrajectoryPlannerROS:
+   max_vel_x: 0.8              #  最大线速度，单位m/s。Create的turtlebot限制速度为0.5m/s，一般建议室内在0.3m/s以内。
+   min_vel_x: 0.05             #
+   max_vel_y: 0                # zero for a differential drive robot
+   min_vel_y: 0                #
+   max_vel_theta: 1.0          # 最大角速度，单位rad/s。这个值不要设置太高。默认1.0rad/s。
+   min_vel_theta: -1.0         #
+   min_in_place_vel_theta: 0.5 # 原地旋转角速度的最小值，单位rad/s，默认0.5rad/s。
+   escape_vel: -0.1 		   # 逃逸速度，单位m/s默认-0.1m/s。为什么叫逃逸速度呢？反正这个速度是反转，姑且算是‘逃逸’速度吧。
+   acc_lim_x: 2.5  			   # x方向的最大线速度的加速度，单位m/s2。默认2.5m/s2。
+   acc_lim_y: 0.0  			   # zero for a differential drive robot
+   acc_lim_theta: 3.2
+
+   holonomic_robot: false 	   #全方向机器人。对于两轮差速，该值为false。
+   yaw_goal_tolerance: 0.1     # about 6 degrees 允许机器人缩到目标的方向（弧度）偏差，该值设置小可能导致机器人接近目标振荡。默认为0.1。
+   xy_goal_tolerance: 0.1      # 允许机器人所到目标的坐标（以米为单位）偏差，该值过小可能导致机器人在目标位置附近不断调整到精确的目标位置。默认为0.1。
+   latch_xy_goal_tolerance: false # 目标坐标偏差锁存，如果上锁，机器人到达过坐标后只进行简单的方向调整，即使在公差外。默认为false。
+   pdist_scale: 0.8            # （path distance）地图单元格的路径距离系数，默认为0.6。决定有多接近路径。
+   gdist_scale: 0.6            # 地图单元格两点距离的系数，默认为0.6。决定有多接近局部目标。
+   occdist_scale: 0.1          # 沿障碍物轨迹最大距离系数
+   meter_scoring: true 		   #以米为单位
+
+   heading_lookahead: 0.325    # 原地旋转时向前看多少米，默认0.35
+   heading_scoring: false      #  通过机器人航向计算还是通过路径计算距离，默认false 
+   heading_scoring_timestep: 0.8 # 航向计算距离时，沿着模拟轨迹向前看的时间，默认0.8
+   occdist_scale: 0.1          #
+   oscillation_reset_dist: 0.05# 在振荡标志被清零前，机器人必须在出行多远。默认0.05.
+   publish_cost_grid_pc: false # 是否使用cost_grid发布。如果为true，在/ cost_cloud话题生成sensor_msgs/ PointCloud2。
+   prune_plan: true            # 设置为true，机器人行走1m后，结束动作。
+
+   sim_time: 2.0               #模拟轨迹的时间，默认1.0s
+   sim_granularity: 0.025      # 给定轨迹的步长，默认0.025米
+   angular_sim_granularity: 0.025 # 给定角度轨迹的弧长，默认0.025弧度
+   vx_samples: 8               # x方向速度的样本数，默认为8
+   vy_samples: 0               # zero for a differential drive robot
+   vtheta_samples: 20          #
+   dwa: true 				   #
+   simple_attractor: false 	   #

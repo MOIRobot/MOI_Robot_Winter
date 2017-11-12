@@ -43,7 +43,7 @@ global MAXROTATESPEED
 MAXSPEED=0.35
 MAXROTATESPEED=0.8
 ACC=0.3
-RotateAcc=0.8
+RotateAcc=0.6
 #控制频率
 global ControllerFrequecny
 ControllerFrequecny=10
@@ -225,6 +225,8 @@ if __name__ == '__main__':
 			rotateRobot(MAXROTATESPEED)
 		elif ch=='o':
 			rotateRobot(0-MAXROTATESPEED)
+		elif ch=='l':
+			rotateRobot(-MAXROTATESPEED)
 		elif ch=='k':
 			stop_robot()
 		elif ch=='q':
@@ -238,5 +240,11 @@ if __name__ == '__main__':
 			if last_ch is '' :
 				stop_robot()
 		last_ch=ch
+		print "Reading form keybord"
+		print """   i
+j  k  l
+   m"""
+		print 'press Q to quit'
+		#rate.sleep()
 			
 			

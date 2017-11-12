@@ -53,7 +53,7 @@ bool LslidarN301Decoder::createRosIO() {
   point_cloud_pub = nh.advertise<sensor_msgs::PointCloud2>(
       "lslidar_point_cloud", 10);
   //scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 100);
-  scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 10);
+  scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan",20);
    //求被裁剪的激光束的大小数目 并除以2 来确定被裁剪的数组大小的范围
    if(max_angle==360.0)
    {

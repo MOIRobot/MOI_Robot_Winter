@@ -16,7 +16,6 @@
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h> // for tf
-#include <winter_bringup/Infrared.h>
 
 //角度数据常数
 #define ANGLE_K M_PI/(180.0*10)
@@ -28,7 +27,7 @@
 轮子的半径：2 * M_PI * R = 0.4823
 odom_k = 2*M_PI*R
 */
-#define ODOM_K (0.4823/2400.0)
+#define ODOM_K (1.063 * 0.4823 / 2400.0)
 
 using namespace std;
 using namespace boost::asio;
@@ -58,8 +57,6 @@ private:
 
     ros::Publisher odom_pub;
 
-    ros::Publisher infrared_pub;
-
     ros::Subscriber cmd_sub;
 
     ros::Time current_time, last_time;
@@ -68,10 +65,9 @@ private:
         
     geometry_msgs::Twist cmd_msg;
 
-    boost::asio::streambuf rec_buf;   
     string str;
 
-    //boost::asio::streambuf rec_buf;
+    boost::asio::streambuf rec_buf;
 
     float velocity[2];//m/s
 
@@ -116,7 +112,6 @@ private:
     int encoder_sum[2];
 
     int left_temp, right_temp;
-
 
 public:
 

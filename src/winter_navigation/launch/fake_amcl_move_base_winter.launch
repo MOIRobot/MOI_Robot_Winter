@@ -1,0 +1,39 @@
+<launch>
+
+  <!-- Run the map server with a blank map + obstacle -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find winter_simulation)/maps/my_map.yaml"/>
+ 
+  
+  <arg name="use_map_topic"   default="map"/>
+  <arg name="scan_topic"      default="scan"/> 
+  
+  <arg name="odom_frame_id"   default="odom"/>
+  <arg name="base_frame_id"   default="base_link"/>
+  <arg name="global_frame_id" default="map"/>
+  
+  <node pkg="amcl" type="amcl" name="amcl">
+    <param name="use_map_topic"             value="$(arg use_map_topic)"/>
+    <!-- Publish scans from best pose at a max of 10 Hz -->
+    <param name="odom_model_type"           value="diff"/>
+    <param name="odom_frame_id"             value="$(arg odom_frame_id)"/> 
+    <param name="base_frame_id"             value="$(arg base_frame_id)"/> 
+    <param name="global_frame_id"           value="$(arg global_frame_id)"/>
+    <param name="initial_pose_x" value="0.0"/>
+    <param name="initial_pose_y" value="0.0"/>
+    <param name="initial_pose_a" value="0.0"/>
+    <remap from="scan"                      to="$(arg scan_topic)"/>
+  </node>
+  
+  <include file="$(find winter_simulation)/launch/turtlebot_simulation/move_base_winter.launch" />
+   
+  
+  
+  <arg name="model" />  
+   <arg name="gui" default="True" />  
+   <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot.urdf" />  
+   <param name="use_gui" value="$(arg gui)"/>  
+   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find winter_simulation)/rviz/rviz_turtlebot/amcl.rviz" required="true" />
+  
+
+</launch>

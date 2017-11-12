@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  message_generation
   tf
 )
 
@@ -48,11 +49,10 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+   FILES
+   Infrared.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -69,10 +69,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+   DEPENDENCIES
+   std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -202,6 +202,7 @@ include_directories(
 include_directories(include ${catkin_INCLUDE_DIRS}/base_control.h)
 add_executable(base_control src/base_control.cpp)
 target_link_libraries(base_control ${catkin_LIBRARIES} libboost_system.so)
+add_dependencies(base_control winter_bringup_generate_messages_cpp)
 
 add_executable(fake_odom_publisher src/fake_odom_publisher.cpp)
 target_link_libraries(fake_odom_publisher ${catkin_LIBRARIES})

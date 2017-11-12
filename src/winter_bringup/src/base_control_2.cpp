@@ -30,14 +30,12 @@ BaseControl::BaseControl():
   private_nh.param("wheel_radius", wheel_radius_, 0.06);
   private_nh.param("pulse_per_rotation", pulse_per_rotation_, 500);
   private_nh.param("ratio", ratio_, 25);
-  private_nh.param("loop_rate", loop_rate_, 40);
+  private_nh.param("loop_rate", loop_rate_, 20);
   
 
   cmd_sub = nh.subscribe("/smooth_cmd_vel", 1, &BaseControl::CmdCallback, this);
 
-  odom_pub = nh.advertise<nav_msgs::Odometry>("/odom", 1);
-
-  infrared_pub = nh.advertise<winter_bringup::Infrared>("/infrared", 1);
+  odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 1);
 
   ros::Rate loop_rate(loop_rate_);
 
@@ -104,11 +102,11 @@ void BaseControl::HandleRead(boost::system::error_code ec, std::size_t bytes_tra
     //cout.write(rec_buf, bytes_transferred);
 
     bytes_read = bytes_transferred;
-    printf("read size: %ld  ", bytes_transferred);
 }
 
 void BaseControl::ParseSerial()
 {
+    
     boost::asio::async_read_until(sp, rec_buf, '#', boost::bind(&BaseControl::HandleRead, this,  _1, _2));
 
     //处理接受到的数据
@@ -120,52 +118,33 @@ void BaseControl::ParseSerial()
 
     std::vector<unsigned char> recv_data(recv_str.c_str(), recv_str.c_str() + recv_str.size() + 1);
 
-    
-    printf("rec_buf size: %ld  ", recv_size);
+    /*
+    printf("rec_buf size: %ld   ", recv_size);
     for(int i = 0 ; i < recv_size; i++)
         printf("%d ",recv_data[i]);
     printf("\n");
-    
+    */
 
     rec_buf.consume(recv_size);/// Remove characters from the input sequence.
 
-    printf("rec_buf size: %ld  ", rec_buf.size());
     //Pose Data数据
-    if((recv_data[0] == 0x45) && (recv_data[1] == 0x54) && (recv_data[2] == 0x09) && (recv_data[3] == 'G') && (recv_data[4] == 'P'))
+    int k = recv_size - 10;//i+10最大16,i最大6 ,k = 7,17 - 7 = 11.
+    if(k < 0) return;
+    for(int i = 0; i < k; i++)
     {
-        //check sum
-        if((((recv_data[5] + recv_data[6] + recv_data[7] + recv_data[8] + recv_data[9] + recv_data[10]) & 0x3F) + 0x30) == recv_data[11])
+        if((recv_data[i] == 0x45) && (recv_data[i+1] == 0x54) && (recv_data[i+2] == 0x09) && (recv_data[i+3] == 'G') && (recv_data[i+4] == 'P'))
         {
-            encoder_curr[LeftWheel] = (short int)((recv_data[5] << 8) | recv_data[6]);
-            encoder_curr[RightWheel] = (short int)((recv_data[7] << 8) | recv_data[8]);
-            angle_curr = ((recv_data[9] << 8) | recv_data[10]) * ANGLE_K;
-            //std::cout << "left:"<< encoder_curr[LeftWheel] << " right:" << encoder_curr[RightWheel] << " angle_curr: " << angle_curr << std::endl;
+            //check sum
+            if((((recv_data[i+5] + recv_data[i+6] + recv_data[i+7] + recv_data[i+8] + recv_data[i+9] + recv_data[i+10]) & 0x3F) + 0x30) == recv_data[i+11])
+            {
+                encoder_curr[LeftWheel] = (short int)((recv_data[i+5] << 8) | recv_data[i+6]);
+                encoder_curr[RightWheel] = (short int)((recv_data[i+7] << 8) | recv_data[i+8]);
+                angle_curr = ((recv_data[i+9] << 8) | recv_data[i+10]) * ANGLE_K;
+                //std::cout << "left:"<< encoder_curr[LeftWheel] << " right:" << encoder_curr[RightWheel] << " angle_curr: " << angle_curr << std::endl;
 
-            //发布odom，每更新一次数据更新一次odom
-            PublishOdom();
-        }
-    }
-    //超声波和红外数据
-    else if((recv_data[0] == 0x45) && (recv_data[1] == 0x54) && (recv_data[2] == 0x0C) && (recv_data[3] == 'U') && (recv_data[4] == 'I'))
-    {
-        std::cout << "ultrasonic" <<std::endl;
-        if((((recv_data[5] + recv_data[6] + recv_data[7] + recv_data[8] + recv_data[9] + recv_data[10]+ recv_data[11]+ recv_data[12]) & 0x3F) + 0x30) == recv_data[13])
-        {
-            //单位：m
-            winter_bringup::Infrared infrared_msg;
-            infrared_msg.infrared.resize(8);
-            infrared_msg.infrared[0] = recv_data[5] / 10.0;
-            infrared_msg.infrared[1] = recv_data[6] / 10.0;
-            infrared_msg.infrared[2] = recv_data[7] / 10.0;
-            infrared_msg.infrared[3] = recv_data[8] / 10.0;
-            infrared_msg.infrared[4] = recv_data[9] / 10.0;
-            infrared_msg.infrared[5] = recv_data[10] / 10.0;
-            infrared_msg.infrared[6] = recv_data[11] / 10.0;
-            infrared_msg.infrared[7] = recv_data[12] / 10.0;
-            
-            infrared_pub.publish(infrared_msg);
-	    
-            std::cout << recv_data[5] << " "<< recv_data[6] <<" " <<std::endl;
+                //发布odom，每更新一次数据更新一次odom
+                PublishOdom();
+            }
         }
     }
 }
@@ -268,6 +247,9 @@ void BaseControl::PublishOdom()
     encoder_diff[LeftWheel] = encoder_curr[LeftWheel] - encoder_last[LeftWheel];
     encoder_diff[RightWheel] = encoder_curr[RightWheel] - encoder_last[RightWheel];
 
+    //std::cout << "curr_left: " << encoder_curr[LeftWheel] <<" last_left: "<< encoder_last[LeftWheel] <<" diff_left:"<<encoder_diff[LeftWheel] <<  std::endl;
+   // std::cout << "curr_right: " << encoder_curr[RightWheel] <<" last_right: "<< encoder_last[RightWheel] <<" diff_right:"<<encoder_diff[RightWheel] <<  std::endl;
+   
     if(encoder_diff[LeftWheel] < -10000)
        encoder_diff[LeftWheel] = encoder_diff[LeftWheel] + 60000;
     else if(encoder_diff[LeftWheel] > 10000)
@@ -281,13 +263,13 @@ void BaseControl::PublishOdom()
     delta_time = (current_time - last_time).toSec();
     
     //计算每个轮子行走的距离
-    dis[LeftWheel] = encoder_diff[LeftWheel] * ODOM_K;     
+    dis[LeftWheel] = encoder_diff[LeftWheel] * ODOM_K;
     dis[RightWheel] = encoder_diff[RightWheel] * ODOM_K;
 
-    left_temp += encoder_diff[LeftWheel];
-    right_temp += encoder_diff[RightWheel];
+   // left_temp += encoder_diff[LeftWheel];
+    //right_temp += encoder_diff[RightWheel];
 
-    //std::cout << "left_temp: " << left_temp <<" right_temp:" << right_temp << std::endl;
+   // std::cout << "left: " << encoder_diff[LeftWheel] <<" right:" << encoder_diff[RightWheel] << std::endl;
 
     delta_th = angle_curr - angle_last;
     delta_s = (dis[LeftWheel] + dis[RightWheel]) / 2.0;
@@ -301,6 +283,9 @@ void BaseControl::PublishOdom()
         vth = delta_th / delta_time;
     }
 
+    std::cout << "diff_right: " << encoder_diff[RightWheel] <<" diff_left: "<< encoder_diff[LeftWheel] <<" diff_time:"<< delta_time \
+              << "curr_left: " << encoder_curr[LeftWheel] <<" last_left: "<< encoder_last[LeftWheel]  <<  std::endl;
+
     //累计坐标
     th_pos += delta_th;
 
@@ -308,7 +293,6 @@ void BaseControl::PublishOdom()
     float r_y = delta_s * sin(delta_th / 2.0);
 
     delta_x = r_x * cos(th_pos) + r_y * sin(th_pos);
-    //delta_y = -1.0 * r_x * sin(th_pos) + r_y * cos(th_pos);
     delta_y = r_x * sin(th_pos) - r_y * cos(th_pos);
     
     //delta_x = delta_s * cos(th_pos + delta_th/2.0);

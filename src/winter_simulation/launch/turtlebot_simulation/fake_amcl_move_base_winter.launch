@@ -28,7 +28,7 @@
    
   
   
-  <arg name="model" />  
+   <arg name="model" />  
    <arg name="gui" default="True" />  
    <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot.urdf" />  
    <param name="use_gui" value="$(arg gui)"/>  

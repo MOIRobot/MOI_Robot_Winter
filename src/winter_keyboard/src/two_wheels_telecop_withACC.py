@@ -5,10 +5,9 @@ import rospy
 from geometry_msgs.msg import Twist 
 from std_msgs.msg import String
 import  os  
-import  sys
-import  tty, termios
+import sys, select, termios, tty
 import time    
-
+import thread
 import pyttsx
 def onEnd(name, completed):
 		print 'end'
@@ -42,9 +41,8 @@ global MAXSPEED
 global MAXROTATESPEED
 
 MAXSPEED=0.35
-MAXROTATESPEED=1.4
-
-ACC=0.5
+MAXROTATESPEED=0.8
+ACC=0.3
 RotateAcc=0.8
 #控制频率
 global ControllerFrequecny
@@ -53,6 +51,26 @@ ControllerFrequecny=10
 CurrentSpeedX=0.0
 CurrentSpeedY=0.0
 CurrentRotate=0.0
+
+
+class TSpeak:
+	def __init__(self):
+		self.engine=pyttsx.init()
+		self.engine.setProperty('rate', 120)
+	def say(self,words):
+		self.engine.say(words)
+	def wait(self):
+		self.engine.runAndWait()
+
+man = TSpeak()
+
+msg="""
+Reading form keybord"
+    i
+j   k  l
+    m
+press Q to quit
+"""
 def moveX(speed):
 	global ControllerFrequecny
 	global ACC
@@ -60,13 +78,18 @@ def moveX(speed):
 		cmd.linear.x+=ACC/ControllerFrequecny
 		if(cmd.linear.x>=speed):
 			cmd.linear.x=speed
-			print 'MAX SPEED'
-			man.say("MAX SPEED")
 		if cmd.linear.x<=speed:
 			cmd.linear.y=0.0
 			cmd.angular.z=0.0
 			pub.publish(cmd)
 			time.sleep(1.0/ControllerFrequecny)
+			#print 'MAX SPEED'
+			#man.say('max speed')
+			man.wait()
+		cmd.linear.y=0.0
+		cmd.angular.z=0.0
+		pub.publish(cmd)
+		time.sleep(1.0/ControllerFrequecny)
 		print "move forward!"
 	elif speed<0:
 		cmd.linear.x-=ACC/ControllerFrequecny
@@ -128,13 +151,13 @@ def stop_robot():
 			cmd.angular.z-=RotateAcc/ControllerFrequecny
 		elif(cmd.angular.z<0):
 			cmd.angular.z+=RotateAcc/ControllerFrequecny
-		if(abs(cmd.linear.x)<(2*ACC/ControllerFrequecny)):
+		if(abs(cmd.linear.x)<(ACC/ControllerFrequecny)):
 			cmd.linear.x=0.0
 			fx=True
-		if(abs(cmd.linear.y)<(2*ACC/ControllerFrequecny)):
+		if(abs(cmd.linear.y)<(ACC/ControllerFrequecny)):
 			cmd.linear.y=0.0
 			fy=True
-		if(abs(cmd.angular.z)<(2*RotateAcc/ControllerFrequecny)):
+		if(abs(cmd.angular.z)<(RotateAcc/ControllerFrequecny)):
 			cmd.angular.z=0.0
 			fz=True
 		pub.publish(cmd)
@@ -167,36 +190,41 @@ def rotateRobot(speed):
 		print "rotate to left!"
 	else:
 		return	
+def getKey():
+    tty.setraw(sys.stdin.fileno())
+    rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
+    if rlist:
+        key = sys.stdin.read(1)
+    else:
+        key = ''
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+    return key
 if __name__ == '__main__':
+	settings = termios.tcgetattr(sys.stdin)
 	rospy.init_node('teleop')
 	rate = rospy.Rate(rospy.get_param('~hz', 1))  
-	fd=sys.stdin.fileno()
-	old_settings=termios.tcgetattr(fd)
-	print "Reading form keybord"
-	print """   i
-j  k  l
-   m"""
-	print 'press Q to quit'
-	while True:
-		#old_settings[3]= old_settings[3] & ~termios.ICANON & ~termios.ECHO  
-		try:
-			tty.setraw(fd)
-			ch=sys.stdin.read(1)
-		finally:
-			termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)  
-			#print 'error'
+	#thread.start_new_thread(getCharfromKeyboard,())  
+		#rate.sleep()
+	last_ch=''
+	while not rospy.is_shutdown():
+		print msg
+		ch=getKey()
 		if ch=='i':
-			moveX(MAXSPEED)
+			if last_ch=='i':
+				moveX(MAXSPEED)
 		elif ch=='m':
-			moveX(0-MAXSPEED)
+			if last_ch=='m':
+				moveX(0-MAXSPEED)
 		elif ch=='j':
-			rotateRobot(0.8)
+			if last_ch=='j':
+				rotateRobot(MAXROTATESPEED)
 		elif ch=='l':
-			rotateRobot(-0.8)
+			if last_ch=='l':
+				rotateRobot(0-MAXROTATESPEED)
 		elif ch=='u':
-			rotateRobot(0.8)
+			rotateRobot(MAXROTATESPEED)
 		elif ch=='o':
-			rotateRobot(-0.8)
+			rotateRobot(0-MAXROTATESPEED)
 		elif ch=='k':
 			stop_robot()
 		elif ch=='q':
@@ -207,15 +235,8 @@ j  k  l
 			print "shutdown!"
 			break
 		else:
-			cmd.linear.x=0.0
-			cmd.angular.z=0.0
-		print "Reading form keybord"
-		print """   i
-j  k  l
-   m"""
-		print 'press Q to quit'
-		#rate.sleep()
-
-		
+			if last_ch is '' :
+				stop_robot()
+		last_ch=ch
 			
 			

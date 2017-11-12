@@ -2,7 +2,7 @@ controller_frequency: 5.0
 recovery_behavior_enabled: true
 clearing_rotation_allowed: true
 
-TrajectoryPlannerROS:
+Winter_TrajectoryPlannerROS:
    max_vel_x: 1.2
    min_vel_x: 0.02             
    max_vel_y: 0                # 
@@ -31,7 +31,7 @@ TrajectoryPlannerROS:
    publish_cost_grid_pc: false #
    prune_plan: true            #
 
-   sim_time: 1.5               #
+   sim_time: 1.5               #1.5
    sim_granularity: 0.05       #
    angular_sim_granularity: 0.1 #0.025
    vx_samples: 8               #

@@ -1,0 +1,41 @@
+controller_frequency: 5.0
+recovery_behavior_enabled: false
+clearing_rotation_allowed: false
+
+TrajectoryPlannerROS:
+   max_vel_x: 0.8
+   min_vel_x: 0.2
+   max_vel_y: 0.5  # zero for a differential drive robot
+   min_vel_y: 0.05
+   max_vel_theta: 1.0
+   min_vel_theta: -1.0
+   min_in_place_vel_theta: 0.2
+   escape_vel: -0.1
+   acc_lim_x: 0.3
+   acc_lim_y: 0.3  # zero for a differential drive robot
+   acc_lim_theta: 0.5
+
+   holonomic_robot: true
+   yaw_goal_tolerance: 0.05 # about 6 degrees
+   xy_goal_tolerance: 0.1  # 5 cm
+   latch_xy_goal_tolerance: false
+   pdist_scale: 0.3
+   gdist_scale: 0.8
+   meter_scoring: true
+
+   heading_lookahead: 0.325
+   heading_scoring: false
+   heading_scoring_timestep: 0.8
+   occdist_scale: 0.05
+   oscillation_reset_dist: 0.05
+   publish_cost_grid_pc: false
+   prune_plan: true
+
+   sim_time: 5.0
+   sim_granularity: 0.05
+   angular_sim_granularity: 0.1
+   vx_samples: 15
+   vy_samples: 8  # zero for a differential drive robot
+   vtheta_samples: 20
+   dwa: true
+   simple_attractor: false

@@ -9,7 +9,7 @@ import  sys
 import  tty, termios
 import time    
 cmd = Twist()
-pub = rospy.Publisher('smooth_cmd_vel',Twist,queue_size=20)
+pub = rospy.Publisher('smooth_cmd_vel',Twist,queue_size=1)
 
 
 global CurrentSpeedX
@@ -20,11 +20,11 @@ global RotateAcc
 global MAXSPEED
 global MAXROTATESPEED
 
-MAXSPEED=0.35
-MAXROTATESPEED=1.4
+MAXSPEED=0.3
+MAXROTATESPEED=0.5
 
-ACC=0.5
-RotateAcc=0.8
+ACC=0.3
+RotateAcc=0.3
 #控制频率
 global ControllerFrequecny
 ControllerFrequecny=10
@@ -165,13 +165,13 @@ j  k  l
 		elif ch=='m':
 			moveX(0-MAXSPEED)
 		elif ch=='j':
-			rotateRobot(0.8)
+			rotateRobot(MAXROTATESPEED)
 		elif ch=='l':
-			rotateRobot(-0.8)
+			rotateRobot(-MAXROTATESPEED)
 		elif ch=='u':
-			rotateRobot(0.8)
+			rotateRobot(MAXROTATESPEED)
 		elif ch=='o':
-			rotateRobot(-0.8)
+			rotateRobot(-MAXROTATESPEED)
 		elif ch=='k':
 			stop_robot()
 		elif ch=='q':
@@ -182,6 +182,7 @@ j  k  l
 			print "shutdown!"
 			break
 		else:
+			stop_robot()
 			cmd.linear.x=0.0
 			cmd.angular.z=0.0
 		print "Reading form keybord"

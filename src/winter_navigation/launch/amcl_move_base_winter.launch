@@ -1,0 +1,23 @@
+<launch>
+
+   <arg name="map" default="office.yaml" />
+  <!-- Run the map server with a blank map + obstacle -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find winter_navigation)/maps/$(arg map)"/> 
+  
+  <arg name="use_map_topic"   default="map"/>
+  <arg name="scan_topic"      default="scan"/> 
+  
+  <arg name="odom_frame_id"   default="odom"/>
+  <arg name="base_frame_id"   default="base_link"/>
+  <arg name="global_frame_id" default="map"/>
+ 
+  <include file="$(find winter_navigation)/launch/amcl.launch" /> 
+  <include file="$(find winter_navigation)/launch/move_base_winter.launch" />
+   
+  
+  
+   <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot.urdf" />  
+   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+  
+
+</launch>

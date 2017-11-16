@@ -15,12 +15,23 @@ class PublishUnltro():
     def getDistance(self):
 		while True:
 			self.dist=input("plase input dis:") 
-			print "you have input:"+str(self.dist)
+			try:
+				print "you have input:"+str(self.dist)
+			except:
+				print "you have input nothing"
+			ran = Range()
+			ran.header.stamp = rospy.Time.now()
+			ran.header.frame_id = "/ultrasound"
+			ran.field_of_view = 1;
+			ran.min_range = 0;
+			ran.max_range = 5;
+			ran.range = self.dist;
+			self.ultrasound_pub.publish(ran)
     def Publish(self):
 		#初始化节点
         rospy.init_node("talkerUltraSound", anonymous = True)        
         #超声波数据发布节点
-        ultrasound_pub = rospy.Publisher("UltraSoundPublisher", Range, queue_size = 20)
+        self.ultrasound_pub = rospy.Publisher("UltraSoundPublisher", Range, queue_size = 20)
         
         ran_broadcaster = tf.TransformBroadcaster()
         
@@ -41,7 +52,7 @@ class PublishUnltro():
 			ran.min_range = 0;
 			ran.max_range = 5;
 			ran.range = self.dist;
-			ultrasound_pub.publish(ran)
+			#ultrasound_pub.publish(ran)
 			rate.sleep()		
     def __init__(self):
 		self.dist=0.5

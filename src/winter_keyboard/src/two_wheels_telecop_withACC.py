@@ -85,7 +85,7 @@ def moveX(speed):
 			time.sleep(1.0/ControllerFrequecny)
 			#print 'MAX SPEED'
 			#man.say('max speed')
-			man.wait()
+			#man.wait()
 		cmd.linear.y=0.0
 		cmd.angular.z=0.0
 		pub.publish(cmd)

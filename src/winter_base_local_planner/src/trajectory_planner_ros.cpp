@@ -234,9 +234,11 @@ namespace base_local_planner {
       ROS_ASSERT_MSG(world_model_type == "costmap", "At this time, only costmap world models are supported by this controller");
       world_model_ = new CostmapModel(*costmap_);
       std::vector<double> y_vels = loadYVels(private_nh);
-
+		
       footprint_spec_ = costmap_ros_->getRobotFootprint();
-
+	  
+	  isMoveingBack=false;
+	  
       tc_ = new TrajectoryPlanner(*world_model_, *costmap_, footprint_spec_,
           acc_lim_x_, acc_lim_y_, acc_lim_theta_, sim_time, sim_granularity, vx_samples, vtheta_samples, pdist_scale,
           gdist_scale, occdist_scale, heading_lookahead, oscillation_reset_dist, escape_reset_dist, escape_reset_theta, holonomic_robot,
@@ -323,6 +325,51 @@ namespace base_local_planner {
   {
 	ultro_distance=data->range;
   }
+bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_pose,const tf::Stamped<tf::Pose>& goal_pose,
+																						  const tf::Stamped<tf::Pose>& robot_vel,geometry_msgs::Twist& cmd_vel)
+ {
+		
+		double left_dis=getGoalPositionDistance(global_pose,goal_pose.getOrigin().x(),goal_pose.getOrigin().y());
+		ROS_INFO("cx %f cy %f left_dis %f ",global_pose.getOrigin().x(),global_pose.getOrigin().y(),left_dis);
+		
+		double sharke_dis=0.1*0.1/(2*acc_lim_x_);
+		double vel_yaw = tf::getYaw(robot_vel.getRotation());
+		double yaw = tf::getYaw(global_pose.getRotation());
+		//采样速度
+		double vx=-0.1;
+		double vy=0.0;
+		double vth=0.0;
+		
+		if(left_dis>sharke_dis)
+		{
+			if(left_dis<0.035)  
+			{
+				//将机器人停下
+				cmd_vel.linear.x = 0.0;
+				cmd_vel.linear.y = 0.0;
+				cmd_vel.angular.z = 0.0;
+				//将机器人后退状态清除 机器人将接着前进
+				isMoveingBack=false;
+				return true; 
+			}
+			
+			bool valid_cmd = tc_->checkTrajectory(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), yaw, 
+															robot_vel.getOrigin().getX(), robot_vel.getOrigin().getY(), vel_yaw, vx, vy, vth);
+
+			//if we have a valid command, we'll pass it on, otherwise we'll command all zeros
+			if(valid_cmd){
+				ROS_DEBUG("Slowing down... using vx, vy, vth: %.2f, %.2f, %.2f", vx, vy, vth);
+				cmd_vel.linear.x = vx;
+				cmd_vel.linear.y = vy;
+				cmd_vel.angular.z = vth;
+				return true;
+			}
+		}
+	  
+	  cmd_vel.linear.x = 0.0;
+	  return false;
+	
+ }
 
   bool Winter_TrajectoryPlannerROS::rotateToGoal(const tf::Stamped<tf::Pose>& global_pose, const tf::Stamped<tf::Pose>& robot_vel, double goal_th, geometry_msgs::Twist& cmd_vel){
     double yaw = tf::getYaw(global_pose.getRotation());
@@ -415,17 +462,58 @@ namespace base_local_planner {
     tf::Stamped<tf::Pose> robot_vel;
     odom_helper_.getRobotVel(robot_vel);
     
-    if(ultro_distance<0.6)
+    //是否处于后退的状态中
+    if(!isMoveingBack)
     {
-			ROS_INFO("get ultrosonic data %f robtot will stop here",ultro_distance) ;
-			if ( ! stopWithAccLimits(global_pose, robot_vel, cmd_vel)) {
-            return false;
-          }
-          else
-          {
-			  return true;
-		  }
+		if(ultro_distance<0.6)
+		{
+			ROS_INFO("get ulrtosonic data range: %f",ultro_distance);
+			isMoveingBack=true;
+			//获取机器人朝向
+			double angle=tf::getYaw(global_pose.getRotation());
+			//应该移动的距离
+			double move_dis=0.15;
+			
+			temp_goal_point.stamp_ = global_pose.stamp_;
+			temp_goal_point.frame_id_ = global_pose.frame_id_;
+			double x = global_pose.getOrigin().x()-move_dis*cos(angle);
+			double y = global_pose.getOrigin().y()-move_dis*sin(angle);;
+			temp_goal_point.setOrigin(tf::Vector3(x,y,0));
+			temp_goal_point.setRotation(global_pose.getRotation());
+			ROS_INFO("ox %f oy %f gx %f gy %f ",global_pose.getOrigin().x(),global_pose.getOrigin().y(),x,y);
+		}
+	}
+	if(isMoveingBack)
+	{
+			double current_speed=robot_vel.getOrigin().getX();
+		    if(current_speed>0)
+		    {
+				//处于正在刹车的状态中
+				if ( ! stopWithAccLimits(global_pose, robot_vel, cmd_vel)) {
+						return false;
+					}
+				else
+				{
+					    ROS_INFO("Robot stoping ");
+						return true;
+				}
+			}
+			else
+			{
+				//机器人开始向后移动并停止
+				if (Winter_TrajectoryPlannerROS::MoveBack(global_pose,temp_goal_point,robot_vel,cmd_vel))
+				{ 
+					ROS_INFO("Robot Moing Back");
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
 	  }
+	
+	 
 	  
 	  
 	//得到机器人的速度

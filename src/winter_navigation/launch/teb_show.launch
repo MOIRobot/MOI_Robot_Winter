@@ -1,0 +1,3 @@
+<launch>
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find winter_simulation)/cfg_teb_local_planner/rviz_navigation.rviz"/>
+</launch>

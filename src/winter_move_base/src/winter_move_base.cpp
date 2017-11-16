@@ -337,7 +337,7 @@ namespace move_base {
   }
  void MoveBase::ultrosonicdata(const sensor_msgs::Range::ConstPtr& ultrosonicdata)
 {
-	ROS_INFO("get ulrtosonic data range: %f",ultrosonicdata->range);
+	//ROS_INFO("get ulrtosonic data range: %f",ultrosonicdata->range);
 }
 void MoveBase::clearCostmapWindows(double size_x, double size_y){
     tf::Stamped<tf::Pose> global_pose;

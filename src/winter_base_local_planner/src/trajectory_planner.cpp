@@ -964,6 +964,7 @@ void TrajectoryPlanner::trajectoryMoveX(Trajectory* &best_traj,Trajectory* &comp
 																					   double min_vel_x,double min_vel_theta,
 																					   double dvx,double dvtheta) 
 {
+	/*
 	double goal_distance=1.0;
 	//以当前速度降速下来的距离
 	double brake_distance=	vx*vx/(acc_x*2.0);
@@ -1052,6 +1053,7 @@ void TrajectoryPlanner::trajectoryMoveX(Trajectory* &best_traj,Trajectory* &comp
 	}
 	}
 	traj.cost_=1.0;
+	* */
 } 
 };
 

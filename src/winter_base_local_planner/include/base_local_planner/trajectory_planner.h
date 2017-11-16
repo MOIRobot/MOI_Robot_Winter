@@ -276,7 +276,16 @@ namespace base_local_planner {
 	  void trajectoryMoveBack(Trajectory* &best_traj,Trajectory* &comp_traj ,
 							   double x, double y, double theta,
 							   double vx, double vy, double vtheta,
-							   double acc_x, double acc_y, double acc_theta); 
+							   double acc_x, double acc_y, double acc_theta);
+
+	  void trajectoryMoveX(Trajectory* &best_traj,Trajectory* &comp_traj ,
+												double x, double y, double theta,
+												double vx, double vy, double vtheta,
+												double acc_x, double acc_y, double acc_theta,
+												double max_vel_x,double max_vel_theta,
+												double min_vel_x,double min_vel_theta,
+												double dvx,double dvtheta);
+
 
       base_local_planner::FootprintHelper footprint_helper_;
     

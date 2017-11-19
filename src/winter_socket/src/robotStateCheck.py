@@ -1,7 +1,17 @@
 #!/usr/bin/env python   
 # -*- coding:UTF-8 -*-  
 from socket import *  
-from time import ctime  
+from time import ctime 
+
+CMD=
+"""
+a: roscore on
+b: roscore off
+c: robot driver on(odom message)
+d: robot driver off(odom message)
+e: robot laser on
+f: robot laser off
+""" 
 HOST = '127.0.0.1'  
 PORT = 21567  
 BUFSIZE = 1024  
@@ -25,7 +35,7 @@ while True:
 	except Exception:
 		print 'Robot Off'
 	if RobotAddress:
-		data=raw_input("please input control cmd:")
+		data=raw_input(CMD+"please input control cmd:")
 		udpSerSock.sendto(data,RobotAddress)
 		
 

@@ -43,7 +43,7 @@ def paraseCMD(msg):
 		roscoreNode=subprocess.Popen(cmd)
 		#roscoreNode=subprocess.Popen(cmd,stdout=subprocess.PIPE)
 		#roscoreNode=subprocess.Popen(cmd,stdout=subprocess.PIPE)
-		t#ime.sleep(3)
+		#t#ime.sleep(3)
 		#(stdoutdata, stderrdata)=roscoreNode.communicate(input=None,timeout=5)
 		#print stdoutdata
 		#print stdoutdata

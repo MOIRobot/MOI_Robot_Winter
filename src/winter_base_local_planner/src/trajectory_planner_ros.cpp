@@ -149,6 +149,7 @@ namespace base_local_planner {
       //Assuming this planner is being run within the navigation stack, we can
       //just do an upward search for the frequency at which its being run. This
       //also allows the frequency to be overwritten locally.
+      //tag 机器人控制频率 sim_period_ 机器人速度控制周期
       std::string controller_frequency_param_name;
       if(!private_nh.searchParam("controller_frequency", controller_frequency_param_name))
         sim_period_ = 0.05;
@@ -414,7 +415,8 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 
   }
 
-  bool Winter_TrajectoryPlannerROS::setPlan(const std::vector<geometry_msgs::PoseStamped>& orig_global_plan){
+//这个plan 被外界move base 调用
+ bool Winter_TrajectoryPlannerROS::setPlan(const std::vector<geometry_msgs::PoseStamped>& orig_global_plan){
     if (! isInitialized()) {
       ROS_ERROR("This planner has not been initialized, please call initialize() before using this planner");
       return false;
@@ -451,6 +453,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
       return false;
     }
 
+	//删减 prune 
     //now we'll prune the plan based on the position of the robot
     if(prune_plan_)
       prunePlan(global_pose, transformed_plan, global_plan_);
@@ -473,7 +476,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 			double angle=tf::getYaw(global_pose.getRotation());
 			//应该移动的距离
 			double move_dis=0.15;
-			
+			//设置临时后退的目标点
 			temp_goal_point.stamp_ = global_pose.stamp_;
 			temp_goal_point.frame_id_ = global_pose.frame_id_;
 			double x = global_pose.getOrigin().x()-move_dis*cos(angle);
@@ -530,12 +533,14 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
     if(transformed_plan.empty())
       return false;
 
+	 //局部地图中的目标点
     tf::Stamped<tf::Pose> goal_point;
     tf::poseStampedMsgToTF(transformed_plan.back(), goal_point);
     //we assume the global goal is the last point in the global plan
     double goal_x = goal_point.getOrigin().getX();
     double goal_y = goal_point.getOrigin().getY();
-
+   
+	ROS_INFO("the goal point x is %f y is %f ",goal_x,goal_y);
     double yaw = tf::getYaw(goal_point.getRotation());
 
     double goal_th = yaw;

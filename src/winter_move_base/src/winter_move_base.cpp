@@ -97,6 +97,7 @@ namespace move_base {
     //we'll provide a mechanism for some people to send goals as PoseStamped messages over a topic
     //they won't get any useful information back about its status, but this is useful for tools
     //like nav_view and rviz
+    //tag从这里订阅rviz里面的目标点
     ros::NodeHandle simple_nh("move_base_simple");
     goal_sub_ = simple_nh.subscribe<geometry_msgs::PoseStamped>("goal", 1, boost::bind(&MoveBase::goalCB, this, _1));
     
@@ -328,6 +329,7 @@ namespace move_base {
   }
 
   void MoveBase::goalCB(const geometry_msgs::PoseStamped::ConstPtr& goal){
+    //这里接受rviz里面进来的目标点
     ROS_DEBUG_NAMED("move_base","In ROS goal callback, wrapping the PoseStamped in the action message and re-sending to the server.");
     move_base_msgs::MoveBaseActionGoal action_goal;
     action_goal.header.stamp = ros::Time::now();

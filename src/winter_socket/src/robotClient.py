@@ -4,15 +4,25 @@ from socket import *
 from time import ctime 
 import thread
 import time
+import subprocess
+import sys
+
 CMD="""
 ***********CMD*************
 a: roscore on
 s: robot driver on(odom message)
 d: robot laser on
+f: robot gmapping on
+g:robot navigation on
 
 q: roscore off
 w: robot driver off(odom message)
 e: robot laser off
+r: robot gmapping off
+t:robot navigation off
+
+m:set roscore on robot side for local ros node
+
 ***************************
 """ 
 HOST = '127.0.0.1'  
@@ -31,6 +41,12 @@ global SHOW_FLAG
 RobotOnline=False
 RobotAddress=None
 SHOW_FLAG=False
+
+#获取当前文件目录
+cpath=sys.path[0]
+roscoreNode=None
+robotdriverNode=None
+robotlaserNode=None
 
 def ReceviceData():
 	while True:

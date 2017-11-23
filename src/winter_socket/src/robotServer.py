@@ -25,19 +25,12 @@ udpCliSock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 
 
 #获取当前文件目录
-cpath=sys.path[0]
+cpath=sys.path[0]+"/robot_sh"
 roscoreNode=None
 robotdriverNode=None
 robotlaserNode=None
-
-CMD="""
-a: roscore on
-b: roscore off
-c: robot driver on(odom message)
-d: robot driver off(odom message)
-e: robot laser on
-f: robot laser off
-""" 
+robotgmappingNode=None
+robotnavigationNode=None
 
 def pkill(msg):
 	cmd="pgrep "+msg
@@ -73,7 +66,29 @@ def paraseCMD(msg):
 		print "robot laser off"
 		udpCliSock.sendto("robot laser off",ADDR) 
 		pkill("lslidar_n301_dr")
-		pkill("lslidar_n301_de")	
+		pkill("lslidar_n301_de")
+	elif "f" in msg:
+		print "robot gmapping on"
+		udpCliSock.sendto("robot gmapiing on",ADDR) 
+		cmd=cpath+"/gmapping_core.sh"
+		robotgmappingNode=subprocess.Popen(cmd)
+	elif "r" in msg:
+		print "robot gmapping off"
+		udpCliSock.sendto("robot gmapping off",ADDR) 
+		pkill("state_publisher")
+		pkill("slam_gmapping")
+	elif "g" in msg:
+		print "robot navigation on"
+		udpCliSock.sendto("robot navigation on",ADDR) 
+		cmd=cpath+"/navigation_core.sh"
+		robotnavigationNode=subprocess.Popen(cmd)
+	elif "t" in msg:
+		print "robot navigation off"
+		udpCliSock.sendto("robot navigation off",ADDR) 
+		pkill("move_base")
+		pkill("state_publisher")
+		pkill("map_server")
+		pkill("amcl")	
 def SendStatus():
 	resultMessage="Robot Online!\n"
 	if roscoreNode !=None:
@@ -85,6 +100,12 @@ def SendStatus():
 	if robotlaserNode !=None:
 		if  robotlaserNode.poll() is None:
 			resultMessage=resultMessage+"robot laser on\n"
+	if robotgmappingNode !=None:
+		if  robotgmappingNode.poll() is None:
+			resultMessage=resultMessage+"robot gmapping on\n"
+	if robotnavigationNode !=None:
+		if  robotnavigationNode.poll() is None:
+			resultMessage=resultMessage+"robot navigation on\n"
 	#print resultMessage
 	udpCliSock.sendto(resultMessage,ADDR)
 while True:  

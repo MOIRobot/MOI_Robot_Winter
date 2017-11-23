@@ -31,7 +31,7 @@ TrajectoryPlannerROS:
    publish_cost_grid_pc: false #
    prune_plan: true            #
 
-   sim_time: 3.5               #
+   sim_time: 1.5               #
    sim_granularity: 0.025       #
    angular_sim_granularity: 0.025 #0.025
    vx_samples: 8               #

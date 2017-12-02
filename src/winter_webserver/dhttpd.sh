@@ -8,5 +8,5 @@ PORT=8181
 echo 'Launching dhttpd on port' $PORT
 
 if [ ! `pidof dhttpd` ]; then
-	dhttpd -p $PORT -r `rospack find rbx2_gui`
+	dhttpd -p $PORT -r `rospack find winter_webserver`
 fi

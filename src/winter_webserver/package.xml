@@ -1,5 +1,5 @@
 <package>
-  <name>rbx2_gui</name>
+  <name>winter_webserver</name>
   <version>0.1.0</version>
 
   <description>ROS By Example Vol 2 - Rosbridge Robot GUI</description>

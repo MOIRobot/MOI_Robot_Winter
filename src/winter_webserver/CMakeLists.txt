@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 
-project(rbx2_gui)
+project(winter_webserver)
 
 find_package(catkin REQUIRED)
 

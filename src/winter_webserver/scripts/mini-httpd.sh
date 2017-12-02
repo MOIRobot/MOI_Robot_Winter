@@ -14,4 +14,4 @@ sleep 1
 
 echo "Launching mini-httpd..."
 
-/usr/sbin/mini-httpd -C `rospack find rbx2_gui`/scripts/mini-httpd.conf -d `rospack find rbx2_gui`
+/usr/sbin/mini-httpd -C `rospack find winter_webserver`/scripts/mini-httpd.conf -d `rospack find winter_webserver`

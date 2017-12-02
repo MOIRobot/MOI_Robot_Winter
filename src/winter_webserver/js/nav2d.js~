@@ -64,7 +64,7 @@ NAV2D.Navigator = function(options) {
 
     // create a marker for the goal
     var goalMarker = new ROS2D.NavigationArrow({
-      size : 10,
+      size : 15,
       strokeSize : 2,
       fillColor : createjs.Graphics.getRGB(0, 255, 0, 0.66),
       pulse : true

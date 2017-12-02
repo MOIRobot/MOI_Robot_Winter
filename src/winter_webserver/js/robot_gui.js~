@@ -154,8 +154,8 @@ ros.on('connection', function() {
     // Create the main Navigation viewer.
     var navViewer = new ROS2D.Viewer({
 	divID : 'navCanvas',
-	width : 800,
-	height : 800
+	width : 500,
+	height : 500
     });
  
     // Setup the Navigation client.

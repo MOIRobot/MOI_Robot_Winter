@@ -22,8 +22,8 @@
     // Create the main viewer.
     var viewer = new ROS2D.Viewer({
       divID : 'map',
-      width : 800,
-      height : 800
+      width : 1000,
+      height : 1000
     });
 
     // Setup the map client.

@@ -25,11 +25,11 @@ var NAV2D = NAV2D || {
  *   * rootObject (optional) - the root object to add the click listeners to and render robot markers to
  *   * withOrientation (optional) - if the Navigator should consider the robot orientation (default: false)
  */
- var initialPoseTopic = "/initialpose";
+ var initPoseTopic = "/initialpose";
 var amclPoseTopic = "/amcl_pose";
 var moveBaseTopic = "/move_base_simple/goal";
 var posePub=null;
-var initialposePub=null;
+var initPosePub=null;
 
 var State=0;
 var GoalState=1;
@@ -237,8 +237,9 @@ NAV2D.Navigator = function(options) {
 		}
 		else if(State==PoseState)
 		{
+		console.log("pose start")
 		posePub.publish(getPoseMsg(cx,cy,qz,qw));
-		initialposePub.publish(getPoseMsg(cx,cy,qz,qw));
+		initPosePub.publish(getPoseMsg(cx,cy,qz,qw));
 		}
 		State=0;
 		
@@ -311,9 +312,9 @@ NAV2D.OccupancyGridClientNav = function(options) {
 		name : moveBaseTopic,
 		messageType : 'geometry_msgs/PoseStamped'
 	});
-	var initialposePub = new ROSLIB.Topic({
+	initPosePub = new ROSLIB.Topic({
 		ros : this.ros,
-		name : initialPoseTopic,
+		name : initPoseTopic,
 		messageType : 'geometry_msgs/PoseWithCovarianceStamped'
 	});
 
@@ -346,4 +347,34 @@ function setEPose()
 
 	//document.getElementById("set_pose").style.background="green"; 
 	//document.getElementById("move_base").style.background="grey"; 
+}
+function getPoseMsg(qx,qy,qz,qw)
+{
+	var PoseMsg = new ROSLIB.Message({
+	header : {
+	     frame_id : '/map',
+	    stamp : {
+			secs: 0.0,
+			nsecs: 0.0
+		}
+	},
+	pose : {
+			pose : 
+			{
+				position : {
+					x : qx,
+					y : qy,
+					z : 0.0
+				},
+			orientation : {
+				x : 0.0,
+				y : 0.0,
+				z : qz,
+				w : qw
+			}
+		}
+			
+		}
+    });
+    return PoseMsg;
 }

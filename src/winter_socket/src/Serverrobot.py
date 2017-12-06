@@ -107,7 +107,10 @@ def SendStatus():
 		if  robotnavigationNode.poll() is None:
 			resultMessage=resultMessage+"robot navigation on\n"
 	#print resultMessage
-	udpCliSock.sendto(resultMessage,ADDR)
+	try:
+		udpCliSock.sendto(resultMessage,ADDR)
+	except Exception:
+		return
 while True:  
 	SendStatus()
 	try:

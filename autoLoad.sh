@@ -6,4 +6,4 @@
 #cd /etc/init.d
 #sudo update-rc.d -f autoLoad.sh remove
 # gnome-session-properties
-python ~/MOI_Robot_Winter/src/winter_socket/src/robotStatePublisher.py
+python /home/jobsg/MOI_Robot_Winter/src/winter_socket/src/Serverrobot.py

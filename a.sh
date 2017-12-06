@@ -1,5 +1,5 @@
 #! /bin/bash   
-/usr/bin/python /home/jobs/MOI_Robot_Winter/src/winter_socket/src/Serverrobot.py &
+/usr/bin/python /home/jobsg/MOI_Robot_Winter/src/winter_socket/src/Serverrobot.py &
 sleep 1
 #source /opt/ros/indigo/setup.bash
 #chomd +x autoLoad.sh

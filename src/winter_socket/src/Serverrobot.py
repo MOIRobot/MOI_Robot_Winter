@@ -88,7 +88,16 @@ def paraseCMD(msg):
 		pkill("move_base")
 		pkill("state_publisher")
 		pkill("map_server")
-		pkill("amcl")	
+		pkill("amcl")
+	elif "k" in msg:
+		print "robot webserver on"
+		udpCliSock.sendto("robot webserver on",ADDR) 
+		cmd=cpath+"/webserver.sh"
+		robotnavigationNode=subprocess.Popen(cmd)
+	elif "i" in msg:
+		print "robot webserver off"
+		udpCliSock.sendto("robot webserver off",ADDR) 
+		pkill("webserver.sh")
 def SendStatus():
 	resultMessage="Robot Online!\n"
 	if roscoreNode !=None:

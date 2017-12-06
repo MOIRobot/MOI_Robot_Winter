@@ -26,10 +26,13 @@
     <!-- Style sheets -->
     <link rel="stylesheet" href="js/jqwidgets/styles/jqx.base.css" type="text/css" />
     <link rel="stylesheet" href="js/jqwidgets/styles/jqx.ui-start.css" type="text/css">
-    
-	<script type="text/javascript" src="js/kinetic-v5.1.0.min.js"></script>
+
     <!-- jQuery -->
     <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+
+    <!-- KinectJS -->
+    <script type="text/javascript" src="js/kinetic-v5.1.0.min.js"></script>
+
     <!-- jqWidgets -->
     <script type="text/javascript" src="js/jqwidgets/jqxcore.js"></script>
     <script type="text/javascript" src="js/jqwidgets/jqxbuttons.js"></script>
@@ -53,7 +56,9 @@
     <script type="text/javascript" src="js/nav2d.js"></script>
     <script type="text/javascript" src="js/ros2d.min.js"></script>
     <script type="text/javascript" src="js/roslib.min.js"></script>
-	
+    <!-- The rosbridge/kineticJS code has to be included at the end -->
+	<script type="text/javascript" src="js/pi_remote2.js"></script>
+
   <script type="text/javascript">
     function init() {
         function waitForDOM() {
@@ -146,6 +151,49 @@
           $('#baseAngularSpeed').html(Math.round(event.args.value * 100)/100  + ' rad/s');
           maxAngularSpeed = Math.round(event.args.value * 100)/100;
        });
+
+/*
+       var baseLaserChartSettings = {
+          title: "",
+          description: "",
+          showLegend: false,
+          showBorderLine: false,
+          padding: { left: 5, top: 5, right: 5, bottom: 5 },
+          titlePadding: { left: 90, top: 0, right: 0, bottom: 10 },
+          source: baseLaserScanArray,
+          categoryAxis:
+          {
+             dataField: 'index',
+             showGridLines: false,
+             unitInterval: 5
+          },
+          colorScheme: 'scheme02',
+          seriesGroups:
+          [
+             {
+                type: 'column',
+                columnsGapPercent: 20,
+                seriesGapPercent: 20,
+                valueAxis:
+                {
+                    unitInterval: 1.0,
+                    minValue: 0.1,
+                    maxValue: 3,
+                    displayValueAxis: false,
+                    description: '',
+                    axisSize: 'auto',
+                    tickMarksColor: '#888888'
+                },
+                series: [
+                        { dataField: 'range', displayText: 'Range'},
+                    ]
+            }
+        ]
+      };
+
+      $('#baseLaserChart').jqxChart(baseLaserChartSettings);
+*/
+
        // create jqxtabs.
        $('#jqxtabs').jqxTabs({
            width: '100%',
@@ -303,11 +351,11 @@
 			     <div style="text-align: center;"><input class="set_pose" id="set_pose" value="Set Pose" onclick="setPose();" type="button"></div><br><br>
 			     <div style="text-align: center;"><input class="move_base" id="move_base" value="Move Base" onclick="moveBase();" type="button"></div><br><br>
 			     <div style="text-align: center;"><input class="move_base_cancel" id="move_base_cancel" value="Pause/Cancel" onclick="moveBaseCancel();" type="button"></div><br>
-			     
+			     <!--
 				 <div style="text-align: center;"><input type="button" value="Zoom +" style="font-size:18px;" onClick="zoomInMap();"></div>
 				 <br>
 				 <div style="text-align: center;"><input type="button" value="Zoom -" style="font-size:18px;" onClick="zoomOutMap();"></div>
-				 
+				 -->
 			   </td>
 		       </tr></tbody></table>
 		     </fieldset>
@@ -365,8 +413,4 @@
 	   </form>
         </div>
     </div>
-    <!-- The rosbridge/kineticJS code has to be included at the end -->
-    <!-- KinectJS -->
-    
-    <script type="text/javascript" src="js/pi_remote2.js"></script>
 </body></html>

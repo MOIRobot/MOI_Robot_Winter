@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML5//EN" "http://www.w3.org/TR/html4/strict.dtd">
+  <html>
+    <head>
+      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+      <meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.65, user-scalable=yes">
+
+      <title>Rosbridge Simple GUI</title>
+
+      <script type="text/javascript" src="js/eventemitter2.min.js"></script>
+      <script type="text/javascript" src="js/mjpegcanvas.min.js"></script>
+      <script type="text/javascript" src="js/roslib.min.js"></script>
+      <script type="text/javascript" src="js/simple_gui.js"></script>
+
+      <script type="text/javascript">
+		 function init() {
+		    var readyStateCheckInterval = setInterval(function() {
+			   if (document.readyState === "complete") {
+		          init();
+		       	  clearInterval(readyStateCheckInterval);
+		   	   }
+            }, 100);
+		 }
+	  </script>
+
+      <style type="text/css">
+        body,input {
+	       font-family: sans-serif narrow;
+	       font-size: 14pt;
+        }
+
+        .checkbox {
+	       width: 20px;
+	       height: 20px;
+        }
+
+        table,tr,td,th {
+	      text-align: center;
+	      white-space: nowrap;
+        }
+      </style>
+   </head>
+
+   <body onload="init();init_ros();">
+
+<form name="simple_gui" method="get" action="./">
+
+  <table width="100%" cellpadding="2" cellspacing="2" style="border: 1px solid;">
+   <tbody>
+        <!-- ===== Right Panel ===== -->
+        <td valign="top" border="1">
+          <h2>ROS Remote Control</h2>
+          <table width="100%" border="0" cellpadding="0" cellspacing="0">
+          <tbody>
+            <tr valign="top">
+              <td colspan="3"><label id="cmdVelStatusMessage"></label><br><br>
+                              <b><label id="navInstructions"></label></b>
+              </td>
+             </tr>
+             <tr>
+               <td colspan="3" style="text-align: center;"><img src="images/arrow-up.jpg" id="arrow_up" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('forward');clearTimedStop();" onClick="setSpeed('forward');" alt="" align="middle">
+               </td>
+             </tr>
+             <tr>
+               <td width="33%" style="text-align: center;"><img src="images/arrow-left.jpg" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('left');clearTimedStop();" onClick="setSpeed('left');" alt="" align="middle">
+               </td>
+               <td width="33%" style="text-align: center;"><img src="images/stop.jpg" width="100" onClick="stopRobot('forward');" alt="" align="middle"></td>
+               <td width="33%" style="text-align: center;"><img src="images/arrow-right.jpg" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('right');clearTimedStop();" onClick="setSpeed('right');" alt="" align="middle"></td>
+             </tr>
+             <tr>
+               <td colspan="3" style="text-align: center;"><img src="images/arrow-down.jpg" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('backward');clearTimedStop();" onClick="setSpeed('backward');" alt="" align="middle">
+               </td>
+             </tr>
+             <tr>
+               <td align="right"><span style="font-size: 14pt;">Max Linear Spd:</span></td>
+               <td><input type="range" id="maxLinearSpeed" min="0.01" max="0.5" step="0.01" value="0.2"
+                    onChange="writeStatusMessage('maxLinearSpeedDisplay', this.value);"
+                    onMouseUp="setMaxLinearSpeed(this.value);" onInput="maxLinearSpeedDisplay.value=this.value;"></td>
+               <td><span style="font-weight: bold;"><output id="maxLinearSpeedDisplay" size="4"></output></span></td>
+             </tr>
+             <tr>
+               <td align="right"><span style="font-size: 14pt;">Max Angular Spd:</span></td>
+               <td><input type="range" id="maxAngularSpeed" min="0.01" max="2.0" step="0.01" value="1.0"
+                    onChange="writeStatusMessage('maxAngularSpeedDisplay', this.value);"
+                    onMouseUp="setMaxAngularSpeed(this.value);" onInput="maxAngularSpeedDisplay.value=this.value;"></td>
+               <td><span style="font-weight: bold;"><output id="maxAngularSpeedDisplay" size="4"></output></span></td>
+             </tr>
+           </tbody>
+         </table>
+       </td>
+     </tr>
+   </tbody>
+    </table>
+  </form>
+  
+  </body>
+</html>

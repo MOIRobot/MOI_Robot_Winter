@@ -1,0 +1,36 @@
+ <script type="text/javascript">
+    function init() {
+        function waitForDOM() {
+            var video = document.getElementById('video_container');
+            var video2 = document.getElementById('video2_container');
+            if (video == null || video2 == null) {
+                setTimeout(waitForDOM, 100);
+            }
+        }
+         // Connect to ROS.
+    var ros = new ROSLIB.Ros({
+      url : 'ws://localhost:9090'
+    });
+	 // Create the main Navigation viewer.
+    var navViewer = new ROS2D.Viewer({
+	divID : 'navCanvas',
+	width : 600,
+	height : 600
+    });
+ 
+    // Setup the Navigation client.
+    var navGridClient = new NAV2D.OccupancyGridClientNav({
+	ros : ros,
+	rootObject : navViewer.scene,
+	viewer : navViewer,
+	withOrientation: true,
+	serverName : '/move_base',
+	topic: 'map'
+    });
+    // Scale the canvas to fit to the map
+    navGridClient.on('change', function() {
+      viewer.scaleToDimensions(gridClient.currentGrid.width, gridClient.currentGrid.height);
+      viewer.shift(gridClient.currentGrid.pose.position.x, gridClient.currentGrid.pose.position.y);
+    });    
+    }
+     </script>

@@ -2,7 +2,7 @@
 
 <html lang="zh-cn">
 <h2>Click on the map to move the robot</h2>
-<table border="2" align="right">
+<table border="2" align="center">
 <tr>
 <td>
 <input type="Button" value="2D Nav Goal">

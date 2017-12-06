@@ -6,7 +6,6 @@
 var NAV2D = NAV2D || {
   REVISION : '2'
 };
-
 /**
  * @author Russell Toris - rctoris@wpi.edu
  * @author Lars Kunze - l.kunze@cs.bham.ac.uk
@@ -26,10 +25,21 @@ var NAV2D = NAV2D || {
  *   * rootObject (optional) - the root object to add the click listeners to and render robot markers to
  *   * withOrientation (optional) - if the Navigator should consider the robot orientation (default: false)
  */
+ var initialPoseTopic = "/initialpose";
+var amclPoseTopic = "/amcl_pose";
+var moveBaseTopic = "/move_base_simple/goal";
+var posePub=null;
+var initialposePub=null;
+
+var State=0;
+var GoalState=1;
+var	PoseState=2;
+
 NAV2D.Navigator = function(options) {
   var that = this;
   options = options || {};
   var ros = options.ros;
+  this.connection=options.connection;
   var serverName = options.serverName || '/move_base';
   var actionName = options.actionName || 'move_base_msgs/MoveBaseAction';
   var withOrientation = options.withOrientation || false;
@@ -67,7 +77,7 @@ NAV2D.Navigator = function(options) {
       size : 10,
       strokeSize : 2,
       fillColor : createjs.Graphics.getRGB(0, 255, 0, 0.66),
-      pulse : true
+      pulse : false
     });
     goalMarker.x = pose.position.x;
     goalMarker.y = -pose.position.y;
@@ -80,6 +90,7 @@ NAV2D.Navigator = function(options) {
       that.rootObject.removeChild(goalMarker);
     });
   }
+  
 
   // get a handle to the stage
   var stage;
@@ -94,7 +105,7 @@ NAV2D.Navigator = function(options) {
     size : 12,
     strokeSize : 1,
     fillColor : createjs.Graphics.getRGB(255, 128, 0, 0.66),
-    pulse : true
+    pulse : false
   });
   // wait for a pose to come in first
   robotMarker.visible = false;
@@ -132,8 +143,8 @@ NAV2D.Navigator = function(options) {
       var pose = new ROSLIB.Pose({
         position : new ROSLIB.Vector3(coords)
       });
-      // send the goal
-      sendGoal(pose);
+	sendGoal(pose);
+
     });
   } else { // withOrientation === true
     // setup a click-and-point listener (with orientation)
@@ -159,10 +170,6 @@ NAV2D.Navigator = function(options) {
         that.rootObject.removeChild(orientationMarker);
         
         if ( mouseDown === true) {
-          // if mouse button is held down:
-          // - get current mouse position
-          // - calulate direction between stored <position> and current position
-          // - place orientation marker
           var currentPos = stage.globalToRos(event.stageX, event.stageY);
           var currentPosVec3 = new ROSLIB.Vector3(currentPos);
 
@@ -194,12 +201,9 @@ NAV2D.Navigator = function(options) {
           
           that.rootObject.addChild(orientationMarker);
         }
-      } else { // mouseState === 'up'
-        // if mouse button is released
-        // - get current mouse position (goalPos)
-        // - calulate direction between stored <position> and goal position
-        // - set pose with orientation
-        // - send goal
+      } else { 
+		  
+		  //抬起
         mouseDown = false;
 
         var goalPos = stage.globalToRos(event.stageX, event.stageY);
@@ -208,7 +212,8 @@ NAV2D.Navigator = function(options) {
 
         xDelta =  goalPosVec3.x - positionVec3.x;
         yDelta =  goalPosVec3.y - positionVec3.y;
-        
+        var cx=positionVec3.x;
+        var cy=positionVec3.y;
         thetaRadians  = Math.atan2(xDelta,yDelta);
         
         if (thetaRadians >= 0 && thetaRadians <= Math.PI) {
@@ -226,8 +231,18 @@ NAV2D.Navigator = function(options) {
           position :    positionVec3,
           orientation : orientation
         });
-        // send the goal
+        if(State==GoalState)
+        {
         sendGoal(pose);
+		}
+		else if(State==PoseState)
+		{
+		posePub.publish(getPoseMsg(cx,cy,qz,qw));
+		initialposePub.publish(getPoseMsg(cx,cy,qz,qw));
+		}
+		State=0;
+		
+	
       }
     };
 
@@ -268,6 +283,7 @@ NAV2D.OccupancyGridClientNav = function(options) {
   var that = this;
   options = options || {};
   this.ros = options.ros;
+  this.connection=options.connection;
   var topic = options.topic || '/map';
   var continuous = options.continuous;
   this.serverName = options.serverName || '/move_base';
@@ -277,17 +293,34 @@ NAV2D.OccupancyGridClientNav = function(options) {
   this.withOrientation = options.withOrientation || false;
 
   this.navigator = null;
-
   // setup a client to get the map
   var client = new ROS2D.OccupancyGridClient({
-    ros : this.ros,
-    rootObject : this.rootObject,
-    continuous : continuous,
-    topic : topic
+		ros : this.ros,
+		rootObject : this.rootObject,
+		continuous : continuous,
+		topic : topic
   });
+  ///
+   posePub = new ROSLIB.Topic({
+		ros : this.ros,
+		name : amclPoseTopic,
+		messageType : 'geometry_msgs/PoseWithCovarianceStamped'
+	});
+	var goalPub = new ROSLIB.Topic({
+		ros : this.ros,
+		name : moveBaseTopic,
+		messageType : 'geometry_msgs/PoseStamped'
+	});
+	var initialposePub = new ROSLIB.Topic({
+		ros : this.ros,
+		name : initialPoseTopic,
+		messageType : 'geometry_msgs/PoseWithCovarianceStamped'
+	});
+
   client.on('change', function() {
     that.navigator = new NAV2D.Navigator({
       ros : that.ros,
+      connection: that.connection,
       serverName : that.serverName,
       actionName : that.actionName,
       rootObject : that.rootObject,
@@ -297,6 +330,20 @@ NAV2D.OccupancyGridClientNav = function(options) {
     // scale the viewer to fit the map
     //that.viewer.shift(client.currentGrid.pose.position.x, client.currentGrid.pose.position.y);
     that.viewer.scaleToDimensions(client.currentGrid.width, client.currentGrid.height);
-      that.viewer.shift(client.currentGrid.x,client.currentGrid.y * Math.abs((client.currentGrid.x/client.currentGrid.y)));
+    that.viewer.shift(client.currentGrid.x,client.currentGrid.y * Math.abs((client.currentGrid.x/client.currentGrid.y)));
   });
 };
+function SetGoalModel()
+{
+
+	State=GoalState;
+	//document.getElementById("set_pose").style.background="grey";
+	//document.getElementById("move_base").style.background="green";
+}
+function setEPose()
+{
+	State=PoseState;
+
+	//document.getElementById("set_pose").style.background="green"; 
+	//document.getElementById("move_base").style.background="grey"; 
+}

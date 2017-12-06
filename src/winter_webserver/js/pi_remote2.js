@@ -210,6 +210,12 @@ var roiOffsetX;
 var roiOffsetY;
 var roiWidth;
 var roiHeight;
+
+var videoLayer = new Kinetic.Layer();
+var videoLaserLayer = new Kinetic.Layer();
+var videoMarkerLayer = new Kinetic.Layer();
+var videoMessageLayer = new Kinetic.Layer();
+
 var roiMarker = new Kinetic.Rect({
     x: 100,
     y: 100,
@@ -297,47 +303,6 @@ ros.on("connection", function() {
     	if (resp['map_file'] != null) mapFile = resp['map_file'];
     	if (resp['turtlebot'] != null) turtleBot = resp['turtlebot'];
 
-	// For a TurtleBot, get the battery charge from /turtlebot_node/sensor_state.
-	// Throttle to 1 Hz.
-	if (turtleBot) {
-	    var tb_battery_listener = new ROSLIB.Topic({
-		ros : ros,
-		name : turtleBotBatteryTopic,
-		messageType : 'std_msgs/Float32',
-		throttle_rate: 1
-	    });
-
-	    tb_battery_listener.subscribe(function(msg) {
-		var color;
-		var charge = msg.charge;
-		var capacity = msg.capacity;
-		var remaining = 100 * (1.0 - ((capacity - charge) / (capacity)));
-		var battery_meter = document.getElementById("robot_battery");
-		battery_meter.value = remaining;
-		$('#robotBattery').jqxLinearGauge({ background: { style: { stroke: '#cccccc', fill: '#cccccc'}, visible: true, backgroundType: 'round' }});
-	    });
-	    log('Subscribed to ' +  turtleBotBatteryTopic);
-	}
-	else {
-	    // Otherwise, assume the robot battery topic is /arduino/sensor/main_voltage
-	    var robot_battery_listener = new ROSLIB.Topic({
-		ros : ros,
-		name : robotBatteryTopic,
-		messageType : 'ros_arduino_msgs/AnalogFloat',
-		throttle_rate: 1
-	    });
-
-	    robot_battery_listener.subscribe(function(msg) {
-		var color;
-		var voltage = msg.value;
-		var remaining = 100 * (voltage - 12.5) / (14.0 - 12.5);
-		var battery_meter = document.getElementById("robot_battery");
-		battery_meter.value = remaining;
-		$('#robotBattery').jqxLinearGauge({ background: { style: { stroke: '#cccccc', fill: '#cccccc'}, visible: true, backgroundType: 'round' }});
-	    });
-	    log('Subscribed to ' +  robotBatteryTopic);
-	}
-
 	// Subscribe to the joint_states topic.
 	var joint_states_listener = new ROSLIB.Topic({
 	    ros : ros,
@@ -384,33 +349,7 @@ ros.on("connection", function() {
 	});
         log('Subscribed to ' +  backSonarTopic);
 
-	// Subscribe to the latop battery topic
-	var laptop_battery_listener = new ROSLIB.Topic({
-	    ros : ros,
-	    name : laptopBatteryTopic,
-	    messageType : 'ros_arduino_msgs/AnalogFloat',
-	    throttle_rate: 1
-	});
-
-	laptop_battery_listener.subscribe(function(msg) {
-	    var remaining = msg.percentage;
-	    var charging = msg.charge_state;
-	    var battery_meter = document.getElementById("laptop_battery");
-            battery_meter.value = remaining;
-	    var laptop_charging_status = document.getElementById("laptop_charging");
-	    var laptop_battery_status = document.getElementById("laptop_battery_status");
-	    if (charging) {
-		laptop_charging_status.innerHTML = ' <img src="images/battery_charging.jpg" align="absmiddle" height="36">';
-		laptop_battery_status.innerHTML = 'Laptop Charging';
-		laptop_battery_status.style.fontSize = '16px';
-	    }
-	    else {
-		laptop_charging_status.innerHTML = '&nbsp;<p>';
-		laptop_battery_status.style.fontSize = '16px';
-		laptop_battery_status.innerHTML = 'Laptop Battery';
-	    }
-	});
-        log('Subscribed to ' +  laptopBatteryTopic);
+	
 
 	// Subscribe to the head pan servo temperature
 	var head_pan_temp_listener = new ROSLIB.Topic({
@@ -534,14 +473,6 @@ ros.on("connection", function() {
 
 	// Connect to the mjpeg server for streaming video
 	videoImage.src = "http://" + rosbridgeHost + ":" + mjpegPort + "/stream?topic=" + videoTopic + "?quality=" + videoQuality;
-
-	// Connect to second video source if available
-	//if (video2Topic != null) {
-	//    video2Image.src = "http://" + rosbridgeHost + ":" + mjpegPort + "/stream?topic=" + video2Topic + "?quality=" + video2Quality;
-	    //video2Image.src = "http://192.168.1.100/mjpeg.cgi";
-	//}
-
-    // Start the video and publisher loops
     videoOn();
     pubLoop();
     });
@@ -1106,10 +1037,6 @@ var baseStage = new Kinetic.Stage({
     y: 0
 });
 
-var videoLayer = new Kinetic.Layer();
-var videoLaserLayer = new Kinetic.Layer();
-var videoMarkerLayer = new Kinetic.Layer();
-var videoMessageLayer = new Kinetic.Layer();
 
 if (video2Topic != null) {
     var video2Layer = new Kinetic.Layer();
@@ -1307,4 +1234,3 @@ baseStage.add(baseMessageLayer);
 
 mapLayer.draw();
 mapRobotLayer.draw();
-

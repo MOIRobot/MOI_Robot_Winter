@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML5//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.65, user-scalable=yes">
+
+    <title>MOI ROBOT GUI</title>
+
+    <!-- Style sheets -->
+    <link rel="stylesheet" href="js/jqwidgets/styles/jqx.base.css" type="text/css" />
+    <link rel="stylesheet" href="js/jqwidgets/styles/jqx.ui-start.css" type="text/css">
+    <link rel="stylesheet" href="styles/robot_gui.css" type="text/css">
+	<link rel="stylesheet" href="mbutton.css" type="text/css">
+    <!-- jQuery -->
+    <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+
+    <!-- KinectJS -->
+    <script type="text/javascript" src="js/kinetic-v5.1.0.min.js"></script>
+
+    <!-- jqWidgets -->
+    <script type="text/javascript" src="js/jqwidgets/jqxcore.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxbuttons.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxchart.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxcheckbox.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxdata.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxdragdrop.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxdropdownlist.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxexpander.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxgauge.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxlistbox.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxradiobutton.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxscrollbar.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxslider.js"></script>
+    <script type="text/javascript" src="js/jqwidgets/jqxtabs.js"></script>
+
+    <!-- ROS stuff -->
+    <script type="text/javascript" src="js/easeljs.min.js"></script>
+    <script type="text/javascript" src="js/eventemitter2.min.js"></script>
+    <script type="text/javascript" src="js/mjpegcanvas.min.js"></script>
+    <script type="text/javascript" src="js/nav2d.js"></script>
+    <script type="text/javascript" src="js/ros2d.min.js"></script>
+    <script type="text/javascript" src="js/roslib.min.js"></script>
+
+ </head>
+
+<!-- Run the init() script followed by init_ros() -->
+<body class="default" onload="init_ros();" style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">
+    <h1>MOI Robot Contorl Web</h1>
+    <div id="jqxtabs" >
+           <!-- *** The Navigation Tab *** -->
+	   <form method="get" action="./" name="controller">
+	     <table style="width: 100%;" border="1">
+			<tr style="height:50px">
+				<td style="text-align: center; width: 25%;"><input class="button blue" id="set_pose" value="2D Pose Estimate" onclick="setEPose();" type="button"></td>
+				<td style="text-align: center; width: 25%;"><input class="button blue" id="move_base" value="2D Nav Goal" onclick="SetGoalModel();" type="button"></td>
+				<td  rowspan="2" style="width: 50%;">
+					<table width="100%" cellpadding="2" cellspacing="2" style="border: 1px solid;">
+					<tbody>
+					<td valign="top" border="1">
+						<h2>ROS Remote Control</h2>
+					<table width="100%" border="0" cellpadding="0" cellspacing="0">
+					<tbody>
+						<tr valign="top">
+						<td colspan="3"><label id="cmdVelStatusMessage"></label><br><br>
+									<b><label id="navInstructions"></label></b>
+						</td>
+						</tr>
+						<tr>
+								<td colspan="3" style="text-align: center;"><img src="images/arrow-up.jpg" id="arrow_up" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('forward');clearTimedStop();" onClick="setSpeed('forward');" alt="" align="middle"></td>
+						</tr>
+						<tr>
+						<td width="33%" style="text-align: center;"><img src="images/arrow-left.jpg" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('left');clearTimedStop();" onClick="setSpeed('left');" alt="" align="middle"></td>
+						<td width="33%" style="text-align: center;"><img src="images/stop.jpg" width="100" onClick="stopRobot('forward');" alt="" align="middle"></td>
+						<td width="33%" style="text-align: center;"><img src="images/arrow-right.jpg" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('right');clearTimedStop();" onClick="setSpeed('right');" alt="" align="middle"></td>
+						</tr>
+						<tr>
+						<td colspan="3" style="text-align: center;"><img src="images/arrow-down.jpg" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('backward');clearTimedStop();" onClick="setSpeed('backward');" alt="" align="middle"></td>
+					</tr>
+					<tr>
+					<td align="right"><span style="font-size: 14pt;">Max Linear Spd:</span></td>
+					<td><input type="range" id="maxLinearSpeed" min="0.01" max="0.5" step="0.01" value="0.2"
+                    onChange="writeStatusMessage('maxLinearSpeedDisplay', this.value);"
+                    onMouseUp="setMaxLinearSpeed(this.value);" onInput="maxLinearSpeedDisplay.value=this.value;"></td>
+					<td><span style="font-weight: bold;"><output id="maxLinearSpeedDisplay" size="4"></output></span></td>
+					</tr>
+					<tr>
+					<td align="right"><span style="font-size: 14pt;">Max Angular Spd:</span></td>
+					<td><input type="range" id="maxAngularSpeed" min="0.01" max="2.0" step="0.01" value="1.0"
+                    onChange="writeStatusMessage('maxAngularSpeedDisplay', this.value);"
+                    onMouseUp="setMaxAngularSpeed(this.value);" onInput="maxAngularSpeedDisplay.value=this.value;"></td>
+					<td><span style="font-weight: bold;"><output id="maxAngularSpeedDisplay" size="4"></output></span></td>
+					</tr>
+				</tbody>
+				</table>
+				</td>
+				</tr>
+				</tbody>
+				</table>
+					
+				</td>
+			</tr>
+			<tr>
+					<td colspan="2"><div id="navCanvas"></div></td>
+			</tr>
+
+		</table>
+		</form>
+    </div>
+    <script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>

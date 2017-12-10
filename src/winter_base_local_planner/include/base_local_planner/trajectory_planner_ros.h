@@ -235,6 +235,7 @@ namespace base_local_planner {
       //自己添加的
 	  tf::Stamped<tf::Pose> temp_goal_point;
 	  bool isMoveingBack;
+	  bool ifPublishMessage;
   };
 };
 #endif

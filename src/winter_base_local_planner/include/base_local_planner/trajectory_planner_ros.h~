@@ -187,6 +187,7 @@ namespace base_local_planner {
        */
       bool stopWithAccLimits(const tf::Stamped<tf::Pose>& global_pose, const tf::Stamped<tf::Pose>& robot_vel, geometry_msgs::Twist& cmd_vel);
       
+      bool MoveBack(const tf::Stamped<tf::Pose>& global_pose, const tf::Stamped<tf::Pose>& goal_pose, const tf::Stamped<tf::Pose>& robot_vel, geometry_msgs::Twist& cmd_vel);
       void ultrosonicdata_callback(const sensor_msgs::Range::ConstPtr& data);
 
       std::vector<double> loadYVels(ros::NodeHandle node);
@@ -218,7 +219,6 @@ namespace base_local_planner {
       bool rotating_to_goal_;
       bool reached_goal_;
       bool latch_xy_goal_tolerance_, xy_tolerance_latch_;
-
       ros::Publisher g_plan_pub_, l_plan_pub_;
       ros::Subscriber ultrosonicdata_sub_;
 
@@ -231,6 +231,10 @@ namespace base_local_planner {
       base_local_planner::OdometryHelperRos odom_helper_;
 
       std::vector<geometry_msgs::Point> footprint_spec_;
+      
+      //自己添加的
+	  tf::Stamped<tf::Pose> temp_goal_point;
+	  bool isMoveingBack;
   };
 };
 #endif

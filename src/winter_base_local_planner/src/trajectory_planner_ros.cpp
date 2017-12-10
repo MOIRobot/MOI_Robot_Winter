@@ -52,6 +52,7 @@
 
 
 
+
 //register this planner as a BaseLocalPlanner plugin
 PLUGINLIB_EXPORT_CLASS(base_local_planner::Winter_TrajectoryPlannerROS, nav_core::BaseLocalPlanner)
 
@@ -239,6 +240,7 @@ namespace base_local_planner {
       footprint_spec_ = costmap_ros_->getRobotFootprint();
 	  
 	  isMoveingBack=false;
+	  ifPublishMessage=false;
 	  
       tc_ = new TrajectoryPlanner(*world_model_, *costmap_, footprint_spec_,
           acc_lim_x_, acc_lim_y_, acc_lim_theta_, sim_time, sim_granularity, vx_samples, vtheta_samples, pdist_scale,
@@ -540,7 +542,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
     double goal_x = goal_point.getOrigin().getX();
     double goal_y = goal_point.getOrigin().getY();
    
-	ROS_INFO("the goal point x is %f y is %f ",goal_x,goal_y);
+	//ROS_INFO("the goal point x is %f y is %f ",goal_x,goal_y);
     double yaw = tf::getYaw(goal_point.getRotation());
 
     double goal_th = yaw;
@@ -571,8 +573,10 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
         tc_->updatePlan(transformed_plan);
         //#tag得到速度的入口
         Trajectory path = tc_->findBestPath(global_pose, robot_vel, drive_cmds);
+        if(ifPublishMessage)
+        {
         map_viz_.publishCostCloud(costmap_);
-
+		}
         //copy over the odometry information
         nav_msgs::Odometry base_odom;
         odom_helper_.getOdom(base_odom);
@@ -592,11 +596,12 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
           }
         }
       }
-
+	  if(ifPublishMessage)
       //publish an empty plan because we've reached our goal position
-      publishPlan(transformed_plan, g_plan_pub_);
+      {publishPlan(transformed_plan, g_plan_pub_);
       publishPlan(local_plan, l_plan_pub_);
-
+		}
+	 
       //we don't actually want to run the controller when we're just rotating to goal
       return true;
     }
@@ -607,8 +612,10 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 
     //compute what trajectory to drive along
     Trajectory path = tc_->findBestPath(global_pose, robot_vel, drive_cmds);
-
+	if(ifPublishMessage)
+	{
     map_viz_.publishCostCloud(costmap_);
+	}
     /* For timing uncomment
     gettimeofday(&end, NULL);
     start_t = start.tv_sec + double(start.tv_usec) / 1e6;
@@ -627,8 +634,11 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
       ROS_DEBUG_NAMED("trajectory_planner_ros",
           "The rollout planner failed to find a valid plan. This means that the footprint of the robot was in collision for all simulated trajectories.");
       local_plan.clear();
+      if(ifPublishMessage)
+      {
       publishPlan(transformed_plan, g_plan_pub_);
       publishPlan(local_plan, l_plan_pub_);
+	  }
       return false;
     }
 
@@ -651,8 +661,11 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
     }
 
     //publish information to the visualizer
+    if(ifPublishMessage)
+    {
     publishPlan(transformed_plan, g_plan_pub_);
     publishPlan(local_plan, l_plan_pub_);
+	}
     return true;
   }
 

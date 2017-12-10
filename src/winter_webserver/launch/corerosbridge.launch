@@ -1,0 +1,15 @@
+<launch>
+
+  <rosparam ns="/robot_gui">
+     maxLinearSpeed: 0.5
+     maxAngularSpeed: 2.0
+     videoTopic: /camera/rgb/image_raw
+  </rosparam>
+
+  <node name="mini_httpd" pkg="winter_webserver" type="mini-httpd.sh" output="screen" />
+
+  <node name="robot_pose_publisher" pkg="robot_pose_publisher" type="robot_pose_publisher" output="screen" />
+  
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+
+</launch>

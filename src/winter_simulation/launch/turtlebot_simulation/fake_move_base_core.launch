@@ -1,0 +1,23 @@
+<launch>
+
+  <!-- Run the map server with a blank map + obstacle -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find winter_simulation)/maps/my_map.yaml"/>
+ 
+  <!-- Run a static transform between /odom and /map -->
+  <node pkg="tf" type="static_transform_publisher" name="odom_map_broadcaster" args="0 0 0 0 0 0 /map /odom 100" />
+  
+  <!-- Run fake localization compatible with AMCL output -->
+  <!--node pkg="fake_localization" type="fake_localization" name="fake_localization" output="screen" /-->
+  
+  <include file="$(find winter_simulation)/launch/turtlebot_simulation/move_base.launch" />
+   
+  
+  
+  <arg name="model" />  
+   <arg name="gui" default="True" />  
+   <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot.urdf" />  
+   <param name="use_gui" value="$(arg gui)"/>  
+   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+  
+
+</launch>

@@ -990,7 +990,7 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
 				{
 					float RotatingTime=(float)RotaingTimeCount/controller_frequency_;
 					ROS_INFO("Rotating in Place for %f seconds",RotatingTime);
-					if(RotatingTime>15.0)
+					if(RotatingTime>30.0)
 					{
 						//ROS_INFO("Rotating in Place too long");
 						          //disable the planner thread

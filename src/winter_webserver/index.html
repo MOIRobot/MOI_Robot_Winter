@@ -54,7 +54,7 @@
 				<td style="text-align: center; width: 25%;"><input class="button blue" id="set_pose" value="2D Pose Estimate" onclick="setEPose();" type="button"></td>
 				<td style="text-align: center; width: 25%;"><input class="button blue" id="move_base" value="2D Nav Goal" onclick="SetGoalModel();" type="button"></td>
 				<td  rowspan="2" style="width: 50%;">
-					<table width="100%" cellpadding="2" cellspacing="2" style="border: 1px solid;">
+					<table width="100%" cellpadding="2" cellspacing="2">
 					<tbody>
 					<td valign="top" border="1">
 						<h2>ROS Remote Control</h2>
@@ -69,9 +69,9 @@
 								<td colspan="3" style="text-align: center;"><img src="images/arrow-up.jpg" id="arrow_up" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('forward');clearTimedStop();" onClick="setSpeed('forward');" alt="" align="middle"></td>
 						</tr>
 						<tr>
-						<td width="33%" style="text-align: center;"><img src="images/arrow-left.jpg" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('left');clearTimedStop();" onClick="setSpeed('left');" alt="" align="middle"></td>
-						<td width="33%" style="text-align: center;"><img src="images/stop.jpg" width="100" onClick="stopRobot('forward');" alt="" align="middle"></td>
-						<td width="33%" style="text-align: center;"><img src="images/arrow-right.jpg" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('right');clearTimedStop();" onClick="setSpeed('right');" alt="" align="middle"></td>
+						<td width="37%" style="text-align: right;"><img src="images/arrow-left.jpg" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('left');clearTimedStop();" onClick="setSpeed('left');" alt="" align="middle"></td>
+						<td width="25%" style="text-align: center;"><img src="images/stop.jpg" width="100" onClick="stopRobot('forward');" alt="" align="middle"></td>
+						<td width="37%" style="text-align: left;"><img src="images/arrow-right.jpg" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('right');clearTimedStop();" onClick="setSpeed('right');" alt="" align="middle"></td>
 						</tr>
 						<tr>
 						<td colspan="3" style="text-align: center;"><img src="images/arrow-down.jpg" width="100" onTouchEnd="timedStopRobot();" onTouchStart="setSpeed('backward');clearTimedStop();" onClick="setSpeed('backward');" alt="" align="middle"></td>
@@ -96,7 +96,7 @@
 				</tr>
 				</tbody>
 				</table>
-					
+
 				</td>
 			</tr>
 			<tr>

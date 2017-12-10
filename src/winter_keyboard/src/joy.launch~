@@ -1,0 +1,14 @@
+<launch>
+	<arg name="drive_speed" default="0.9" />
+	<arg name="turn_speed" default="2.4" />
+	<arg name="joy_dev" default="/dev/input/js0" />
+	<arg name="cmd_topic" default="cmd_vel" />
+
+	<node pkg="joy" type="joy_node" name="joy_node">
+		<param name="dev" value="$(arg joy_dev)" />
+		<param name="deadzone" value="0.3" />
+	</node>
+
+	<node pkg="winter_keyboard" type="two_wheels_telecop_withACC" name="joycontrol" output="screen">
+	</node>
+</launch>

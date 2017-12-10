@@ -201,13 +201,10 @@ def getKey():
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
     return key
 
-global currentState
 currentState='n'
 
 def callback(msg):
-	print 'herer'
 	global SPEED
-	global currentState
 	if msg.buttons[0]==1:
 		currentState='rUp'
 	elif msg.buttons[1]==1:
@@ -243,21 +240,19 @@ if __name__ == '__main__':
 		#rate.sleep()
 	last_ch=''
 	while not rospy.is_shutdown():
-		global currentState
-		print currentState
 		print msg
 		ch=getKey()
 		if ch=='i' or currentState=='rUp':
-			if last_ch=='i' or currentState=='rUp':
+			if last_ch=='i':
 				moveX(MAXSPEED)
 		elif ch=='m' or currentState== 'rDown':
-			if last_ch=='m' or currentState== 'rDown':
+			if last_ch=='m':
 				moveX(0-MAXSPEED)
-		elif ch=='j'or currentState=='rLeft':
+		elif ch=='j':
 			if last_ch=='j' or currentState=='rLeft':
 				rotateRobot(MAXROTATESPEED)
 		elif ch=='l' or currentState=='rRight':
-			if last_ch=='l' or currentState=='rRight':
+			if last_ch=='l':
 				rotateRobot(0-MAXROTATESPEED)
 		elif ch=='u':
 			rotateRobot(MAXROTATESPEED)
@@ -278,14 +273,12 @@ if __name__ == '__main__':
 			if last_ch is '' :
 				stop_robot()
 		last_ch=ch
-		#print "Reading form keybord"
-		'''
+		print "Reading form keybord"
 		print """   i
 j  k  l
    m"""
 		print 'press Q to quit'
-		'''
-		#rospy.spinonce()
+		rospy.spinonce()
 		#rate.sleep()
 			
 			

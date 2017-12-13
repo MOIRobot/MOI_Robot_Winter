@@ -1,6 +1,6 @@
 <launch>
 
-   <arg name="map" default="office.yaml" />
+  <arg name="map" default="map1213.yaml" />
   <!-- Run the map server with a blank map + obstacle -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(find winter_navigation)/maps/$(arg map)"/> 
   

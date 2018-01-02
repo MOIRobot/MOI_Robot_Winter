@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(winter_simulation)
+project(winter_people)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -7,13 +7,7 @@ project(winter_simulation)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  std_msgs
-  tf
-  nav_msgs
-)
+find_package(catkin REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -72,7 +66,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs
+#   std_msgs  # Or other packages containing msgs
 # )
 
 ################################################
@@ -100,14 +94,14 @@ find_package(catkin REQUIRED COMPONENTS
 ###################################
 ## The catkin_package macro generates cmake config files for your package
 ## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if you package contains header files
+## INCLUDE_DIRS: uncomment this if your package contains header files
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES winter_simulation
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+#  LIBRARIES winter_people
+#  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
 
@@ -119,12 +113,12 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 # include
-  ${catkin_INCLUDE_DIRS}
+# ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/winter_simulation.cpp
+#   src/${PROJECT_NAME}/winter_people.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -135,7 +129,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/winter_simulation_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/winter_people_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -186,20 +180,13 @@ include_directories(
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
-add_executable(fake_odo_publiser src/FakeBaseController/fake_controller.cpp)
-target_link_libraries(fake_odo_publiser ${catkin_LIBRARIES})
 
-add_executable(fake_ultrosonicdata src/fake_ultrosonicData/fake_ultrosonicdata.cpp)
-target_link_libraries(fake_ultrosonicdata ${catkin_LIBRARIES})
-
-add_executable(fake_odo_publiser_follow src/FakeBaseController/fake_controller_follow.cpp)
-target_link_libraries(fake_odo_publiser_follow ${catkin_LIBRARIES})
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_winter_simulation.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_winter_people.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

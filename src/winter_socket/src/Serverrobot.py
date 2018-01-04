@@ -31,6 +31,7 @@ robotdriverNode=None
 robotlaserNode=None
 robotgmappingNode=None
 robotnavigationNode=None
+robotjoyNode=None
 
 def pkill(msg):
 	cmd="pgrep "+msg
@@ -98,6 +99,16 @@ def paraseCMD(msg):
 		print "robot webserver off"
 		udpCliSock.sendto("robot webserver off",ADDR) 
 		pkill("webserver.sh")
+	elif "j" in msg:
+		print "robot joycontrol on"
+		udpCliSock.sendto("robot joycontrol on",ADDR) 
+		cmd=cpath+"/joycontrol.sh"
+		robotjoyNode=subprocess.Popen(cmd)
+	elif "u" in msg:
+		print "robot joycontrol off"
+		udpCliSock.sendto("robot joycontrol off",ADDR) 
+		commands.getoutput("rosnode kill joy_node")
+		commands.getoutput("rosnode kill joycontrol")
 def SendStatus():
 	resultMessage="Robot Online!\n"
 	if roscoreNode !=None:

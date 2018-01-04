@@ -25,7 +25,7 @@
     <param name="lsigma" value="0.075"/>
     <param name="ogain" value="3.0"/>
     <param name="lskip" value="0"/>
-    <param name="minimumScore" value="100"/>
+    <param name="minimumScore" value="80"/>
     <param name="srr" value="0.1"/>
     <param name="srt" value="0.2"/>
     <param name="str" value="0.1"/>

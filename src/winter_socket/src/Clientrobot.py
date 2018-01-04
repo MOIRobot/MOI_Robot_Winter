@@ -13,8 +13,9 @@ a: roscore on
 s: robot driver on(odom message)
 d: robot laser on
 f: robot gmapping on
-g:robot navigation on
-k:robot webserver on
+g: robot navigation on
+k: robot webserver on
+j:  robot joycontrol
 
 q: roscore off
 w: robot driver off(odom message)
@@ -22,6 +23,7 @@ e: robot laser off
 r: robot gmapping off
 t:robot navigation off
 k:robot webserver off
+u: robot joycontrol off
 m:set roscore on robot side for local ros node
 
 ***************************

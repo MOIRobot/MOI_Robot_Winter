@@ -43,8 +43,8 @@ global MAXROTATESPEED
 
 MAXSPEED=0.35
 MAXROTATESPEED=0.8
-ACC=1.5
-RotateAcc=2.5
+ACC=0.5
+RotateAcc=1.0
 #控制频率
 global ControllerFrequecny
 ControllerFrequecny=10
@@ -163,7 +163,6 @@ def stop_robot():
 			fz=True
 		pub.publish(cmd)
 		time.sleep(1.0/ControllerFrequecny)
-		print 'stoping robot now'
 		if fx and fy and fz:
 			return
 def rotateRobot(speed):
@@ -191,16 +190,6 @@ def rotateRobot(speed):
 		print "rotate to left!"
 	else:
 		return	
-def getKey():
-    tty.setraw(sys.stdin.fileno())
-    rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
-    if rlist:
-        key = sys.stdin.read(1)
-    else:
-        key = ''
-    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
-    return key
-
 global currentState
 currentState='n'
 
@@ -241,8 +230,6 @@ if __name__ == '__main__':
 	rate = rospy.Rate(rospy.get_param('~hz', 1))  
 	while not rospy.is_shutdown():
 		global currentState
-		print currentState
-		print msg
 		if currentState=='rUp':
 			moveX(MAXSPEED)
 		elif currentState== 'rDown':

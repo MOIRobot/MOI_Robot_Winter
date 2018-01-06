@@ -1210,7 +1210,7 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
       n.setParam("sonar_clear/static_layer_name", "static_map");
       n.setParam("sonar_clear/sonar_layer_name", "sonar");
       boost::shared_ptr<nav_core::RecoveryBehavior> sonar_clear(recovery_loader_.createInstance("clear_costmap_recovery_gao/ClearCostmapRecoveryGao"));
-      sonar_clear->initialize("sonar_clear", &tf_, planner_costmap_ros_, controller_costmap_ros_);
+      sonar_clear->initialize("obstacle_layer", &tf_, planner_costmap_ros_, controller_costmap_ros_);
       recovery_behaviors_.push_back(sonar_clear);
       
       boost::shared_ptr<nav_core::RecoveryBehavior> cons_clear(recovery_loader_.createInstance("clear_costmap_recovery/ClearCostmapRecovery"));

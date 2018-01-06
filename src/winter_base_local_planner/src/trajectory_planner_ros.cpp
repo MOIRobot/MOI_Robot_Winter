@@ -240,7 +240,7 @@ namespace base_local_planner {
       footprint_spec_ = costmap_ros_->getRobotFootprint();
 	  
 	  isMoveingBack=false;
-	  ifPublishMessage=false;
+	  ifPublishMessage=true;
 	  
       tc_ = new TrajectoryPlanner(*world_model_, *costmap_, footprint_spec_,
           acc_lim_x_, acc_lim_y_, acc_lim_theta_, sim_time, sim_granularity, vx_samples, vtheta_samples, pdist_scale,

@@ -41,10 +41,10 @@ global RotateAcc
 global MAXSPEED
 global MAXROTATESPEED
 
-MAXSPEED=0.35
-MAXROTATESPEED=0.8
-ACC=0.5
-RotateAcc=1.0
+MAXSPEED=0.4
+MAXROTATESPEED=0.5
+ACC=0.2
+RotateAcc=0.2
 #控制频率
 global ControllerFrequecny
 ControllerFrequecny=10
@@ -72,7 +72,7 @@ j   k  l
     m
 press Q to quit
 """
-def moveX(speed):
+def moveX(speed,state):
 	global ControllerFrequecny
 	global ACC
 	if speed>0:
@@ -88,7 +88,12 @@ def moveX(speed):
 			#man.say('max speed')
 			#man.wait()
 		cmd.linear.y=0.0
-		cmd.angular.z=0.0
+		if state=='fleft':
+			cmd.angular.z=0.4
+		elif state=='fright':
+			cmd.angular.z=-0.4
+		else:
+			cmd.angular.z=0.0
 		pub.publish(cmd)
 		time.sleep(1.0/ControllerFrequecny)
 		print "move forward!"
@@ -141,24 +146,24 @@ def stop_robot():
 	fz=False
 	while True:
 		if(cmd.linear.x>0):
-			cmd.linear.x-=ACC/ControllerFrequecny
+			cmd.linear.x-=2*ACC/ControllerFrequecny
 		elif(cmd.linear.x<0):
-			cmd.linear.x+=ACC/ControllerFrequecny
+			cmd.linear.x+=2*ACC/ControllerFrequecny
 		if(cmd.linear.y>0):
 			cmd.linear.y-=ACC/ControllerFrequecny
 		elif (cmd.linear.y<0):
 			cmd.linear.y+=ACC/ControllerFrequecny
 		if (cmd.angular.z>0):
-			cmd.angular.z-=RotateAcc/ControllerFrequecny
+			cmd.angular.z-=3*RotateAcc/ControllerFrequecny
 		elif(cmd.angular.z<0):
-			cmd.angular.z+=RotateAcc/ControllerFrequecny
-		if(abs(cmd.linear.x)<(ACC/ControllerFrequecny)):
+			cmd.angular.z+=3*RotateAcc/ControllerFrequecny
+		if(abs(cmd.linear.x)<(3*ACC/ControllerFrequecny)):
 			cmd.linear.x=0.0
 			fx=True
-		if(abs(cmd.linear.y)<(ACC/ControllerFrequecny)):
+		if(abs(cmd.linear.y)<(3*ACC/ControllerFrequecny)):
 			cmd.linear.y=0.0
 			fy=True
-		if(abs(cmd.angular.z)<(RotateAcc/ControllerFrequecny)):
+		if(abs(cmd.angular.z)<(3*RotateAcc/ControllerFrequecny)):
 			cmd.angular.z=0.0
 			fz=True
 		pub.publish(cmd)
@@ -199,6 +204,10 @@ def callback(msg):
 	global currentState
 	if msg.buttons[0]==1:
 		currentState='rUp'
+		if msg.axes[0]==1.0:
+			currentState='fleft'
+		if msg.axes[0]==-1.0:
+			currentState='fright'
 	elif msg.buttons[1]==1:
 		currentState='rRight'
 	elif msg.buttons[2]==1:
@@ -231,13 +240,15 @@ if __name__ == '__main__':
 	while not rospy.is_shutdown():
 		global currentState
 		if currentState=='rUp':
-			moveX(MAXSPEED)
+			moveX(MAXSPEED,currentState)
 		elif currentState== 'rDown':
-			moveX(0-MAXSPEED)
+			moveX(0-MAXSPEED,currentState)
 		elif currentState=='rLeft':
 			rotateRobot(MAXROTATESPEED)
 		elif currentState=='rRight':
-				rotateRobot(0-MAXROTATESPEED)
+			rotateRobot(0-MAXROTATESPEED)
+		elif currentState=='fleft' or currentState=='fright':
+			moveX(MAXSPEED,currentState);
 		else:
 			stop_robot()
 			

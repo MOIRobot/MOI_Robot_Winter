@@ -16,8 +16,8 @@ Winter_TrajectoryPlannerROS:
    acc_lim_theta: 4.0          #229degree 
 
    holonomic_robot: false      #
-   yaw_goal_tolerance: 0.1     # 5.72degree
-   xy_goal_tolerance: 0.05      #
+   yaw_goal_tolerance: 0.2     # 5.72degree
+   xy_goal_tolerance: 0.15      #
    latch_xy_goal_tolerance: false # 
    pdist_scale: 0.8            #
    gdist_scale: 0.4            #
@@ -31,7 +31,7 @@ Winter_TrajectoryPlannerROS:
    publish_cost_grid_pc: false #
    prune_plan: true            #
 
-   sim_time: 1.5               #1.5
+   sim_time: 2.0               #1.5
    sim_granularity: 0.05       #
    angular_sim_granularity: 0.1 #0.025
    vx_samples: 8               #

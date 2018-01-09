@@ -29,7 +29,6 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from tf.transformations import quaternion_from_euler
 from visualization_msgs.msg import Marker
 from math import radians, pi
-import time
 
 class MoveBaseFloor():
     def __init__(self):
@@ -85,29 +84,28 @@ class MoveBaseFloor():
         goal = MoveBaseGoal()
         goal.target_pose.header.frame_id = 'map'
         goal.target_pose.header.stamp = rospy.Time.now()
-        goal.target_pose.pose.position.x=5.53
-        goal.target_pose.pose.position.y=-1.45
+        goal.target_pose.pose.position.x=0.714
+        goal.target_pose.pose.position.y=0.148
         goal.target_pose.pose.position.z=0.0
         #angle 0.604
         goal.target_pose.pose.orientation.x=0.0
         goal.target_pose.pose.orientation.y=0.0
-        goal.target_pose.pose.orientation.z=-0.654
-        goal.target_pose.pose.orientation.w=0.757
-        self.move(goal)
-        time.sleep(5)
+        goal.target_pose.pose.orientation.z=0.297
+        goal.target_pose.pose.orientation.w=0.955
+        
         
         goal2 = MoveBaseGoal()
         goal2.target_pose.header.frame_id = 'map'
         goal2.target_pose.header.stamp = rospy.Time.now()
-        goal2.target_pose.pose.position.x=5.53
-        goal2.target_pose.pose.position.y=0.65
+        goal2.target_pose.pose.position.x=0.714
+        goal2.target_pose.pose.position.y=0.148
         goal2.target_pose.pose.position.z=0.0
         #angle 0.604
         goal2.target_pose.pose.orientation.x=0.0
         goal2.target_pose.pose.orientation.y=0.0
-        goal2.target_pose.pose.orientation.z=0.71
-        goal2.target_pose.pose.orientation.w=0.704
-        self.move(goal2)
+        goal2.target_pose.pose.orientation.z=0.297
+        goal2.target_pose.pose.orientation.w=0.955
+        self.move(goal)
         
     def move(self, goal):
             # Send the goal pose to the MoveBaseAction server

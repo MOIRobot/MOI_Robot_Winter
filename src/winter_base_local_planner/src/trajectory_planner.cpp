@@ -665,8 +665,7 @@ namespace base_local_planner{
 	/**tag third*****************************************************************************************/
     /**************************************************************************************************/
 	//向后退的路径
-	trajectoryMoveBack(best_traj,comp_traj ,
-											 x,  y,  theta,vx,  vy,  vtheta, acc_x,  acc_y,  acc_theta); 
+	trajectoryMoveBack(best_traj,comp_traj ,x,  y,  theta,vx,  vy,  vtheta, acc_x,  acc_y,  acc_theta); 
 
     return *best_traj;
     

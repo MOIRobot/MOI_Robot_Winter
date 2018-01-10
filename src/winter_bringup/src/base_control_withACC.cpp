@@ -179,9 +179,11 @@ void BaseControl::CmdCallback(const geometry_msgs::TwistConstPtr& msg)
     //cmd_msg = *msg;
     if(msg->linear.x>current_vx_)  
 		cmd_msg.linear.x=current_vx_+acc_x_/loop_rate_;
-    else
+    else if (msg->linear.x<current_vx_)
 		cmd_msg.linearx=current_vx_-acc_x_/loop_rate_;
-	
+	else
+		cmd_msg.linearx=msg->linear.x;
+		
 	 if(msg->angular.z>current_vth_)  
 		cmd_msg.angular.z=current_vth_+acc_th_/loop_rate_;
     else
@@ -209,7 +211,7 @@ void BaseControl::ShutdownRobot()
 
     ros::shutdown();
 }
-void BaseControl::SetSpeed()
+void BaseControl::SetSpeed() 
 {
     string SetSpeedCmd;
     float right_wheel_velocity = 0.0;

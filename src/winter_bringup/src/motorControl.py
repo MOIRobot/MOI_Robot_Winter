@@ -26,9 +26,15 @@ def arrToStr(arr):
 		except:
 			str1+=num
 	return str1
+global ls
+global rs
+ls=0
+rs=0
 def MotorSetSpeed(a,b):
-	right_wheel_velocity = b;
-	leftWheel_velocity=a;
+	global ls
+	global rs
+	right_wheel_velocity = rs;
+	leftWheel_velocity=ls;
 	WL_H = ((leftWheel_velocity) >> 8) & 0xFF;
 	WL_L = leftWheel_velocity & 0xFF;
 	WR_H = ((right_wheel_velocity) >> 8) & 0xFF;
@@ -41,11 +47,13 @@ def MotorSetSpeed(a,b):
 		
 if __name__ == '__main__':
 	while True:
+		global ls
+		global rs
 		a=input("Input:")
 		if a==1:
-			le=input("Left Motor Speed:")
-			MotorSetSpeed(le,0)
+			ls=input("Left Motor Speed:")
+			MotorSetSpeed(0,0)
 		elif a==2:
-			e=input("Right Motor Speed:")
-			MotorSetSpeed(0,e)
+			rs=input("Right Motor Speed:")
+			MotorSetSpeed(0,0)
 	

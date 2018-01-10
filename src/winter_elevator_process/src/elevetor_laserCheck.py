@@ -52,6 +52,15 @@ def move(goal):
 	state = move_base.get_state()
 	if state == GoalStatus.SUCCEEDED:
 		rospy.loginfo("Goal succeeded!")	
+def WaitDoorOpen():
+	global doorState
+	try:
+		while doorState==False:
+			time.sleep(0.5)
+			print 'waiting for elevator to open'
+	except:
+		return 
+	
 def check():
 	global doorState
 	goal = MoveBaseGoal()
@@ -103,11 +112,20 @@ def check():
 	goal_in2.target_pose.pose.orientation.z=-0.708
 	goal_in2.target_pose.pose.orientation.w=0.706
 
-	move(goal2)
-	while doorState==False:
-		time.sleep(0.5)
-		print 'waiting for elevator to open'
-	print 'going to the elevator'
+	while True:
+		sel=input("choose goal:")
+		if sel==1:
+			print 'going to goal 1'
+			move(goal)
+		elif sel==2:
+			print 'going to goal2'
+			move(goal2)
+		elif sel==3:
+			print 'going to goal3'
+			move(goal3)
+		elif sel=='q':
+			return 
+	'''
 	move(goal_in2)
 	time.sleep(15)
 	while doorState==False:
@@ -115,6 +133,7 @@ def check():
 		print 'waiting for elevator to open'
 	print 'going to the elevator'
 	move(goal)
+	'''
 	'''
 	goal2 = MoveBaseGoal()
 	goal2.target_pose.header.frame_id = 'map'

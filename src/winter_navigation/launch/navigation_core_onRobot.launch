@@ -1,8 +1,8 @@
 <launch>
 
-  <arg name="map" default="map1213.yaml" />
+  <arg name="map" default="map0107.yaml" />
   <!-- Run the map server with a blank map + obstacle -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find winter_navigation)/maps/$(arg map)"/> 
+  <node name="map_server" pkg="map_server" type="map_server" args="/home/jobsg/$(arg map)"/> 
   
   <arg name="use_map_topic"   default="map"/>
   <arg name="scan_topic"      default="scan"/> 

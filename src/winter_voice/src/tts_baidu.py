@@ -43,8 +43,8 @@ class Speak:
 		f.close()
 	def say(self):
 		os.system("play tts-temp.mp3")
-	def over(self):
-		os.system("rm tts-temp.mp3")
 	def play(music):
 		os.system("play "+music)
-man=Speak("你好 中国",1,"zh",True)
+man=Speak("等待电梯打开",1,"zh",True)
+def over(self):
+	os.system("rm tts-temp.mp3")

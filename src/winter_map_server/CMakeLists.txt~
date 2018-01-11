@@ -26,6 +26,7 @@ catkin_package(
         tf
         nav_msgs
 )
+add_message_files(  FILES  Num.msg)
 
 include_directories( include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} )
 target_link_libraries(map_server_image_loader SDL SDL_image ${Boost_LIBRARIES})

@@ -28,6 +28,7 @@ catkin_package(
 )
 
 include_directories( include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} )
+add_library(map_server_image_loader src/image_loader.cpp)
 target_link_libraries(map_server_image_loader SDL SDL_image ${Boost_LIBRARIES})
 
 add_executable(map_server src/main.cpp)
@@ -61,3 +62,41 @@ function(copy_test_data)
         file(COPY ${datafile} DESTINATION ${PROJECT_BINARY_DIR}/test)
     endforeach()
 endfunction()
+
+## Tests
+if(CATKIN_ENABLE_TESTING)
+  copy_test_data( FILES
+      test/testmap.bmp
+      test/testmap.png )
+  catkin_add_gtest(${PROJECT_NAME}_utest test/utest.cpp test/test_constants.cpp)
+  target_link_libraries(${PROJECT_NAME}_utest map_server_image_loader SDL SDL_image)
+
+  add_executable(rtest test/rtest.cpp test/test_constants.cpp)
+  target_link_libraries( rtest
+      gtest
+      ${catkin_LIBRARIES}
+  )
+  add_dependencies(rtest nav_msgs_gencpp)
+
+  # This has to be done after we've already built targets, or catkin variables get borked
+  find_package(rostest)
+  add_rostest(test/rtest.xml)
+endif()
+
+## Install executables and/or libraries
+install(TARGETS map_server-map_saver map_server map_server_image_loader
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+## Install project namespaced headers
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE)
+
+## Install excutable python script
+install( 
+    PROGRAMS
+      scripts/crop_map
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

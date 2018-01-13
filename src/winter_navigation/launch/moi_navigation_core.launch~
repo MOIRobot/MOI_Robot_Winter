@@ -1,8 +1,10 @@
 <launch>
 
-  <arg name="map" default="map0107.yaml" />
-  <!-- Run the map server with a blank map + obstacle -->
   <node name="map_server" pkg="map_server" type="map_server" args="/home/jobsg/$(arg map)"/> 
+  <node name="map_server" pkg="map_server" type="map_server" args="/home/jobsg/$(arg map)"/> 
+
+  <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot.urdf" />  
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
   
   <arg name="use_map_topic"   default="map"/>
   <arg name="scan_topic"      default="scan"/> 
@@ -12,24 +14,24 @@
   <arg name="global_frame_id" default="map"/>
  
   <include file="$(find winter_navigation)/launch/amcl.launch" /> 
-
   
-  <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot.urdf" />  
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
-
-  <rosparam file="$(find winter_simulation)/costmapConfig/minimal.yaml" command="load" ns="/planner/costmap" />
+   
+  <rosparam file="$(find winter_navigation)/costmapConfig_turtlebot/minimal.yaml" command="load" ns="/planner/costmap" />
       
   <node pkg="winter_globalplanner" type="globalplanner" name="planner" output="screen" clear_params="true" >
   <param name="~RATE"  value="20" />
-	<param name="~MAX_ANGULAR_Z"  value="0.8" />
+	<param name="~MAX_ANGULAR_Z"  value="0.6" />
 	<param name="~MIN_ANGULAR_Z"  value="0.25" />
 	<param name="~ACC_ANGULAR_Z"  value="1.0" />
-	<param name="~ANGULAR_Z_ERR"  value="0.05" />
+	<param name="~ANGULAR_Z_ERR"  value="0.1" />
 	
-	<param name="~MAX_LINEAR_X"  value="0.8" />
+	<param name="~MAX_LINEAR_X"  value="0.4" />
 	<param name="~MIN_LINEAR_X"  value="0.05" />
-	<param name="~ACC_LINEAR_X"  value="0.8" />
-	<param name="~LINEAR_X_ERR"  value="0.02" />
+	<param name="~ACC_LINEAR_X"  value="0.5" />
+	<param name="~LINEAR_X_ERR"  value="0.1" />
   </node>
-
+   
+  
+   
 </launch>
+

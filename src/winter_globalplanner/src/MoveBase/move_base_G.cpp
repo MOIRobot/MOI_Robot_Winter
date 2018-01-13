@@ -33,7 +33,7 @@ LocalMoveBase::LocalMoveBase(costmap_2d::Costmap2D *costmap,const std::vector<ge
 	}
 	else
 	{
-		cmd_vel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 5);
+		cmd_vel_pub = n.advertise<geometry_msgs::Twist>("/smooth_cmd_vel", 5);
 	}
 	n.param<double>("RATE",RATE,20.0);
 	n.param<double>("MAX_ANGULAR_Z",MAX_ANGULAR_Z,0.8);

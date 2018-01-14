@@ -386,8 +386,11 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
         std::min(-1.0 * min_in_place_vel_th_, ang_diff));
 
     //take the acceleration limits of the robot into account
-    double max_acc_vel = fabs(vel_yaw) + acc_lim_theta_ * sim_period_;
-    double min_acc_vel = fabs(vel_yaw) - acc_lim_theta_ * sim_period_;
+    //double max_acc_vel = fabs(vel_yaw) + acc_lim_theta_ * sim_period_;
+    //double min_acc_vel = fabs(vel_yaw) - acc_lim_theta_ * sim_period_;
+    
+    double max_acc_vel = fabs(vel_yaw) + 0.2 * sim_period_;
+    double min_acc_vel = fabs(vel_yaw) - 0.2 * sim_period_;
 
     v_theta_samp = sign(v_theta_samp) * std::min(std::max(fabs(v_theta_samp), min_acc_vel), max_acc_vel);
 

@@ -824,6 +824,7 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
       ros::WallTime start = ros::WallTime::now();
 
       //the real work on pursuing a goal is done here
+      //827
       bool done = executeCycle(goal, global_plan);
 
       //if we're done, then we'll return from execute
@@ -979,13 +980,12 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
          boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(controller_costmap_ros_->getCostmap()->getMutex()));
         
         if(tc_->computeVelocityCommands(cmd_vel)){
-          ROS_DEBUG_NAMED( "move_base", "Got a valid command from the local planner: %.3lf, %.3lf, %.3lf",
+          ROS_INFO( "move_base", "Got a valid command from the local planner: %.3lf, %.3lf, %.3lf",
                            cmd_vel.linear.x, cmd_vel.linear.y, cmd_vel.angular.z );
-          
           //# 判断是否原地旋转太久
-          if((cmd_vel.linear.x==0.0) &&( cmd_vel.linear.y==0.0)&&(cmd_vel.angular.z!=0.0))
+          /*if((cmd_vel.linear.x==0.0) &&( cmd_vel.linear.y==0.0)&&(cmd_vel.angular.z!=0.0))
           {
-				RotaingTimeCount++;
+				/*RotaingTimeCount++;
 				if(RotaingTimeCount>5)
 				{
 					float RotatingTime=(float)RotaingTimeCount/controller_frequency_;
@@ -1009,8 +1009,8 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
           {
 			  RotaingTimeCount=0;
 			  last_valid_control_ = ros::Time::now();
-		  }
-          //last_valid_control_ = ros::Time::now(); 原来是在这个位置 为了判断一直旋转是错的 就拿到了上面
+		  }*/
+          last_valid_control_ = ros::Time::now(); //原来是在这个位置 为了判断一直旋转是错的 就拿到了上面
           //make sure that we send the velocity command to the base
           vel_pub_.publish(cmd_vel);
           if(recovery_trigger_ == CONTROLLING_R)

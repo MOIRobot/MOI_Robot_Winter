@@ -1,0 +1,5 @@
+<launch>
+  
+  <node pkg="yun_global_planner" type="PointPathManager.py" name="PointPathManager"/>
+
+</launch>

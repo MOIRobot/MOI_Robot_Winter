@@ -7,7 +7,7 @@
     <rosparam file="$(find winter_navigation)/costmapConfig_turtlebot/fake/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find winter_navigation)/costmapConfig_turtlebot/fake/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find winter_navigation)/costmapConfig_turtlebot/fake/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find winter_navigation)/costmapConfig_turtlebot/fake/moi_base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find winter_navigation)/costmapConfig_turtlebot/fake/moi_base_local_planner_params2.yaml" command="load" />
   </node>
   
 </launch>

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- start purepursuit node -->
+  <node pkg="yun_global_planner" type="path_marker.py" name="path_marker" output="screen">
+	<param name="frame_id" value="/map" type="string"/>
+	<param name="planner" value="move_base" type="string"/>
+  </node>
+
+</launch>
+

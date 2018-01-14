@@ -12,12 +12,12 @@
   <arg name="global_frame_id" default="map"/>
  
   <include file="$(find winter_navigation)/launch/amcl.launch" /> 
-  <include file="$(find winter_navigation)/launch/move_base_winter.launch" />
-   
+
   
-  
-   <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot.urdf" />  
-   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
-  
+  <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot.urdf" />  
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+
+   <include file="$(find winter_navigation)/launch/move_base_winter.launch" />
+
 
 </launch>

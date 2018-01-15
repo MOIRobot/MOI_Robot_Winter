@@ -277,7 +277,7 @@ def check():
 		os.system("play waitOpen.mp3")
 		WaitDoorOpen()
 		os.system("play goingInElevator.mp3")
-		move_base.send_goal(goalInE[sel])
+		move(goalInE[sel])
 		time.sleep(5)
 		os.system("play waitOpen.mp3")
 		WaitDoorOpen()

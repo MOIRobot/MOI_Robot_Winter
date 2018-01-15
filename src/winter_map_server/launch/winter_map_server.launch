@@ -1,4 +1,5 @@
-  <!--  ****** Maps *****  -->
+<launch>
   <node name="map_server" pkg="winter_map_server" type="map_server" args="$(find winter_map_server)/test/floors.yaml" output="screen">
     <param name="frame_id" value="/map"/>
   </node>
+</launch>

@@ -26,8 +26,8 @@ BaseControl::BaseControl():
   private_nh.param("usb_device", usb_device_, std::string("/dev/ttyUSB0"));
   private_nh.param("deadline_time", deadline_time_, 1);
   private_nh.param("baudrate", baudrate_, 115200);
-  private_nh.param("wheels_separation", wheels_separation_, 0.6);
-  private_nh.param("wheel_radius", wheel_radius_, 0.06);
+  private_nh.param("wheels_separation", wheels_separation_, 0.47);
+  private_nh.param("wheel_radius", wheel_radius_, 0.085);
   private_nh.param("pulse_per_rotation", pulse_per_rotation_, 500);
   private_nh.param("ratio", ratio_, 25);
   private_nh.param("loop_rate", loop_rate_, 40);
@@ -178,7 +178,7 @@ void BaseControl::CmdCallback(const geometry_msgs::TwistConstPtr& msg)
 void BaseControl::ShutdownRobot()
 {
     string SetSpeedCmd;
-    SetSpeedCmd.push_back(0x54);
+    SetSpeedCmd.push_back(0x55);
     SetSpeedCmd.push_back(0x45);
     SetSpeedCmd.push_back(0x07);
     SetSpeedCmd.push_back('S');
@@ -221,7 +221,7 @@ void BaseControl::SetSpeed()
     SUM = (char)(((WL_H + WL_L + WR_H + WR_L) & 0x3F) + 0x30);
 
     SetSpeedCmd.clear();
-    SetSpeedCmd.push_back(0x54);
+    SetSpeedCmd.push_back(0x55);
     SetSpeedCmd.push_back(0x45);
     SetSpeedCmd.push_back(0x07);
     SetSpeedCmd.push_back('S');
@@ -281,8 +281,8 @@ void BaseControl::PublishOdom()
     delta_time = (current_time - last_time).toSec();
     
     //计算每个轮子行走的距离
-    dis[LeftWheel] = encoder_diff[LeftWheel] * ODOM_K;     
-    dis[RightWheel] = encoder_diff[RightWheel] * ODOM_K;
+    dis[LeftWheel] = encoder_diff[LeftWheel] * ODOM_K_USST;     
+    dis[RightWheel] = encoder_diff[RightWheel] * ODOM_K_USST;
 
     left_temp += encoder_diff[LeftWheel];
     right_temp += encoder_diff[RightWheel];

@@ -1,0 +1,21 @@
+#串口设备名称
+usb_device : /dev/ttyUSB0
+
+#定时的时间
+deadline_time:19
+
+#通信的波特率
+baudrate:115200
+
+#轮子的间距
+wheels_separation:0.6
+
+#轮子的半径
+wheel_radius:0.3
+
+#轮子转动一圈的脉冲数
+pulse_per_rotation:500
+
+#电机减速比
+ratio:3
+

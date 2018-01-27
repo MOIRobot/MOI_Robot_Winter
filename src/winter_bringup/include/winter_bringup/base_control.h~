@@ -30,6 +30,8 @@ odom_k = 2*M_PI*R
 */
 #define ODOM_K (0.4823/2400.0)
 
+#define ODOM_K_USST (0.5341/4096.0)
+
 using namespace std;
 using namespace boost::asio;
 

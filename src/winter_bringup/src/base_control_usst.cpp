@@ -387,7 +387,8 @@ void BaseControl::SigHandler(int sig)
 int main(int argc ,char* argv[])
 {
   ros::init(argc, argv, "base_control_node");
-
+   y_pos=0.0001;
+   x_pos=0.0001;
   BaseControl base_control;
 
   return 0;

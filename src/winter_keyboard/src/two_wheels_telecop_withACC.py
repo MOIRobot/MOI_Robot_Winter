@@ -9,30 +9,9 @@ import  os
 import sys, select, termios, tty
 import time    
 import thread
-import pyttsx
-def onEnd(name, completed):
-		print 'end'
-class TSpeak:
-	def __init__(self):
-		self.engine=pyttsx.init()
-		self.engine.setProperty('rate', 120)
-		self.engine.connect('finished-utterance', onEnd)
-	def say(self,words):
-		self.engine.say(words)
-		#self.engine.runAndWait()
-		#self.engine.runAndWait()
-		self.engine.startLoop()
-		#self.engine.startLoop(False)
-		# engine.iterate() must be called inside externalLoop()
-		#externalLoop()
-		#self.engine.endLoop()
-	def wait(self):
-		self.engine.runAndWait()
-	def onsEnd(self):
-		self.engine.endLoop()
 cmd = Twist()
 pub = rospy.Publisher('smooth_cmd_vel',Twist,queue_size=20)
-man=TSpeak()
+
 global CurrentSpeedX
 global CurrentSpeedY
 global CurrentRotate
@@ -54,17 +33,6 @@ CurrentSpeedY=0.0
 CurrentRotate=0.0
 
 
-class TSpeak:
-	def __init__(self):
-		self.engine=pyttsx.init()
-		self.engine.setProperty('rate', 120)
-	def say(self,words):
-		self.engine.say(words)
-	def wait(self):
-		self.engine.runAndWait()
-
-man = TSpeak()
-
 msg="""
 Reading form keybord"
     i
@@ -84,9 +52,6 @@ def moveX(speed):
 			cmd.angular.z=0.0
 			pub.publish(cmd)
 			time.sleep(1.0/ControllerFrequecny)
-			#print 'MAX SPEED'
-			#man.say('max speed')
-			#man.wait()
 		cmd.linear.y=0.0
 		cmd.angular.z=0.0
 		pub.publish(cmd)
@@ -96,8 +61,6 @@ def moveX(speed):
 		cmd.linear.x-=ACC/ControllerFrequecny
 		if(cmd.linear.x<=speed):
 			cmd.linear.x=speed
-			print 'MAX SPEED'
-			man.say("max speed")
 		if(cmd.linear.x>speed):
 			cmd.linear.y=0.0
 			cmd.angular.z=0.0
@@ -113,8 +76,6 @@ def moveY(speed):
 		cmd.linear.y+=ACC/ControllerFrequecny
 		if(cmd.linear.y>=speed):
 			cmd.linear.y=speed
-			print 'MAX SPEED'
-			man.say("max speed")
 		cmd.linear.x=0.0
 		cmd.angular.z=0.0
 		pub.publish(cmd)

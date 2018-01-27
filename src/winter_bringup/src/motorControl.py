@@ -33,15 +33,18 @@ rs=0
 def MotorSetSpeed(a,b):
 	global ls
 	global rs
-	right_wheel_velocity = rs;
-	leftWheel_velocity=ls;
+	right_wheel_velocity = a;
+	leftWheel_velocity=a;
 	WL_H = ((leftWheel_velocity) >> 8) & 0xFF;
 	WL_L = leftWheel_velocity & 0xFF;
 	WR_H = ((right_wheel_velocity) >> 8) & 0xFF;
 	WR_L = (right_wheel_velocity) & 0xFF;
 	SUM = (((WL_H + WL_L + WR_H + WR_L) & 0x3F) + 0x30);
-	cmd=[0x54,0x45,0x07,'S','S',WL_H,WL_L,WR_H,WR_L,SUM,'#']
+	cmd=[0x55,0x45,0x07,'S','S',WL_H,WL_L,WR_H,WR_L,SUM,'#']
+	
+	print16(cmd)
 	mSerial.send(arrToStr(cmd))
+	#mSerial.send("tsrn100#")
 #-----------------------------------------------------------
 #-----------------------------------------------------------
 		
@@ -50,10 +53,5 @@ if __name__ == '__main__':
 		global ls
 		global rs
 		a=input("Input:")
-		if a==1:
-			ls=input("Left Motor Speed:")
-			MotorSetSpeed(0,0)
-		elif a==2:
-			rs=input("Right Motor Speed:")
-			MotorSetSpeed(0,0)
+		MotorSetSpeed(a,a)
 	

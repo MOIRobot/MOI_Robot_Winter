@@ -13,7 +13,7 @@ class MSerialPort:
 				self.port.open()
 		except Exception,msg:
 				raise Exception("串口出错")
-		#thread.start_new_thread(self.read_data,())    
+		thread.start_new_thread(self.read,())    
 	def port_open(self):
 		if not self.port.isOpen():
 			self.port.open()  
@@ -24,10 +24,17 @@ class MSerialPort:
 	def readLine(self):
 		data=self.port.readline()
 		return data
-	def read(self,count):
-		try:
-			data=self.port.read(count)
-			return data
-		except Exception as e:
-			return '#'
+	def read(self):
+		while True:
+			try:
+				data=self.port.read()
+				print16(data)
+			except Exception as e:
+				return '#'
 			
+def print16(arr):
+	for i in arr:
+		try:
+			print('%#x'%i)
+		except:
+			print('%#x'%ord(i))

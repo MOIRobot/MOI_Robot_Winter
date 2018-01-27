@@ -178,7 +178,7 @@ void BaseControl::CmdCallback(const geometry_msgs::TwistConstPtr& msg)
 void BaseControl::ShutdownRobot()
 {
     string SetSpeedCmd;
-    SetSpeedCmd.push_back(0x54);
+    SetSpeedCmd.push_back(0x55);
     SetSpeedCmd.push_back(0x45);
     SetSpeedCmd.push_back(0x07);
     SetSpeedCmd.push_back('S');
@@ -221,7 +221,7 @@ void BaseControl::SetSpeed()
     SUM = (char)(((WL_H + WL_L + WR_H + WR_L) & 0x3F) + 0x30);
 
     SetSpeedCmd.clear();
-    SetSpeedCmd.push_back(0x54);
+    SetSpeedCmd.push_back(0x55);
     SetSpeedCmd.push_back(0x45);
     SetSpeedCmd.push_back(0x07);
     SetSpeedCmd.push_back('S');

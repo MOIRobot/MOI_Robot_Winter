@@ -11,6 +11,7 @@ find_package(catkin REQUIRED
             sensor_msgs
             message_generation
             nav_core
+            winter_nav_core
             nav_msgs
             pcl_conversions
             pcl_ros
@@ -66,7 +67,9 @@ catkin_package(
         costmap_2d
         dynamic_reconfigure
         geometry_msgs
+        sensor_msgs
         message_runtime
+        winter_nav_core
         nav_core
         nav_msgs
         pluginlib

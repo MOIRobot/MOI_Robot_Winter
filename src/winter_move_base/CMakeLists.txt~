@@ -14,6 +14,7 @@ find_package(catkin REQUIRED
         message_generation
         move_base_msgs
         nav_core
+        winter_nav_core
         nav_msgs
         navfn
         pluginlib
@@ -36,6 +37,7 @@ catkin_package(
     CATKIN_DEPENDS
         dynamic_reconfigure
         geometry_msgs
+        sensor_msgs
         move_base_msgs
         nav_msgs
         roscpp

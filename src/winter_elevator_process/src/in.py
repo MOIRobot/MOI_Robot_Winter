@@ -42,7 +42,7 @@ def LaserScanCallback(lasermsg):
 		doorState=True
 
 rospy.init_node('laser_check', anonymous=False)
-rospy.Subscriber('/scan',LaserScan,LaserScanCallback)
+#rospy.Subscriber('/scan',LaserScan,LaserScanCallback)
 vpub=rospy.Publisher('/robot_state',String,queue_size=1)
 r = rospy.Rate(20)
 move_base = actionlib.SimpleActionClient("move_base", MoveBaseAction)

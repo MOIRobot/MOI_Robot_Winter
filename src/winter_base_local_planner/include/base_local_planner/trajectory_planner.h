@@ -205,6 +205,9 @@ namespace base_local_planner {
 
       /** @brief Set the footprint specification of the robot. */
       void setFootprint( std::vector<geometry_msgs::Point> footprint ) { footprint_spec_ = footprint; }
+      
+      /*check path if is valid*/
+      bool checkPath(tf::Stamped<tf::Pose> global_pose,std::vector<geometry_msgs::PoseStamped>& transformed_plan);
 
       /** @brief Return the footprint specification of the robot. */
       geometry_msgs::Polygon getFootprintPolygon() const { return costmap_2d::toPolygon(footprint_spec_); }

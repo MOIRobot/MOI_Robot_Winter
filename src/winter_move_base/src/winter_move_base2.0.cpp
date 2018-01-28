@@ -37,7 +37,7 @@
 *********************************************************************/
 #include <winter_move_base/winter_move_base.h>
 #include <cmath>
-#include <math.h>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/thread.hpp>
 
@@ -331,6 +331,7 @@ namespace move_base {
   void MoveBase::goalCB(const geometry_msgs::PoseStamped::ConstPtr& goal){
     //这里接受rviz里面进来的目标点
     ROS_DEBUG_NAMED("move_base","In ROS goal callback, wrapping the PoseStamped in the action message and re-sending to the server.");
+    move_base_msgs::MoveBaseActionGoal action_goal;
     action_goal.header.stamp = ros::Time::now();
     action_goal.goal.target_pose = *goal;
 
@@ -750,23 +751,22 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
       if(as_->isPreemptRequested()){
         if(as_->isNewGoalAvailable()){
           //if we're active and a new goal is available, we'll accept it, but we won't shut anything down
-         move_base_msgs::MoveBaseGoal new_goal ;
-          new_goal = *as_->acceptNewGoal();
+          move_base_msgs::MoveBaseGoal new_goal = *as_->acceptNewGoal();
 
-			if(!isQuaternionValid(new_goal.target_pose.pose.orientation)){
+          if(!isQuaternionValid(new_goal.target_pose.pose.orientation)){
             as_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on goal because it was sent with an invalid quaternion");
             return;
-			}
+          }
 
           goal = goalToGlobalFrame(new_goal.target_pose);
-		
+
           //we'll make sure that we reset our state for the next execution cycle
           recovery_index_ = 0;
           state_ = PLANNING;
 
           //we have a new goal so make sure the planner is awake
           lock.lock();
-		  planner_goal_ = goal;
+          planner_goal_ = goal;
           runPlanner_ = true;
           planner_cond_.notify_one();
           lock.unlock();
@@ -823,10 +823,8 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
       //for timing that gives real time even in simulation
       ros::WallTime start = ros::WallTime::now();
 
-	//查看全局路径是否失效　如果失效重新规划一条路径　避免遇到障碍物等待时间太久
-		
       //the real work on pursuing a goal is done here
-      //827 这里执行到达动作
+      //827
       bool done = executeCycle(goal, global_plan);
 
       //if we're done, then we'll return from execute
@@ -910,6 +908,7 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
       lock.unlock();
       ROS_DEBUG_NAMED("move_base","pointers swapped!");
 
+	  //把全局路径　传入到局部路径规划
       if(!tc_->setPlan(*controller_plan_)){
         //ABORT and SHUTDOWN COSTMAPS
         ROS_ERROR("Failed to pass global plan to the controller, aborting.");
@@ -981,22 +980,9 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
         {
          boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(controller_costmap_ros_->getCostmap()->getMutex()));
         
-        
         if(tc_->computeVelocityCommands(cmd_vel)){
-			
-			 if(!tc_->checkGlobalPath())
-			 {
-				   publishZeroVelocity();
-				   resetState();
-					//disable the planner thread
-					boost::unique_lock<boost::recursive_mutex> lock(planner_mutex_);
-					runPlanner_ = false;
-					lock.unlock();
-					as_->setSucceeded(move_base_msgs::MoveBaseResult(), "Goal reached.");
-					 action_goal_pub_.publish(action_goal);
-					return true;
-			 }
-          //ROS_INFO( "move_base　Got a valid command from the local planner: %.3lf, %.3lf, %.3lf",cmd_vel.linear.x, cmd_vel.linear.y, cmd_vel.angular.z );
+          ROS_INFO( "move_base", "Got a valid command from the local planner: %.3lf, %.3lf, %.3lf",
+                           cmd_vel.linear.x, cmd_vel.linear.y, cmd_vel.angular.z );
           //# 判断是否原地旋转太久
           /*if((cmd_vel.linear.x==0.0) &&( cmd_vel.linear.y==0.0)&&(cmd_vel.angular.z!=0.0))
           {

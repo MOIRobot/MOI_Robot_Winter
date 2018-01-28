@@ -154,6 +154,9 @@ namespace base_local_planner {
        * @return score of trajectory (double)
        */
       double scoreTrajectory(double vx_samp, double vy_samp, double vtheta_samp, bool update_map = true);
+      
+      bool globalPathvalid;
+      bool checkGlobalPath(void);
 
       bool isInitialized() {
         return initialized_;
@@ -161,6 +164,9 @@ namespace base_local_planner {
 
       /** @brief Return the inner TrajectoryPlanner object.  Only valid after initialize(). */
       TrajectoryPlanner* getPlanner() const { return tc_; }
+      
+     
+      
 
     private:
       /**
@@ -195,6 +201,11 @@ namespace base_local_planner {
       double sign(double x){
         return x < 0.0 ? -1.0 : 1.0;
       }
+      
+      double normalize_angle(double angle);
+      double canculateAngle(double GoalX,double GoalY,double CurrentX,double CurrentY);
+      double canculateDistance(double GoalX,double GoalY,double CurrentX,double CurrentY);
+	  void rotateToAngle(double goalAngle);
 
       WorldModel* world_model_; ///< @brief The world model that the controller will use
       TrajectoryPlanner* tc_; ///< @brief The trajectory controller
@@ -236,6 +247,8 @@ namespace base_local_planner {
 	  tf::Stamped<tf::Pose> temp_goal_point;
 	  bool isMoveingBack;
 	  bool ifPublishMessage;
+	  int turning_flag;
+	  ros::Publisher vel_pub_;
   };
 };
 #endif

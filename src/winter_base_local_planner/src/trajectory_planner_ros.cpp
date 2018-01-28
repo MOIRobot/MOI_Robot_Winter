@@ -49,6 +49,7 @@
 
 #include <base_local_planner/goal_functions.h>
 #include <nav_msgs/Path.h>
+#include <geometry_msgs/Twist.h>
 
 
 
@@ -92,6 +93,9 @@ namespace base_local_planner {
       ros::NodeHandle private_nh("~/" + name);
       g_plan_pub_ = private_nh.advertise<nav_msgs::Path>("global_plan", 1);
       l_plan_pub_ = private_nh.advertise<nav_msgs::Path>("local_plan", 1);
+      
+      vel_pub_ = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+      
       ultrosonicdata_sub_ = n.subscribe<sensor_msgs::Range>("UltraSoundPublisher", 1, boost::bind(&Winter_TrajectoryPlannerROS::ultrosonicdata_callback, this, _1));
       //初始化超声波距离
       ultro_distance=10.0;
@@ -110,6 +114,7 @@ namespace base_local_planner {
       double stop_time_buffer;
       std::string world_model_type;
       rotating_to_goal_ = false;
+      turning_flag=0;
 
       //initialize the copy of the costmap the controller will use
       costmap_ = costmap_ros_->getCostmap();
@@ -254,6 +259,8 @@ namespace base_local_planner {
       dsrv_ = new dynamic_reconfigure::Server<BaseLocalPlannerConfig>(private_nh);
       dynamic_reconfigure::Server<BaseLocalPlannerConfig>::CallbackType cb = boost::bind(&Winter_TrajectoryPlannerROS::reconfigureCB, this, _1, _2);
       dsrv_->setCallback(cb);
+      
+      globalPathvalid=true;
 
     } else {
       ROS_WARN("This planner has already been initialized, doing nothing");
@@ -328,6 +335,133 @@ namespace base_local_planner {
   {
 	ultro_distance=data->range;
   }
+  double Winter_TrajectoryPlannerROS::canculateDistance(double GoalX,double GoalY,double CurrentX,double CurrentY)
+{
+	return sqrt(pow((GoalX-CurrentX),2)+pow((GoalY-CurrentY),2));
+}
+
+double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
+{
+    if( angle > M_PI)
+        angle -= 2.0 * M_PI;
+    if( angle < -M_PI)
+        angle += 2.0 * M_PI;
+    return angle;
+}
+  double Winter_TrajectoryPlannerROS::canculateAngle(double GoalX,double GoalY,double CurrentX,double CurrentY)
+{
+	double ERR_X=GoalX-CurrentX;
+	double ERR_Y=GoalY-CurrentY;
+	if (ERR_X>0)
+	{
+		return atan(ERR_Y/ERR_X);
+	}
+	else if( ERR_X<0)
+	{
+		if (ERR_Y>0)
+			{return atan(ERR_Y/ERR_X)+M_PI;}
+		else
+			{return atan(ERR_Y/ERR_X)-M_PI;}
+	}
+	else
+	{
+		if (ERR_Y>0)
+			return M_PI/2.0;
+		else
+			return 0-M_PI/2.0;
+	}
+}
+/*
+  * 转到指定的方向上*/
+   /*
+  * 可以用的速度全局变量
+  　　acc_lim_x_, acc_lim_y_, acc_lim_theta_, 
+          max_vel_x, min_vel_x, max_vel_th_, min_vel_th_, min_in_place_vel_th_, backup_vel,
+          * //直接加速然后减速后的角度值
+	MODE1_ANGLE=MAX_ANGULAR_Z*MAX_ANGULAR_Z/ACC_ANGULAR_Z;
+	//#直接加速或者减速产生的角度
+	MODE2_ANGLE=MODE1_ANGLE/2.0;
+  * */
+ void Winter_TrajectoryPlannerROS::rotateToAngle(double goalAngle)
+{
+	double MAX_ANGULAR_Z=max_vel_th_;
+	double ACC_ANGULAR_Z=acc_lim_theta_;
+	double MODE1_ANGLE=MAX_ANGULAR_Z*MAX_ANGULAR_Z/ACC_ANGULAR_Z;
+	double MODE2_ANGLE=MODE1_ANGLE/2.0;
+	double current_angle;
+	double ANGULAR_Z_ERR=yaw_goal_tolerance_;
+	//获取当前的角度
+	tf::Stamped<tf::Pose> global_pose;
+    //获得机器人的全局坐标
+    if (!costmap_ros_->getRobotPose(global_pose)) {
+      return false;
+    }
+    current_angle=gtf:getYaw(lobal_pose.getRotation());
+    
+	//获取两个角度之间的差值
+	double turn_angle=normalize_angle(goalAngle-current_angle);
+	
+	//设置旋转加速度  这个值为正的 所以要判断一下旋转方向
+	double rotate_acc=ACC_ANGULAR_Z;
+	if (turn_angle<0.0)
+	{
+		rotate_acc=0.0-rotate_acc;
+	}
+	//记录最初的旋转角
+	double O_turn_angle=turn_angle;
+	
+	geometry_msgs::Twist move_cmd;
+	ros::Rate r(10);
+	double cAngle;
+	while ((fabs(turn_angle)>ANGULAR_Z_ERR)  and ros::ok())
+	{
+		ros::spinOnce();
+		vel_pub_.publish(move_cmd);
+		r.sleep();
+		
+		if (!costmap_ros_->getRobotPose(global_pose)) {
+				return false;
+		}
+		cAngle=tf:getYaw(global_pose.getRotation());
+		
+		turn_angle=mMath.normalize_angle(goalAngle-cAngle);
+		bool up=true;
+		if (fabs(O_turn_angle)<MODE1_ANGLE)
+		{
+			//第一种模式 加速然后减速
+			if((fabs(turn_angle)>(fabs(O_turn_angle)/2.0)) and not NewPath)	{	up=true;	}
+			else {	up=false;}
+		}
+		else
+		{
+				//第二种模式 加速 匀速 减速
+			if((fabs(turn_angle)>MODE2_ANGLE) and not NewPath)  { up=true;}
+			else {up=false;}
+		}
+		if(up)
+		{
+			if (fabs(move_cmd.angular.z)<MAX_ANGULAR_Z)
+					move_cmd.angular.z+=rotate_acc/RATE;
+		}
+		else
+		{
+			if (fabs(move_cmd.angular.z)>MIN_ANGULAR_Z)
+					move_cmd.angular.z-=rotate_acc/RATE;
+			else
+				{
+					if(NewPath)
+					{
+						PublishMoveStopCMD();
+						return ;
+					}
+				}
+		}
+			
+	}
+	geometry_msgs::Twist move_stop;
+	vel_pub_.publish(move_stop);
+	
+}
 bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_pose,const tf::Stamped<tf::Pose>& goal_pose,
 																						  const tf::Stamped<tf::Pose>& robot_vel,geometry_msgs::Twist& cmd_vel)
  {
@@ -375,6 +509,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
  }
 
   bool Winter_TrajectoryPlannerROS::rotateToGoal(const tf::Stamped<tf::Pose>& global_pose, const tf::Stamped<tf::Pose>& robot_vel, double goal_th, geometry_msgs::Twist& cmd_vel){
+    
     double yaw = tf::getYaw(global_pose.getRotation());
     double vel_yaw = tf::getYaw(robot_vel.getRotation());
     cmd_vel.linear.x = 0;
@@ -463,6 +598,16 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
     if(prune_plan_)
       prunePlan(global_pose, transformed_plan, global_plan_);
 
+	//判断全局路径是否有效
+	if(tc_->checkPath(global_pose,global_plan_))
+	{
+		 globalPathvalid=true;
+	}
+	else
+	{
+		globalPathvalid=false;
+	}
+	
     tf::Stamped<tf::Pose> drive_cmds;
     drive_cmds.frame_id_ = robot_base_frame_;
 
@@ -470,10 +615,20 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
     tf::Stamped<tf::Pose> robot_vel;
     odom_helper_.getRobotVel(robot_vel);
     
+    double cx=global_pose.getOrigin().x();
+    double cy=global_pose.getOrigin().y();
+    double disFromStart=canculateDistance(transformed_plan[0].pose.position.x,transformed_plan[0].pose.position.y,cx,cy);
+    double current_angle=tf::getYaw(global_pose.getRotation());
+    double goalAngle=canculateAngle(transformed_plan[5].pose.position.x,transformed_plan[5].pose.position.y,transformed_plan[0].pose.position.x,transformed_plan[0].pose.position.y);
+   double  ang_diff = normalize_angle(goalAngle-current_angle);
+    //在起点且朝向角度与方向偏差很大　则转向到目标方向　0.523 30
+    geometry_msgs::Twist cmd_v;
+    ros::Rate loop_rate(10);
+   
     //是否处于后退的状态中
     if(!isMoveingBack)
     {
-		if(ultro_distance<0.6)
+		if(ultro_distance<0.1)
 		{
 			ROS_INFO("get ulrtosonic data range: %f",ultro_distance);
 			isMoveingBack=true;
@@ -549,7 +704,9 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
     double yaw = tf::getYaw(goal_point.getRotation());
 
     double goal_th = yaw;
-
+	
+	
+	
     //check to see if we've reached the goal position
     /*****************以下是到达目的地的动作**************************************/
     if (xy_tolerance_latch_ || (getGoalPositionDistance(global_pose, goal_x, goal_y) <= xy_goal_tolerance_)) {
@@ -611,6 +768,39 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
     
     /**************以上是到达目的地的动作*****************************************/
 
+	/*************出发状态****************************/
+	
+	//用turning flag 防止反复转向
+	 //ROS_INFO("dis %f  anglediff %f ",disFromStart,fabs(ang_diff));
+    while(((disFromStart<0.35)&&(fabs(ang_diff)>0.3))&&(turning_flag==0))
+    {
+		if (!costmap_ros_->getRobotPose(global_pose)) {
+			return false;
+		}
+		current_angle=tf::getYaw(global_pose.getRotation());
+		ang_diff = normalize_angle(goalAngle-current_angle);
+		//ROS_INFO("turing");
+		 if(ang_diff>0)
+		 {
+				cmd_v.linear.x = 0.0;
+				cmd_v.linear.y = 0.0;
+				cmd_v.angular.z = 1.0;
+				vel_pub_.publish(cmd_v);
+		 }
+		 if(ang_diff<0)
+		{
+			cmd_v.linear.x = 0.0;
+			cmd_v.linear.y = 0.0;
+			cmd_v.angular.z = -1.0;
+			vel_pub_.publish(cmd_v);
+		}
+		loop_rate.sleep();
+	}
+	turning_flag=1;
+	if(disFromStart>0.3) turning_flag=0;	
+	
+	
+	/******************************************/
     tc_->updatePlan(transformed_plan);
 
     //compute what trajectory to drive along
@@ -734,7 +924,11 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
     return -1.0;
   }
 
-  bool Winter_TrajectoryPlannerROS::isGoalReached() {
+bool Winter_TrajectoryPlannerROS::checkGlobalPath(void)
+	{
+		return globalPathvalid;
+	}
+ bool Winter_TrajectoryPlannerROS::isGoalReached() {
     if (! isInitialized()) {
       ROS_ERROR("This planner has not been initialized, please call initialize() before using this planner");
       return false;

@@ -519,7 +519,7 @@ namespace base_local_planner{
     }
   }
 
-  bool TrajectoryPlanner::checkTrajectory(double x, double y, double theta, double vx, double vy,
+bool TrajectoryPlanner::checkTrajectory(double x, double y, double theta, double vx, double vy,
       double vtheta, double vx_samp, double vy_samp, double vtheta_samp){
     Trajectory t;
 
@@ -727,6 +727,34 @@ namespace base_local_planner{
     //check if the footprint is legal
     return world_model_.footprintCost(x_i, y_i, theta_i, footprint_spec_, inscribed_radius_, circumscribed_radius_);
   }
+  bool TrajectoryPlanner::checkPath(tf::Stamped<tf::Pose> global_pose,std::vector<geometry_msgs::PoseStamped>& transformed_plan)
+{
+	int i;
+	double cx=global_pose.getOrigin().x();
+	double cy=global_pose.getOrigin().y();
+	
+	double lx ;
+    double ly ;
+    double x;
+    double y;
+    double angle;
+    double yaw;
+    bool flag=true;
+    
+	for(i=0;i<transformed_plan.size();i++)
+	{
+			x=transformed_plan[i].pose.position.x;
+			y=transformed_plan[i].pose.position.y;
+			
+			if((abs(x-cx)<2)&&(abs(y-cy)<2))
+				{
+					yaw=tf::getYaw(transformed_plan[i].pose.orientation);
+					//ROS_INFO("cs %f cy %f x %f,y %f cost %f",cx,cy,x,y,footprintCost(x,y,yaw));
+					if (footprintCost(x,y,yaw)<0.0) flag=false;
+				}
+	}
+	return flag;
+}
 
 
   void TrajectoryPlanner::getLocalGoal(double& x, double& y){

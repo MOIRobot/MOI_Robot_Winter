@@ -46,6 +46,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 
 #include <nav_core/base_local_planner.h>
+
 #include <nav_core/base_global_planner.h>
 #include <nav_core/recovery_behavior.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -239,6 +240,8 @@ namespace move_base {
       move_base::MoveBaseConfig default_config_;
       bool setup_, p_freq_change_, c_freq_change_;
       bool new_global_plan_;
+      
+      move_base_msgs::MoveBaseActionGoal action_goal;
       
       clear_costmap_recovery_gao::ClearCostmapRecoveryGao mapLayerClearer;
       

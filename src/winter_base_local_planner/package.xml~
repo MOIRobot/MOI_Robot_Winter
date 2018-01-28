@@ -29,6 +29,7 @@
     <build_depend>geometry_msgs</build_depend>
     <build_depend>sensor_msgs</build_depend>
     <build_depend>nav_core</build_depend>
+    <build_depend>winter_nav_core</build_depend>
     <build_depend>pcl_conversions</build_depend>
     <build_depend>pcl_ros</build_depend>
     <build_depend>eigen</build_depend>
@@ -45,8 +46,9 @@
     <run_depend>voxel_grid</run_depend>
     <run_depend>angles</run_depend>
     <run_depend>geometry_msgs</run_depend>
-    <run_depend>sensro_msgs</run_depend>
+    <run_depend>sensor_msgs</run_depend>
     <run_depend>nav_core</run_depend>
+    <run_depend>winter_nav_core</run_depend>
     <run_depend>pcl_ros</run_depend>
     <run_depend>eigen</run_depend>
     <run_depend>dynamic_reconfigure</run_depend>

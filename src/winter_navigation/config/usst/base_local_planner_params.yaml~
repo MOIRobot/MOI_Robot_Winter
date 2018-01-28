@@ -7,13 +7,13 @@ TrajectoryPlannerROS:
    min_vel_x: 0.01            
    max_vel_y: 0                # 
    min_vel_y: 0                #
-   max_vel_theta: 1.2          # 57.2 degree
-   min_vel_theta: -1.2         #
-   min_in_place_vel_theta: 0.3 #
+   max_vel_theta: 5.0         # 57.2 degree
+   min_vel_theta: -5.0         #
+   min_in_place_vel_theta: 0.02 #
    escape_vel: -0.1            #
-   acc_lim_x: 1.5              # 
+   acc_lim_x: 2.8              # 
    acc_lim_y: 0.0              #
-   acc_lim_theta: 2.0          #229degree 
+   acc_lim_theta: 5.0          #229degree 
 
    holonomic_robot: false      #
    yaw_goal_tolerance: 0.10     # 5.72degree
@@ -28,11 +28,11 @@ TrajectoryPlannerROS:
    heading_scoring: false      #
    heading_scoring_timestep: 0.8 #
    occdist_scale: 0.1          #
-   oscillation_reset_dist: 0.05#
+   oscillation_reset_dist: 0.05 #
    publish_cost_grid_pc: false #
    prune_plan: true            #
 
-   sim_time: 2.5               #
+   sim_time: 2.0               #
    sim_granularity: 0.025      #
    angular_sim_granularity: 0.025 #
    vx_samples: 8               #

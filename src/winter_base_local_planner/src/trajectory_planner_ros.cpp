@@ -384,6 +384,7 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
   * */
  void Winter_TrajectoryPlannerROS::rotateToAngle(double goalAngle)
 {
+	/*
 	double MAX_ANGULAR_Z=max_vel_th_;
 	double ACC_ANGULAR_Z=acc_lim_theta_;
 	double MODE1_ANGLE=MAX_ANGULAR_Z*MAX_ANGULAR_Z/ACC_ANGULAR_Z;
@@ -460,7 +461,7 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	}
 	geometry_msgs::Twist move_stop;
 	vel_pub_.publish(move_stop);
-	
+	*/
 }
 bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_pose,const tf::Stamped<tf::Pose>& goal_pose,
 																						  const tf::Stamped<tf::Pose>& robot_vel,geometry_msgs::Twist& cmd_vel)

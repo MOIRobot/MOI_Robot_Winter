@@ -12,7 +12,7 @@
   <arg name="base_frame_id"   default="base_link"/>
   <arg name="global_frame_id" default="map"/>
  
-  <include file="$(find winter_navigation)/launch/navigation_usst/winter_move_base/amcl_usst_winter.launch" /> 
+  <include file="$(find winter_navigation)/launch/navigation_usst/winter_move_base/amcl_usst.launch" /> 
   
    
   <include file="$(find winter_navigation)/launch/navigation_usst/winter_move_base/winter_move_base_usst.launch" /> 

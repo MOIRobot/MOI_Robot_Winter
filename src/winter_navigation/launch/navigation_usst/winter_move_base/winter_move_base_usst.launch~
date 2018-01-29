@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+  <node pkg="winter_move_base" type="winter_move_base" respawn="false" name="winter_move_base" output="screen" clear_params="true">
     <remap from="cmd_vel" to="/smooth_cmd_vel"/>
     <rosparam file="$(find winter_navigation)/config/usst/winter_move_base/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find winter_navigation)/config/usst/winter_move_base/costmap_common_params.yaml" command="load" ns="local_costmap" />

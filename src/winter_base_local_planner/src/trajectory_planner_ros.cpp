@@ -786,7 +786,9 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 	 //ROS_INFO("dis %f  anglediff %f ",disFromStart,fabs(ang_diff));
 	 if((disFromStart<0.3)&&(turning_flag==0))
 	 {
+		 ROS_INFO("Ratating start");
 		 rotateToAngle(goalAngle,0.3);
+		 ROS_INFO("Ratating stop");
 	}
 	 
     /*while(((disFromStart<0.35)&&(fabs(ang_diff)>0.3))&&(turning_flag==0))
@@ -816,13 +818,10 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 	turning_flag=1;
 	if(turning_flag==1)
 	{
-		cmd_v.linear.x = 0.0;
-		cmd_v.linear.y = 0.0;
-		cmd_v.angular.z = 0.0;
-		vel_pub_.publish(cmd_v);
+		PublishMoveStopCMD();
 		turning_flag=2;
 	}
-	if(disFromStart>0.3) turning_flag=0;
+	if(disFromStart>0.4) turning_flag=0;
 	
 	
 	

@@ -388,11 +388,12 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	
 	double MAX_ANGULAR_Z=max_vel_th_;
 	double ACC_ANGULAR_Z=acc_lim_theta_;
-	if (MAX_ANGULAR_Z>2.0)  MAX_ANGULAR_Z=2.0;
-	double MIN_ANGULAR_Z=0-MAX_ANGULAR_Z;
-	if (ACC_ANGULAR_Z>2.0) ACC_ANGULAR_Z=2.0;
-	double MODE1_ANGLE=MAX_ANGULAR_Z*MAX_ANGULAR_Z/ACC_ANGULAR_Z;
-	double MODE2_ANGLE=MODE1_ANGLE/2.0;
+	if (MAX_ANGULAR_Z>3.5)  MAX_ANGULAR_Z=3.5;
+	double MIN_ANGULAR_Z=0.3;
+	if (ACC_ANGULAR_Z>3.5) ACC_ANGULAR_Z=3.5;
+	
+	double sharke_dis=0.5*MAX_ANGULAR_Z*MAX_ANGULAR_Z/ACC_ANGULAR_Z; //减速的距离
+
 	double current_angle;
 	double ANGULAR_Z_ERR=err_angle;
 	//获取当前的角度
@@ -422,6 +423,7 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	{
 		ros::spinOnce();
 		vel_pub_.publish(move_cmd);
+		ROS_INFO("speed %f",move_cmd.angular.z);
 		r.sleep();
 		
 		if (!costmap_ros_->getRobotPose(global_pose)) {
@@ -430,20 +432,9 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 		cAngle=tf::getYaw(global_pose.getRotation());
 		
 		turn_angle=normalize_angle(goalAngle-cAngle);
+		ROS_INFO("angle %f",turn_angle);
 		bool up=true;
-		if (fabs(O_turn_angle)<MODE1_ANGLE)
-		{
-			//第一种模式 加速然后减速
-			if((fabs(turn_angle)>(fabs(O_turn_angle)/2.0)) and not NewPath)	{	up=true;	}
-			else {	up=false;}
-		}
-		else
-		{
-				//第二种模式 加速 匀速 减速
-			if((fabs(turn_angle)>MODE2_ANGLE) and not NewPath)  { up=true;}
-			else {up=false;}
-		}
-		if(up)
+		if(fabs(turn_angle)>sharke_dis)
 		{
 			if (fabs(move_cmd.angular.z)<MAX_ANGULAR_Z)
 					move_cmd.angular.z+=rotate_acc/RATE;
@@ -451,17 +442,16 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 		else
 		{
 			if (fabs(move_cmd.angular.z)>MIN_ANGULAR_Z)
-					move_cmd.angular.z-=rotate_acc/RATE;
-			else
-				{
-					if(NewPath)
 					{
-						PublishMoveStopCMD();
-						return false;
+						move_cmd.angular.z-=rotate_acc/RATE;
+						if (fabs(move_cmd.angular.z)<0.3)
+						 {
+							 if (O_turn_angle>0) move_cmd.angular.z=0.3;
+							 else move_cmd.angular.z=-0.3;
+						}
+						
 					}
-				}
 		}
-			
 	}
 	PublishMoveStopCMD();
 	return true;
@@ -781,7 +771,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 	
 	//用turning flag 防止反复转向
 	 //ROS_INFO("dis %f  anglediff %f ",disFromStart,fabs(ang_diff));
-	 if((disFromStart<0.35)&&(turning_flag==0))
+	 if((disFromStart<0.3)&&(turning_flag==0))
 	 {
 		 rotateToAngle(goalAngle,0.3);
 	}

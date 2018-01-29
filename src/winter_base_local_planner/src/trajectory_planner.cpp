@@ -750,7 +750,7 @@ bool TrajectoryPlanner::checkTrajectory(double x, double y, double theta, double
 				{
 					yaw=tf::getYaw(transformed_plan[i].pose.orientation);
 					//ROS_INFO("cs %f cy %f x %f,y %f cost %f",cx,cy,x,y,footprintCost(x,y,yaw));
-					if (footprintCost(x,y,yaw)<0.0)||(footprintCost(x,y,yaw)>240) flag=false;
+					if ((footprintCost(x,y,yaw)<0.0)||(footprintCost(x,y,yaw)>240)) return false;
 				}
 	}
 	return flag;

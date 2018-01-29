@@ -13,7 +13,7 @@ Winter_TrajectoryPlannerROS:
    escape_vel: -0.1            #
    acc_lim_x: 2.8              # 
    acc_lim_y: 0.0              #
-   acc_lim_theta: 5.0          #229degree 
+   acc_lim_theta: 3.0          #229degree 
 
    holonomic_robot: false      #
    yaw_goal_tolerance: 0.10     # 5.72degree

@@ -1,7 +1,7 @@
 controller_frequency: 5.0
 recovery_behavior_enabled: true
 clearing_rotation_allowed: true
-
+speed_topic: cmd_vel
 Winter_TrajectoryPlannerROS:
    max_vel_x: 0.8
    min_vel_x: 0.02             

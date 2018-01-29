@@ -94,7 +94,9 @@ namespace base_local_planner {
       g_plan_pub_ = private_nh.advertise<nav_msgs::Path>("global_plan", 1);
       l_plan_pub_ = private_nh.advertise<nav_msgs::Path>("local_plan", 1);
       
-      vel_pub_ = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+      n.param("speed_topic", speed_topic_, "cmd_vel");
+      
+      vel_pub_ = n.advertise<geometry_msgs::Twist>(speed_topic_, 1);
       
       ultrosonicdata_sub_ = n.subscribe<sensor_msgs::Range>("UltraSoundPublisher", 1, boost::bind(&Winter_TrajectoryPlannerROS::ultrosonicdata_callback, this, _1));
       //初始化超声波距离
@@ -382,22 +384,25 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	//#直接加速或者减速产生的角度
 	MODE2_ANGLE=MODE1_ANGLE/2.0;
   * */
- void Winter_TrajectoryPlannerROS::rotateToAngle(double goalAngle)
+ bool Winter_TrajectoryPlannerROS::rotateToAngle(double goalAngle,double err_angle)
 {
-	/*
+	
 	double MAX_ANGULAR_Z=max_vel_th_;
 	double ACC_ANGULAR_Z=acc_lim_theta_;
+	if (MAX_ANGULAR_Z>2.0)  MAX_ANGULAR_Z=2.0;
+	double MIN_ANGULAR_Z=0-MAX_ANGULAR_Z;
+	if (ACC_ANGULAR_Z>2.0) ACC_ANGULAR_Z=2.0;
 	double MODE1_ANGLE=MAX_ANGULAR_Z*MAX_ANGULAR_Z/ACC_ANGULAR_Z;
 	double MODE2_ANGLE=MODE1_ANGLE/2.0;
 	double current_angle;
-	double ANGULAR_Z_ERR=yaw_goal_tolerance_;
+	double ANGULAR_Z_ERR=err_angle;
 	//获取当前的角度
 	tf::Stamped<tf::Pose> global_pose;
     //获得机器人的全局坐标
     if (!costmap_ros_->getRobotPose(global_pose)) {
       return false;
     }
-    current_angle=gtf:getYaw(lobal_pose.getRotation());
+    current_angle=tf::getYaw(global_pose.getRotation());
     
 	//获取两个角度之间的差值
 	double turn_angle=normalize_angle(goalAngle-current_angle);
@@ -410,9 +415,9 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	}
 	//记录最初的旋转角
 	double O_turn_angle=turn_angle;
-	
+	double RATE=10;
 	geometry_msgs::Twist move_cmd;
-	ros::Rate r(10);
+	ros::Rate r(RATE);
 	double cAngle;
 	while ((fabs(turn_angle)>ANGULAR_Z_ERR)  and ros::ok())
 	{
@@ -423,9 +428,9 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 		if (!costmap_ros_->getRobotPose(global_pose)) {
 				return false;
 		}
-		cAngle=tf:getYaw(global_pose.getRotation());
+		cAngle=tf::getYaw(global_pose.getRotation());
 		
-		turn_angle=mMath.normalize_angle(goalAngle-cAngle);
+		turn_angle=normalize_angle(goalAngle-cAngle);
 		bool up=true;
 		if (fabs(O_turn_angle)<MODE1_ANGLE)
 		{
@@ -453,15 +458,19 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 					if(NewPath)
 					{
 						PublishMoveStopCMD();
-						return ;
+						return false;
 					}
 				}
 		}
 			
 	}
-	geometry_msgs::Twist move_stop;
-	vel_pub_.publish(move_stop);
-	*/
+	PublishMoveStopCMD();
+	return true;
+}
+void Winter_TrajectoryPlannerROS::PublishMoveStopCMD()
+{
+		geometry_msgs::Twist move_stop;
+	    vel_pub_.publish(move_stop);
 }
 bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_pose,const tf::Stamped<tf::Pose>& goal_pose,
 																						  const tf::Stamped<tf::Pose>& robot_vel,geometry_msgs::Twist& cmd_vel)
@@ -773,7 +782,12 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 	
 	//用turning flag 防止反复转向
 	 //ROS_INFO("dis %f  anglediff %f ",disFromStart,fabs(ang_diff));
-    while(((disFromStart<0.35)&&(fabs(ang_diff)>0.3))&&(turning_flag==0))
+	 if((disFromStart<0.35)&&(turning_flag==0))
+	 {
+		 rotateToAngle(goalAngle,0.3);
+	}
+	 
+    /*while(((disFromStart<0.35)&&(fabs(ang_diff)>0.3))&&(turning_flag==0))
     {
 		if (!costmap_ros_->getRobotPose(global_pose)) {
 			return false;
@@ -796,7 +810,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 			vel_pub_.publish(cmd_v);
 		}
 		loop_rate.sleep();
-	}
+	}*/
 	turning_flag=1;
 	if(turning_flag==1)
 	{
@@ -806,7 +820,8 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 		vel_pub_.publish(cmd_v);
 		turning_flag=2;
 	}
-	if(disFromStart>0.3) turning_flag=0;	
+	if(disFromStart>0.3) turning_flag=0;
+	
 	
 	
 	/******************************************/

@@ -272,14 +272,14 @@ void BaseControl::PublishOdom()
     encoder_diff[RightWheel] = encoder_curr[RightWheel] - encoder_last[RightWheel];
 
     if(encoder_diff[LeftWheel] < -10000)
-       encoder_diff[LeftWheel] = encoder_diff[LeftWheel] + 60000;
+       encoder_diff[LeftWheel] = encoder_diff[LeftWheel] + 20000;
     else if(encoder_diff[LeftWheel] > 10000)
-       encoder_diff[LeftWheel] = encoder_diff[LeftWheel] - 60000;
+       encoder_diff[LeftWheel] = encoder_diff[LeftWheel] - 20000;
 
     if(encoder_diff[RightWheel] < -10000)
-        encoder_diff[RightWheel] = encoder_diff[RightWheel] + 60000;
+        encoder_diff[RightWheel] = encoder_diff[RightWheel] + 20000;
     else if(encoder_diff[RightWheel] > 10000)
-        encoder_diff[RightWheel] = encoder_diff[RightWheel] - 60000;
+        encoder_diff[RightWheel] = encoder_diff[RightWheel] - 20000;
 
     delta_time = (current_time - last_time).toSec();
     

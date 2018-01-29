@@ -392,7 +392,8 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	double MIN_ANGULAR_Z=0.3;
 	if (ACC_ANGULAR_Z>3.5) ACC_ANGULAR_Z=3.5;
 	
-	double sharke_dis=0.5*MAX_ANGULAR_Z*MAX_ANGULAR_Z/ACC_ANGULAR_Z; //减速的距离
+	double MODE1_ANGLE=MAX_ANGULAR_Z*MAX_ANGULAR_Z/ACC_ANGULAR_Z; //减速的距离
+	double sharke_dis=MODE1_ANGLE/2.0; //减速的距离
 
 	double current_angle;
 	double ANGULAR_Z_ERR=err_angle;
@@ -419,22 +420,33 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	geometry_msgs::Twist move_cmd;
 	ros::Rate r(RATE);
 	double cAngle;
+	ROS_INFO("MODE1_ANGLE %f",MODE1_ANGLE);
+	ROS_INFO("sharddis %f",sharke_dis);
 	while ((fabs(turn_angle)>ANGULAR_Z_ERR)  and ros::ok())
 	{
 		ros::spinOnce();
 		vel_pub_.publish(move_cmd);
-		ROS_INFO("speed %f",move_cmd.angular.z);
 		r.sleep();
-		
-		if (!costmap_ros_->getRobotPose(global_pose)) {
-				return false;
+		 if (!costmap_ros_->getRobotPose(global_pose)) {
+			return false;
 		}
 		cAngle=tf::getYaw(global_pose.getRotation());
-		
 		turn_angle=normalize_angle(goalAngle-cAngle);
-		ROS_INFO("angle %f",turn_angle);
+		ROS_INFO("tangle %f speed %f",turn_angle,move_cmd.angular.z);
 		bool up=true;
-		if(fabs(turn_angle)>sharke_dis)
+		if (fabs(O_turn_angle)<MODE1_ANGLE)
+		{
+			//第一种模式 加速然后减速
+			if((fabs(turn_angle)>(fabs(O_turn_angle)/2.0)) and not NewPath)	{	up=true;	}
+			else {	up=false;}
+		}
+		else
+		{
+				//第二种模式 加速 匀速 减速
+			if((fabs(turn_angle)>sharke_dis) and not NewPath)  { up=true;}
+			else {up=false;}
+		}
+		if(up)
 		{
 			if (fabs(move_cmd.angular.z)<MAX_ANGULAR_Z)
 					move_cmd.angular.z+=rotate_acc/RATE;
@@ -442,16 +454,17 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 		else
 		{
 			if (fabs(move_cmd.angular.z)>MIN_ANGULAR_Z)
+					move_cmd.angular.z-=rotate_acc/RATE;
+			else
+				{
+					if(NewPath)
 					{
-						move_cmd.angular.z-=rotate_acc/RATE;
-						if (fabs(move_cmd.angular.z)<0.3)
-						 {
-							 if (O_turn_angle>0) move_cmd.angular.z=0.3;
-							 else move_cmd.angular.z=-0.3;
-						}
-						
+						PublishMoveStopCMD();
+						return false ;
 					}
+				}
 		}
+			
 	}
 	PublishMoveStopCMD();
 	return true;

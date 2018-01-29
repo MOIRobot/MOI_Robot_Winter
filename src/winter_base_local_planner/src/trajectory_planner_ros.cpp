@@ -248,6 +248,10 @@ namespace base_local_planner {
 	  isMoveingBack=false;
 	  ifPublishMessage=true;
 	  
+	  ROS_INFO("acc_lim_x_: %f  acc_lim_y_:%f acc_lim_theta_%f",acc_lim_x_, acc_lim_y_, acc_lim_theta_);
+	  ROS_INFO("pdist_scale:%f gdist_scale:%f occdist_scale:%f",pdist_scale,gdist_scale, occdist_scale);
+	  ROS_INFO("max_vel_x:%f max_vel_th_:%f backup_vel:%f",max_vel_x,max_vel_th_, backup_vel);
+	  ROS_INFO("sim_period_:%f sim_granularity:%f angular_sim_granularity:%f",sim_period_,sim_granularity, angular_sim_granularity);
       tc_ = new TrajectoryPlanner(*world_model_, *costmap_, footprint_spec_,
           acc_lim_x_, acc_lim_y_, acc_lim_theta_, sim_time, sim_granularity, vx_samples, vtheta_samples, pdist_scale,
           gdist_scale, occdist_scale, heading_lookahead, oscillation_reset_dist, escape_reset_dist, escape_reset_theta, holonomic_robot,

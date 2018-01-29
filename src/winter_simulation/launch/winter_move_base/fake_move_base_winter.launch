@@ -9,7 +9,7 @@
   <!-- Run fake localization compatible with AMCL output -->
   <!--node pkg="fake_localization" type="fake_localization" name="fake_localization" output="screen" /-->
   
-  <include file="$(find winter_simulation)/launch/turtlebot_simulation/move_base_winter.launch" />
+  <include file="$(find winter_simulation)/launch/winter_move_base/move_base_winter.launch" />
    
   
   

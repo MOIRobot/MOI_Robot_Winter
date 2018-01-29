@@ -9,7 +9,7 @@
   <!-- Run fake localization compatible with AMCL output -->
   <!--node pkg="fake_localization" type="fake_localization" name="fake_localization" output="screen" /-->
   
-  <include file="$(find winter_simulation)/launch/turtlebot_simulation/move_base_winter.launch" />
+  <include file="$(find winter_simulation)/launch/winter_move_base/move_base_winter.launch" />
    
   
   
@@ -18,7 +18,6 @@
    <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot.urdf" />  
    <param name="use_gui" value="$(arg gui)"/>  
    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
-   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find winter_simulation)/rviz/rviz_turtlebot/amcl.rviz" required="true" />
   
 
 </launch>

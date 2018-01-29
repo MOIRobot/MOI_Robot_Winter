@@ -3,7 +3,7 @@ recovery_behavior_enabled: true
 clearing_rotation_allowed: true
 
 TrajectoryPlannerROS:
-   max_vel_x: 0.8              #  最大线速度，单位m/s。Create的turtlebot限制速度为0.5m/s，一般建议室内在0.3m/s以内。
+   max_vel_x: 0.5              #  最大线速度，单位m/s。Create的turtlebot限制速度为0.5m/s，一般建议室内在0.3m/s以内。
    min_vel_x: 0.05             #
    max_vel_y: 0                # zero for a differential drive robot
    min_vel_y: 0                #

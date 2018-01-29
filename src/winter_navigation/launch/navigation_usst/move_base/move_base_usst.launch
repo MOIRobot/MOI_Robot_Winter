@@ -3,11 +3,11 @@
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
     <remap from="cmd_vel" to="/smooth_cmd_vel"/>
-    <rosparam file="$(find winter_navigation)/config/usst/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find winter_navigation)/config/usst/costmap_common_params.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find winter_navigation)/config/usst/local_costmap_params.yaml" command="load" />
-    <rosparam file="$(find winter_navigation)/config/usst/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find winter_navigation)/config/usst/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find winter_navigation)/config/usst/move_base/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find winter_navigation)/config/usst/move_base/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find winter_navigation)/config/usst/move_base/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find winter_navigation)/config/usst/move_base/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find winter_navigation)/config/usst/move_base/base_local_planner_params.yaml" command="load" />
   </node>
   
 </launch>

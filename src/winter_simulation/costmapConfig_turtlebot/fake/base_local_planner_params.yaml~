@@ -19,9 +19,9 @@ Winter_TrajectoryPlannerROS:
    yaw_goal_tolerance: 0.2     # 5.72degree
    xy_goal_tolerance: 0.10      
    latch_xy_goal_tolerance: false # 
-   pdist_scale: 0.6            #
-   gdist_scale: 0.4            #
-   occdist_scale: 0.1          #
+   pdist_scale: 0.6            #0.6
+   gdist_scale: 0.4            #0.4
+   occdist_scale: 0.03          #
    meter_scoring: true         #
 
    heading_lookahead: 0.325    #
@@ -33,8 +33,8 @@ Winter_TrajectoryPlannerROS:
 
    sim_time: 2.5               #1.5
    sim_granularity: 0.05       #
-   angular_sim_granularity: 0.1 #0.025
-   vx_samples: 12               #
+   angular_sim_granularity: 0.025 #0.025
+   vx_samples: 20               #
    vy_samples: 0               #
    vtheta_samples: 20          #
    dwa: true                   #

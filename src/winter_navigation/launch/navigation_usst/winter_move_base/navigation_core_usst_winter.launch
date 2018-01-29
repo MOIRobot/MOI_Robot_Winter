@@ -1,0 +1,23 @@
+<launch>
+
+  <node name="map_server" pkg="map_server" type="map_server" args="/home/ros/map127usst.yaml"/> 
+
+  <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot_usst.urdf" />  
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+  
+  <arg name="use_map_topic"   default="map"/>
+  <arg name="scan_topic"      default="scan"/> 
+  
+  <arg name="odom_frame_id"   default="odom"/>
+  <arg name="base_frame_id"   default="base_link"/>
+  <arg name="global_frame_id" default="map"/>
+ 
+  <include file="$(find winter_navigation)/launch/navigation_usst/winter_move_base/amcl_usst.launch" /> 
+  
+   
+  <include file="$(find winter_navigation)/launch/navigation_usst/winter_move_base/winter_move_base_usst.launch" /> 
+   
+  
+   
+</launch>
+

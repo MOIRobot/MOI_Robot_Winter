@@ -798,6 +798,14 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 		loop_rate.sleep();
 	}
 	turning_flag=1;
+	if(turning_flag==1)
+	{
+		cmd_v.linear.x = 0.0;
+		cmd_v.linear.y = 0.0;
+		cmd_v.angular.z = 0.0;
+		vel_pub_.publish(cmd_v);
+		turning_flag=2;
+	}
 	if(disFromStart>0.3) turning_flag=0;	
 	
 	

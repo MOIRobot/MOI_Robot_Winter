@@ -94,8 +94,7 @@ namespace base_local_planner {
       g_plan_pub_ = private_nh.advertise<nav_msgs::Path>("global_plan", 1);
       l_plan_pub_ = private_nh.advertise<nav_msgs::Path>("local_plan", 1);
       
-      n.param("speed_topic", speed_topic_, "cmd_vel");
-      
+       n.param("speed_topic", speed_topic_, std::string("cmd_vel"));
       vel_pub_ = n.advertise<geometry_msgs::Twist>(speed_topic_, 1);
       
       ultrosonicdata_sub_ = n.subscribe<sensor_msgs::Range>("UltraSoundPublisher", 1, boost::bind(&Winter_TrajectoryPlannerROS::ultrosonicdata_callback, this, _1));

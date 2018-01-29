@@ -251,7 +251,7 @@ namespace base_local_planner {
 	  int turning_flag;
 	  ros::Publisher vel_pub_;
 	  bool NewPath;
-	  std::string speed_topic;
+	  std::string speed_topic_;
   };
 };
 #endif

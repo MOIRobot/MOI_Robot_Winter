@@ -465,7 +465,7 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 		}
 		if(up)
 		{
-			if (fabs(move_cmd.angular.z)<max_z)
+			if (fabs(move_cmd.angular.z)<0.8)
 					move_cmd.angular.z+=rotate_acc/RATE;
 		}
 		else

@@ -333,14 +333,14 @@ void BaseControl::PublishOdom()
     if (wheel_pos<0.0) wheel_pos=6.283+wheel_pos;
     //std::cout<<th_pos<<std::endl;
     //std::cout<<wheel_pos<<std::endl;
-    delta_s = (dis[LeftWheel] + dis[RightWheel]) / 2.0;
-    delta_s = (dis[LeftWheel] + dis[RightWheel]) / 2.0;
-    float r_x = delta_s * cos(delta_th / 2.0);
-    float r_y = delta_s * sin(delta_th / 2.0);
+    //delta_s = (dis[LeftWheel] + dis[RightWheel]) / 2.0;
+    //delta_s = (dis[LeftWheel] + dis[RightWheel]) / 2.0;
+    float r_x = delta_s * cos(wheel_delta_th / 2.0);
+    float r_y = delta_s * sin(wheel_delta_th / 2.0);
 
-    delta_x = r_x * cos(th_pos) + r_y * sin(th_pos);
+    delta_x = r_x * cos(wheel_pos) + r_y * sin(wheel_pos);
     //delta_y = -1.0 * r_x * sin(th_pos) + r_y * cos(th_pos);
-    delta_y = r_x * sin(th_pos) - r_y * cos(th_pos);
+    delta_y = r_x * sin(wheel_pos) - r_y * cos(wheel_pos);
     
     //delta_x = delta_s * cos(th_pos + delta_th/2.0);
     //delta_y = delta_s * sin(th_pos + delta_th/2.0);

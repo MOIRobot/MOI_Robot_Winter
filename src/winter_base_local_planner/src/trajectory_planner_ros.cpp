@@ -475,8 +475,8 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 			else
 			{
 				if (turn_angle<0.0)
-				move_cmd.angular.z=-0.3;
-				else move_cmd.angular.z=0.3;
+				move_cmd.angular.z=-0.2;
+				else move_cmd.angular.z=0.2;
 			}
 		}
 			

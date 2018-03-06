@@ -475,8 +475,8 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 			else
 			{
 				if (turn_angle<0.0)
-				move_cmd.angular.z=-0.2;
-				else move_cmd.angular.z=0.2;
+				move_cmd.angular.z=-0.1;
+				else move_cmd.angular.z=0.1;
 			}
 		}
 			
@@ -551,8 +551,8 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
     //double max_acc_vel = fabs(vel_yaw) + acc_lim_theta_ * sim_period_;
     //double min_acc_vel = fabs(vel_yaw) - acc_lim_theta_ * sim_period_;
     
-    double max_acc_vel = fabs(vel_yaw) + 0.2 * sim_period_;
-    double min_acc_vel = fabs(vel_yaw) - 0.2 * sim_period_;
+    double max_acc_vel = fabs(vel_yaw) + 0.3 * sim_period_;
+    double min_acc_vel = fabs(vel_yaw) - 0.3 * sim_period_;
 
     v_theta_samp = sign(v_theta_samp) * std::min(std::max(fabs(v_theta_samp), min_acc_vel), max_acc_vel);
 

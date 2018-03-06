@@ -398,6 +398,7 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	double MIN_ANGULAR_Z=0.3;
 	if (ACC_ANGULAR_Z>1.0) ACC_ANGULAR_Z=1.0;
 	
+	double max_z=0.0;//运行中机器人旋转的最大速度
 	double MODE1_ANGLE=MAX_ANGULAR_Z*MAX_ANGULAR_Z/ACC_ANGULAR_Z; //减速的距离
 	double sharke_dis=MODE1_ANGLE/2.0; //减速的距离
 
@@ -422,6 +423,16 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	}
 	//记录最初的旋转角
 	double O_turn_angle=turn_angle;
+	if(fabs(O_turn_angle)<sharke_dis)
+	{
+		max_z=sqrt(fabs(O_turn_angle));
+	}
+	else
+	{
+		max_z=MAX_ANGULAR_Z;
+	}
+
+	
 	double RATE=10;
 	geometry_msgs::Twist move_cmd;
 	ros::Rate r(RATE);
@@ -454,7 +465,7 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 		}
 		if(up)
 		{
-			if (fabs(move_cmd.angular.z)<MAX_ANGULAR_Z)
+			if (fabs(move_cmd.angular.z)<max_z)
 					move_cmd.angular.z+=rotate_acc/RATE;
 		}
 		else

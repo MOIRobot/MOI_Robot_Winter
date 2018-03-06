@@ -471,7 +471,7 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 		else
 		{
 			if (fabs(move_cmd.angular.z)>MIN_ANGULAR_Z)
-					move_cmd.angular.z-=rotate_acc/RATE*2;
+					move_cmd.angular.z-=rotate_acc/RATE*3;
 			else
 			{
 				if (turn_angle<0.0)
@@ -806,7 +806,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 		 if (tc_->mcheckTrajectory(cx,cy,current_angle,cvx,cvy,vtheta,cvx,cvy,vtheta))
 		 {*/
 			ROS_INFO("Ratating start");
-			rotateToAngle(goalAngle,0.2); //0.2/3.14*180=11 degree
+			rotateToAngle(goalAngle,0.3); //0.2/3.14*180=11 degree
 			ROS_INFO("Ratating stop");
 			turning_flag=1;
 			NewPath=false;

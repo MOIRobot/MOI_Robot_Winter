@@ -798,18 +798,24 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 	
 	//用turning flag 防止反复转向
 	 //ROS_INFO("dis %f  anglediff %f ",disFromStart,fabs(ang_diff));
+	 
 	 if(((disFromStart<0.3)&&(turning_flag==0))||NewPath)
 	 {
+		 
 		 /*double cvx=robot_vel.getOrigin().getX();
 		 double cvy=robot_vel.getOrigin().getY();
 		 double vtheta=tf::getYaw(robot_vel.getRotation());
 		 if (tc_->mcheckTrajectory(cx,cy,current_angle,cvx,cvy,vtheta,cvx,cvy,vtheta))
 		 {*/
+			if(robot_vel.getOrigin().getX()==0.0)
+			{
+				//机器人起始的时候，中途不使用这个
 			ROS_INFO("Ratating start");
 			rotateToAngle(goalAngle,0.3); //0.2/3.14*180=11 degree
 			ROS_INFO("Ratating stop");
 			turning_flag=1;
 			NewPath=false;
+			}
 		/*}
 		else
 			return false;*/

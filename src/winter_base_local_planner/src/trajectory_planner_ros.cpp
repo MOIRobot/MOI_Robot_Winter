@@ -394,7 +394,7 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	
 	double MAX_ANGULAR_Z=max_vel_th_;
 	double ACC_ANGULAR_Z=acc_lim_theta_;
-	if (MAX_ANGULAR_Z>2.0)  MAX_ANGULAR_Z=2.0;
+	if (MAX_ANGULAR_Z>2.0)  MAX_ANGULAR_Z=1.3;
 	double MIN_ANGULAR_Z=0.3;
 	if (ACC_ANGULAR_Z>1.0) ACC_ANGULAR_Z=1.0;
 	

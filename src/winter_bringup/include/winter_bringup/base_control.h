@@ -92,6 +92,7 @@ private:
     float y_pos;
 
     float th_pos;
+    float wheel_pos;
 
     std::string usb_device_;
 

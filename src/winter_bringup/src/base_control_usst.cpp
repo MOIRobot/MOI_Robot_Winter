@@ -107,7 +107,7 @@ void BaseControl::HandleRead(boost::system::error_code ec, std::size_t bytes_tra
     //cout.write(rec_buf, bytes_transferred);
 
     bytes_read = bytes_transferred;
-    printf("read size: %ld  ", bytes_transferred);
+    //printf("read size: %ld  ", bytes_transferred);
 }
 
 void BaseControl::ParseSerial()
@@ -124,15 +124,16 @@ void BaseControl::ParseSerial()
     std::vector<unsigned char> recv_data(recv_str.c_str(), recv_str.c_str() + recv_str.size() + 1);
 
     
-    printf("rec_buf size: %ld  ", recv_size);
+   
+  /* printf("rec_buf size: %ld  ", recv_size);
     for(int i = 0 ; i < recv_size; i++)
         printf("%d ",recv_data[i]);
-    printf("\n");
+    printf("\n");*/
     
 
     rec_buf.consume(recv_size);/// Remove characters from the input sequence.
 
-    printf("rec_buf size: %ld  ", rec_buf.size());
+//    printf("rec_buf size: %ld  ", rec_buf.size());
     //Pose Data数据
     if((recv_data[0] == 0x45) && (recv_data[1] == 0x54) && (recv_data[2] == 0x09) && (recv_data[3] == 'G') && (recv_data[4] == 'P'))
     {
@@ -267,6 +268,7 @@ void BaseControl::PublishOdom()
         encoder_last[RightWheel] = encoder_curr[RightWheel];
     }
 
+    //ROS_INFO(" lc %d rc %d",encoder_curr[LeftWheel],encoder_curr[RightWheel] );
     //计算差值
     encoder_diff[LeftWheel] = encoder_curr[LeftWheel] - encoder_last[LeftWheel];
     encoder_diff[RightWheel] = encoder_curr[RightWheel] - encoder_last[RightWheel];
@@ -293,6 +295,12 @@ void BaseControl::PublishOdom()
     //std::cout << "left_temp: " << left_temp <<" right_temp:" << right_temp << std::endl;
 
     delta_th = angle_curr - angle_last;
+	if(delta_th>5.0) delta_th=angle_curr-6.283-angle_last;
+	if(delta_th<-5.0) delta_th=angle_curr+6.283-angle_last;
+    float wheel_delta_th=(0-dis[LeftWheel]+dis[RightWheel])/0.47; //轮子间距
+	
+	
+	
     delta_s = (dis[LeftWheel] + dis[RightWheel]) / 2.0;
 
     if(FistTime){
@@ -303,10 +311,30 @@ void BaseControl::PublishOdom()
         vs = delta_s / delta_time;
         vth = delta_th / delta_time;
     }
-
+	if(wheel_delta_th==0.0) delta_th=0.0;
     //累计坐标
     th_pos += delta_th;
+	//if(wheel_delta_th>0.0) wheel_delta_th*=0.9812;
+	//if(wheel_delta_th<0.0) wheel_delta_th*=0.9812;
+    wheel_delta_th*=0.9812;
+    float wheel_vth=0.0;
+    if(delta_time!=0.0) wheel_vth=wheel_delta_th/delta_time;
+    wheel_pos +=wheel_delta_th;
 
+/*    std::cout<<delta_th<<std::endl;
+    std::cout<<wheel_delta_th<<std::endl;
+    std::cout<<angle_curr<<std::endl;*/
+    
+    delta_s = (dis[LeftWheel] + dis[RightWheel]) / 2.0;
+
+    if (th_pos>6.283) th_pos=th_pos-6.283;
+    if (th_pos<0.0) th_pos=6.283+th_pos;
+    if (wheel_pos>6.283) wheel_pos=wheel_pos-6.283;
+    if (wheel_pos<0.0) wheel_pos=6.283+wheel_pos;
+    //std::cout<<th_pos<<std::endl;
+    //std::cout<<wheel_pos<<std::endl;
+    delta_s = (dis[LeftWheel] + dis[RightWheel]) / 2.0;
+    delta_s = (dis[LeftWheel] + dis[RightWheel]) / 2.0;
     float r_x = delta_s * cos(delta_th / 2.0);
     float r_y = delta_s * sin(delta_th / 2.0);
 
@@ -329,7 +357,8 @@ void BaseControl::PublishOdom()
     encoder_last[RightWheel] = encoder_curr[RightWheel];
 
     //send TF
-    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th_pos);
+//    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th_pos);
+    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(wheel_pos);
     geometry_msgs::TransformStamped odom_trans;
     odom_trans.header.stamp = current_time;
     odom_trans.header.frame_id = "odom";
@@ -353,7 +382,8 @@ void BaseControl::PublishOdom()
     //velocity
     odom.child_frame_id = "base_link";
     odom.twist.twist.linear.x = vs;
-    odom.twist.twist.angular.z = vth;
+//    odom.twist.twist.angular.z = vth;
+    odom.twist.twist.angular.z = wheel_vth;
     //publish the message
     odom.pose.covariance[0]  = 0.1;
     odom.pose.covariance[7]  = 0.1;

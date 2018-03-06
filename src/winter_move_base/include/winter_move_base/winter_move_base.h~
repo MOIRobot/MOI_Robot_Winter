@@ -60,7 +60,6 @@
 
 #include <dynamic_reconfigure/server.h>
 #include "move_base/MoveBaseConfig.h"
-#include <clear_costmap_recovery_gao/clear_costmap_recovery_gao.h>
 
 namespace move_base {
   //typedefs to help us out with the action server so that we don't hace to type so much
@@ -242,6 +241,7 @@ namespace move_base {
       bool new_global_plan_;
       
       move_base_msgs::MoveBaseActionGoal action_goal;
+      move_base_msgs::MoveBaseGoal current_goal;
       
       clear_costmap_recovery_gao::ClearCostmapRecoveryGao mapLayerClearer;
       

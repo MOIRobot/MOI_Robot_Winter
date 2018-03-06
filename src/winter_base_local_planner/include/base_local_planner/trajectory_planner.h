@@ -63,10 +63,10 @@
 
 namespace base_local_planner {
   /**
-   * @class TrajectoryPlanner
+   * @class Winter_TrajectoryPlanner
    * @brief Computes control velocities for a robot given a costmap, a plan, and the robot's position in the world. 
    */
-  class TrajectoryPlanner{
+  class Winter_TrajectoryPlanner{
     friend class TrajectoryPlannerTest; //Need this for gtest to work
     public:
       /**
@@ -105,7 +105,7 @@ namespace base_local_planner {
        * @param y_vels A vector of the y velocities the controller will explore
        * @param angular_sim_granularity The distance between simulation points for angular velocity should be small enough that the robot doesn't hit things
        */
-      TrajectoryPlanner(WorldModel& world_model, 
+      Winter_TrajectoryPlanner(WorldModel& world_model, 
           const costmap_2d::Costmap2D& costmap, 
           std::vector<geometry_msgs::Point> footprint_spec,
           double acc_lim_x = 1.0, double acc_lim_y = 1.0, double acc_lim_theta = 1.0,
@@ -128,12 +128,12 @@ namespace base_local_planner {
       /**
        * @brief  Destructs a trajectory controller
        */
-      ~TrajectoryPlanner();
+      ~Winter_TrajectoryPlanner();
 
       /**
        * @brief Reconfigures the trajectory planner
        */
-      void reconfigure(BaseLocalPlannerConfig &cfg);
+      void mreconfigure(BaseLocalPlannerConfig &cfg);
 
       /**
        * @brief  Given the current position, orientation, and velocity of the robot, return a trajectory to follow
@@ -142,15 +142,16 @@ namespace base_local_planner {
        * @param drive_velocities Will be set to velocities to send to the robot base
        * @return The selected path or trajectory
        */
-      Trajectory findBestPath(tf::Stamped<tf::Pose> global_pose, tf::Stamped<tf::Pose> global_vel,
-          tf::Stamped<tf::Pose>& drive_velocities);
-
+       
+      Trajectory findBestPath(tf::Stamped<tf::Pose> global_pose, tf::Stamped<tf::Pose> global_vel, tf::Stamped<tf::Pose>& drive_velocities);
+	  Trajectory mfindBestPath(tf::Stamped<tf::Pose> global_pose, tf::Stamped<tf::Pose> global_vel, tf::Stamped<tf::Pose>& drive_velocities);
       /**
        * @brief  Update the plan that the controller is following
        * @param new_plan A new plan for the controller to follow 
        * @param compute_dists Wheter or not to compute path/goal distances when a plan is updated
        */
       void updatePlan(const std::vector<geometry_msgs::PoseStamped>& new_plan, bool compute_dists = false);
+      void mupdatePlan(const std::vector<geometry_msgs::PoseStamped>& new_plan, bool compute_dists = false);
 
       /**
        * @brief  Accessor for the goal the robot is currently pursuing in world corrdinates
@@ -174,6 +175,8 @@ namespace base_local_planner {
        */
       bool checkTrajectory(double x, double y, double theta, double vx, double vy, 
           double vtheta, double vx_samp, double vy_samp, double vtheta_samp);
+      bool mcheckTrajectory(double x, double y, double theta, double vx, double vy, 
+        double vtheta, double vx_samp, double vy_samp, double vtheta_samp);
 
       /**
        * @brief  Generate and score a single trajectory
@@ -189,6 +192,8 @@ namespace base_local_planner {
        * @return The score (as double)
        */
       double scoreTrajectory(double x, double y, double theta, double vx, double vy, 
+          double vtheta, double vx_samp, double vy_samp, double vtheta_samp);
+      double mscoreTrajectory(double x, double y, double theta, double vx, double vy, 
           double vtheta, double vx_samp, double vy_samp, double vtheta_samp);
 
       /**
@@ -229,6 +234,8 @@ namespace base_local_planner {
        */
       Trajectory createTrajectories(double x, double y, double theta, double vx, double vy, double vtheta, 
           double acc_x, double acc_y, double acc_theta);
+      Trajectory mcreateTrajectories(double x, double y, double theta, double vx, double vy, double vtheta, 
+          double acc_x, double acc_y, double acc_theta);
 
       /**
        * @brief  Generate and score a single trajectory
@@ -250,6 +257,9 @@ namespace base_local_planner {
       void generateTrajectory(double x, double y, double theta, double vx, double vy, 
           double vtheta, double vx_samp, double vy_samp, double vtheta_samp, double acc_x, double acc_y,
           double acc_theta, double impossible_cost, Trajectory& traj);
+      void mgenerateTrajectory(double x, double y, double theta, double vx, double vy, 
+          double vtheta, double vx_samp, double vy_samp, double vtheta_samp, double acc_x, double acc_y,
+          double acc_theta, double impossible_cost, Trajectory& traj);
 
       /**
        * @brief  Checks the legality of the robot footprint at a position and orientation using the world model
@@ -266,7 +276,7 @@ namespace base_local_planner {
 								double x, double y, double theta,
 								double vx, double vy, double vtheta,
 								double acc_x, double acc_y, double acc_theta,
-								double min_vel_x,double min_vel_theta,
+								double min_vel_x,double max_vel_x,double min_vel_theta,double max_vel_theta,
 								double dvx,double dvtheta); 
 	  //路径算法 原地旋转
 	  void trajectoryRotate(Trajectory* &best_traj,Trajectory* &comp_traj ,

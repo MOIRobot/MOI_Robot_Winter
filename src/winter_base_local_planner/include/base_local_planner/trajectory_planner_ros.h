@@ -163,7 +163,7 @@ namespace base_local_planner {
       }
 
       /** @brief Return the inner TrajectoryPlanner object.  Only valid after initialize(). */
-      TrajectoryPlanner* getPlanner() const { return tc_; }
+      Winter_TrajectoryPlanner* getPlanner() const { return tc_; }
       
      
       
@@ -209,7 +209,7 @@ namespace base_local_planner {
 	  void PublishMoveStopCMD();
 
       WorldModel* world_model_; ///< @brief The world model that the controller will use
-      TrajectoryPlanner* tc_; ///< @brief The trajectory controller
+      Winter_TrajectoryPlanner* tc_; ///< @brief The trajectory controller
 
       costmap_2d::Costmap2DROS* costmap_ros_; ///< @brief The ROS wrapper for the costmap the controller will use
       costmap_2d::Costmap2D* costmap_; ///< @brief The costmap the controller will use

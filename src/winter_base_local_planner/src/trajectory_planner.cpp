@@ -56,7 +56,7 @@ using namespace costmap_2d;
 
 namespace base_local_planner{
 
-  void TrajectoryPlanner::reconfigure(BaseLocalPlannerConfig &cfg)
+  void Winter_TrajectoryPlanner::mreconfigure(BaseLocalPlannerConfig &cfg)
   {
       BaseLocalPlannerConfig config(cfg);
 
@@ -138,7 +138,7 @@ namespace base_local_planner{
       
   }
 
-  TrajectoryPlanner::TrajectoryPlanner(WorldModel& world_model,
+  Winter_TrajectoryPlanner::Winter_TrajectoryPlanner(WorldModel& world_model,
       const Costmap2D& costmap,
       std::vector<geometry_msgs::Point> footprint_spec,
       double acc_lim_x, double acc_lim_y, double acc_lim_theta,
@@ -183,13 +183,14 @@ namespace base_local_planner{
     escaping_ = false;
     final_goal_position_valid_ = false;
 
-
+	if(vx_samples_%2!=0) vx_samples_+=1;
+    if(vtheta_samples_%2!=0) vtheta_samples_+=1;
     costmap_2d::calculateMinAndMaxDistances(footprint_spec_, inscribed_radius_, circumscribed_radius_);
   }
 
-  TrajectoryPlanner::~TrajectoryPlanner(){}
+  Winter_TrajectoryPlanner::~Winter_TrajectoryPlanner(){}
 
-  bool TrajectoryPlanner::getCellCosts(int cx, int cy, float &path_cost, float &goal_cost, float &occ_cost, float &total_cost) {
+  bool Winter_TrajectoryPlanner::getCellCosts(int cx, int cy, float &path_cost, float &goal_cost, float &occ_cost, float &total_cost) {
     MapCell cell = path_map_(cx, cy);
     MapCell goal_cell = goal_map_(cx, cy);
     if (cell.within_robot) {
@@ -210,7 +211,7 @@ namespace base_local_planner{
   /**
    * create and score a trajectory given the current pose of the robot and selected velocities
    */
-  void TrajectoryPlanner::generateTrajectory(
+  void Winter_TrajectoryPlanner::mgenerateTrajectory(
       double x, double y, double theta,
       double vx, double vy, double vtheta,
       double vx_samp, double vy_samp, double vtheta_samp,
@@ -218,6 +219,7 @@ namespace base_local_planner{
       double impossible_cost,
       Trajectory& traj) {
 
+	//ROS_INFO("mgenerateTrajectory ");
     // make sure the configuration doesn't change mid run
     boost::mutex::scoped_lock l(configuration_mutex_);
 
@@ -286,40 +288,10 @@ namespace base_local_planner{
       if(footprint_cost < 0){
         traj.cost_ = -1.0;
         return;
-        //TODO: Really look at getMaxSpeedToStopInTime... dues to discretization errors and high acceleration limits,
-        //it can actually cause the robot to hit obstacles. There may be something to be done to fix, but I'll have to
-        //come back to it when I have time. Right now, pulling it out as it'll just make the robot a bit more conservative,
-        //but safe.
-        /*
-        double max_vel_x, max_vel_y, max_vel_th;
-        //we want to compute the max allowable speeds to be able to stop
-        //to be safe... we'll make sure we can stop some time before we actually hit
-        getMaxSpeedToStopInTime(time - stop_time_buffer_ - dt, max_vel_x, max_vel_y, max_vel_th);
-
-        //check if we can stop in time
-        if(fabs(vx_samp) < max_vel_x && fabs(vy_samp) < max_vel_y && fabs(vtheta_samp) < max_vel_th){
-          ROS_ERROR("v: (%.2f, %.2f, %.2f), m: (%.2f, %.2f, %.2f) t:%.2f, st: %.2f, dt: %.2f", vx_samp, vy_samp, vtheta_samp, max_vel_x, max_vel_y, max_vel_th, time, stop_time_buffer_, dt);
-          //if we can stop... we'll just break out of the loop here.. no point in checking future points
-          break;
-        }
-        else{
-          traj.cost_ = -1.0;
-          return;
-        }
-        */
       }
 
       occ_cost = std::max(std::max(occ_cost, footprint_cost), double(costmap_.getCost(cell_x, cell_y)));
-
-      //do we want to follow blindly
-      if (simple_attractor_) {
-        //简单的距离判断是 goal_dist就是当前机器人当前位置与目标点的距离
-        goal_dist = (x_i - global_plan_[global_plan_.size() -1].pose.position.x) *
-          (x_i - global_plan_[global_plan_.size() -1].pose.position.x) +
-          (y_i - global_plan_[global_plan_.size() -1].pose.position.y) *
-          (y_i - global_plan_[global_plan_.size() -1].pose.position.y);
-      } else {
-
+	
         bool update_path_and_goal_distances = true;
 
         // with heading scoring, we take into account heading diff, and also only score
@@ -345,7 +317,6 @@ namespace base_local_planner{
             return;
           }
         }
-      }
 
 
       //the point is legal... add it to the trajectory
@@ -367,15 +338,15 @@ namespace base_local_planner{
 
     //ROS_INFO("OccCost: %f, vx: %.2f, vy: %.2f, vtheta: %.2f", occ_cost, vx_samp, vy_samp, vtheta_samp);
     double cost = -1.0;
-    if (!heading_scoring_) {
-      cost = pdist_scale_ * path_dist + goal_dist * gdist_scale_ + occdist_scale_ * occ_cost;
-    } else {
-      cost = occdist_scale_ * occ_cost + pdist_scale_ * path_dist + 0.3 * heading_diff + goal_dist * gdist_scale_;
-    }
+    //采用　距离　方向　同时打分
+    //ROS_INFO("gdist_scale_: %f, pdist_scale_: %.2f, occdist_scale_: %.2f", gdist_scale_, pdist_scale_, occdist_scale_);
+    cost = occdist_scale_ * occ_cost + pdist_scale_ * path_dist + 0.3 * heading_diff + goal_dist * gdist_scale_;
+    //cost = occdist_scale_ * occ_cost + pdist_scale_ * path_dist + 0.3 * heading_diff;
+    //ROS_INFO("cost %f",cost);
     traj.cost_ = cost;
   }
 
-  double TrajectoryPlanner::headingDiff(int cell_x, int cell_y, double x, double y, double heading){
+  double Winter_TrajectoryPlanner::headingDiff(int cell_x, int cell_y, double x, double y, double heading){
     double heading_diff = DBL_MAX;
     unsigned int goal_cell_x, goal_cell_y;
     const double v2_x = cos(heading);
@@ -405,7 +376,7 @@ namespace base_local_planner{
   }
 
   //calculate the cost of a ray-traced line
-  double TrajectoryPlanner::lineCost(int x0, int x1,
+  double Winter_TrajectoryPlanner::lineCost(int x0, int x1,
       int y0, int y1){
     //Bresenham Ray-Tracing
     int deltax = abs(x1 - x0);        // The difference between the x's
@@ -482,7 +453,7 @@ namespace base_local_planner{
     return line_cost;
   }
 
-  double TrajectoryPlanner::pointCost(int x, int y){
+  double Winter_TrajectoryPlanner::pointCost(int x, int y){
     unsigned char cost = costmap_.getCost(x, y);
     //if the cell is in an obstacle the path is invalid
     if(cost == LETHAL_OBSTACLE || cost == INSCRIBED_INFLATED_OBSTACLE || cost == NO_INFORMATION){
@@ -492,7 +463,7 @@ namespace base_local_planner{
     return cost;
   }
 
-  void TrajectoryPlanner::updatePlan(const vector<geometry_msgs::PoseStamped>& new_plan, bool compute_dists){
+  void Winter_TrajectoryPlanner::mupdatePlan(const vector<geometry_msgs::PoseStamped>& new_plan, bool compute_dists){
     global_plan_.resize(new_plan.size());
     for(unsigned int i = 0; i < new_plan.size(); ++i){
       global_plan_[i] = new_plan[i];
@@ -519,11 +490,11 @@ namespace base_local_planner{
     }
   }
 
-bool TrajectoryPlanner::checkTrajectory(double x, double y, double theta, double vx, double vy,
+bool Winter_TrajectoryPlanner::mcheckTrajectory(double x, double y, double theta, double vx, double vy,
       double vtheta, double vx_samp, double vy_samp, double vtheta_samp){
     Trajectory t;
 
-    double cost = scoreTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp);
+    double cost = mscoreTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp);
 
     //if the trajectory is a legal one... the check passes
     if(cost >= 0) {
@@ -535,11 +506,11 @@ bool TrajectoryPlanner::checkTrajectory(double x, double y, double theta, double
     return false;
   }
 
-  double TrajectoryPlanner::scoreTrajectory(double x, double y, double theta, double vx, double vy,
+  double Winter_TrajectoryPlanner::mscoreTrajectory(double x, double y, double theta, double vx, double vy,
       double vtheta, double vx_samp, double vy_samp, double vtheta_samp) {
     Trajectory t;
     double impossible_cost = path_map_.obstacleCosts();
-    generateTrajectory(x, y, theta,
+    mgenerateTrajectory(x, y, theta,
                        vx, vy, vtheta,
                        vx_samp, vy_samp, vtheta_samp,
                        acc_lim_x_, acc_lim_y_, acc_lim_theta_,
@@ -552,7 +523,7 @@ bool TrajectoryPlanner::checkTrajectory(double x, double y, double theta, double
   /*
    * create the trajectories we wish to score
    */
-  Trajectory TrajectoryPlanner::createTrajectories(double x, double y, double theta,
+  Trajectory Winter_TrajectoryPlanner::mcreateTrajectories(double x, double y, double theta,
       double vx, double vy, double vtheta,
       double acc_x, double acc_y, double acc_theta) {
     //compute feasible velocity limits in robot space
@@ -564,26 +535,23 @@ bool TrajectoryPlanner::checkTrajectory(double x, double y, double theta, double
       max_vel_x = min( max_vel_x, final_goal_dist / sim_time_ );
     }
 
-    //should we use the dynamic window approach?
-    if (dwa_) {
+    //should we use the dynamic window approach　这里使用ＤＷＡ 直接删去原来不是的ｄｗａ代码
       max_vel_x = max(min(max_vel_x, vx + acc_x * sim_period_), min_vel_x_);
       min_vel_x = max(min_vel_x_, vx - acc_x * sim_period_);
 
       max_vel_theta = min(max_vel_th_, vtheta + acc_theta * sim_period_);
       min_vel_theta = max(min_vel_th_, vtheta - acc_theta * sim_period_);
-    } else {
-      max_vel_x = max(min(max_vel_x, vx + acc_x * sim_time_), min_vel_x_);
-      min_vel_x = max(min_vel_x_, vx - acc_x * sim_time_);
-
-      max_vel_theta = min(max_vel_th_, vtheta + acc_theta * sim_time_);
-      min_vel_theta = max(min_vel_th_, vtheta - acc_theta * sim_time_);
-    }
 
    /**tag First ************************************************************************************************/
    /**************************************************************************************************/
-    //we want to sample the velocity space regularly
-    double dvx = (max_vel_x - min_vel_x) / (vx_samples_ - 1);
-    double dvtheta = (max_vel_theta - min_vel_theta) / (vtheta_samples_ - 1);
+    /*we want to sample the velocity space regularly　　这里将vx_samples_　还有vtheta_samples_　定义为这个最大最小速度中间有多少段速度
+     * |____|__|__|___| 始终为偶数　中间的为当前值
+    */
+    
+    double dvx = (max_vel_x - min_vel_x) / vx_samples_ ;
+    
+    //角度间隔均匀增加
+    double dvtheta = (max_vel_theta - min_vel_theta) /vtheta_samples_ ;
 
     double vx_samp = min_vel_x;
     double vtheta_samp = min_vel_theta;
@@ -600,18 +568,19 @@ bool TrajectoryPlanner::checkTrajectory(double x, double y, double theta, double
     comp_traj->cost_ = -1.0;
 
 	Trajectory* swap = NULL;
-	
+	//ROS_INFO("move trajectoryDWA ");
 	double impossible_cost = path_map_.obstacleCosts();
 	//向前的动态规划路径
    trajectoryDWA(best_traj,comp_traj ,
 							    x,  y,  theta, vx,  vy,  vtheta,acc_x, acc_y, acc_theta,
-								min_vel_x, min_vel_theta,
+								min_vel_x,max_vel_x,min_vel_theta,max_vel_theta,
 								dvx,dvtheta);
 	//原地旋转路径
-  trajectoryRotate(best_traj,comp_traj ,
+	//ROS_INFO("trajectoryRotate ");
+  /*trajectoryRotate(best_traj,comp_traj ,
 									x,  y,  theta, vx,  vy,  vtheta,acc_x,  acc_y,  acc_theta,
 									min_vel_x,min_vel_theta,
-									dvx,dvtheta,heading_dist); 
+									dvx,dvtheta,heading_dist); */
     //do we have a legal trajectory
     if (best_traj->cost_ >= 0) {
       if (!(best_traj->xv_ > 0)) {
@@ -665,21 +634,21 @@ bool TrajectoryPlanner::checkTrajectory(double x, double y, double theta, double
 	/**tag third*****************************************************************************************/
     /**************************************************************************************************/
 	//向后退的路径
-	trajectoryMoveBack(best_traj,comp_traj ,x,  y,  theta,vx,  vy,  vtheta, acc_x,  acc_y,  acc_theta); 
+	//trajectoryMoveBack(best_traj,comp_traj ,x,  y,  theta,vx,  vy,  vtheta, acc_x,  acc_y,  acc_theta); 
 
+    
     return *best_traj;
     
 
   }
-
   //given the current state of the robot, find a good trajectory
-  Trajectory TrajectoryPlanner::findBestPath(tf::Stamped<tf::Pose> global_pose, tf::Stamped<tf::Pose> global_vel,
+  Trajectory Winter_TrajectoryPlanner::mfindBestPath(tf::Stamped<tf::Pose> global_pose, tf::Stamped<tf::Pose> global_vel,
       tf::Stamped<tf::Pose>& drive_velocities){
-
+		  
     Eigen::Vector3f pos(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), tf::getYaw(global_pose.getRotation()));
     //vel 机器人的速度
     Eigen::Vector3f vel(global_vel.getOrigin().getX(), global_vel.getOrigin().getY(), tf::getYaw(global_vel.getRotation()));
-
+	
     //reset the map for new operations
     path_map_.resetPathDist();
     goal_map_.resetPathDist();
@@ -699,14 +668,14 @@ bool TrajectoryPlanner::checkTrajectory(double x, double y, double theta, double
 
     //make sure that we update our path based on the global plan and compute costs
     path_map_.setTargetCells(costmap_, global_plan_);
+    //设置局部地图的边缘为local ｇｏａｌ
     goal_map_.setLocalGoal(costmap_, global_plan_);
+    
     ROS_DEBUG("Path/Goal distance computed");
-
     //rollout trajectories and find the minimum cost one
-    Trajectory best = createTrajectories(pos[0], pos[1], pos[2],
+    Trajectory best = mcreateTrajectories(pos[0], pos[1], pos[2],
         vel[0], vel[1], vel[2],
         acc_lim_x_, acc_lim_y_, acc_lim_theta_);
-    ROS_DEBUG("Trajectories created");
     
     if(best.cost_ < 0){
       drive_velocities.setIdentity();
@@ -723,11 +692,11 @@ bool TrajectoryPlanner::checkTrajectory(double x, double y, double theta, double
   }
 
   //we need to take the footprint of the robot into account when we calculate cost to obstacles
-  double TrajectoryPlanner::footprintCost(double x_i, double y_i, double theta_i){
+  double Winter_TrajectoryPlanner::footprintCost(double x_i, double y_i, double theta_i){
     //check if the footprint is legal
     return world_model_.footprintCost(x_i, y_i, theta_i, footprint_spec_, inscribed_radius_, circumscribed_radius_);
   }
-  bool TrajectoryPlanner::checkPath(tf::Stamped<tf::Pose> global_pose,std::vector<geometry_msgs::PoseStamped>& transformed_plan)
+  bool Winter_TrajectoryPlanner::checkPath(tf::Stamped<tf::Pose> global_pose,std::vector<geometry_msgs::PoseStamped>& transformed_plan)
 {
 	int i;
 	double cx=global_pose.getOrigin().x();
@@ -750,23 +719,24 @@ bool TrajectoryPlanner::checkTrajectory(double x, double y, double theta, double
 				{
 					yaw=tf::getYaw(transformed_plan[i].pose.orientation);
 					//ROS_INFO("cs %f cy %f x %f,y %f cost %f",cx,cy,x,y,footprintCost(x,y,yaw));
-					if ((footprintCost(x,y,yaw)<0.0)||(footprintCost(x,y,yaw)>240)) return false;
+					//if ((footprintCost(x,y,yaw)<0.0)||(footprintCost(x,y,yaw)>252)) return false;
+					if ((footprintCost(x,y,yaw)<0.0)) return false;
 				}
 	}
 	return flag;
 }
 
 
-  void TrajectoryPlanner::getLocalGoal(double& x, double& y){
+  void Winter_TrajectoryPlanner::getLocalGoal(double& x, double& y){
     x = path_map_.goal_x_;
     y = path_map_.goal_y_;
   }
-void TrajectoryPlanner::trajectoryDWA(
+void Winter_TrajectoryPlanner::trajectoryDWA(
 																					   Trajectory* &best_traj,Trajectory* &comp_traj ,
 																					   double x, double y, double theta,
 																					   double vx, double vy, double vtheta,
 																					   double acc_x, double acc_y, double acc_theta,
-																						double min_vel_x,double min_vel_theta,
+																						double min_vel_x,double max_vel_x,double min_vel_theta,double max_vel_theta,
 																						double dvx,double dvtheta) 
   {
 		Trajectory* swap = NULL;
@@ -774,87 +744,47 @@ void TrajectoryPlanner::trajectoryDWA(
 		double vx_samp = min_vel_x;
 		double vtheta_samp = min_vel_theta;
 		double vy_samp = 0.0;
-		
+		//集约度
+		double scale=0.35;
+		int half_vtheta_samples_=vtheta_samples_/2;
+		double dvtheta_h=(max_vel_theta-vtheta)/half_vtheta_samples_;
+		double dvtheta_l=(vtheta-min_vel_theta)/half_vtheta_samples_;
 		//any cell with a cost greater than the size of the map is impossible
 		double impossible_cost = path_map_.obstacleCosts();
-	 
-	  /**tag First ************************************************************************************************/
    /**************************************************************************************************/
     //if we're performing an escape we won't allow moving forward
 	//tag 如果是避让模式 只采样直线速度和原地旋转的速度
     if (!escaping_) {
       //loop through all x velocities
-      for(int i = 0; i < vx_samples_; ++i) {
-       
-       /******************************************/
-        //将角速度置0 采样一组轨迹
-        vtheta_samp = 0;
-        //first sample the straight trajectory
-		//只采样直线速度 得到comp_traj 路径
-        generateTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp,
-            acc_x, acc_y, acc_theta, impossible_cost, *comp_traj);
-
-        //if the new trajectory is better... let's take it cost 越小越好 将新的路径放到best_traj 路径里面
-        if(comp_traj->cost_ >= 0 && (comp_traj->cost_ < best_traj->cost_ || best_traj->cost_ < 0)){
-          swap = best_traj;
-          best_traj = comp_traj;
-          comp_traj = swap;
-        }
-         /******************************************/
+      for(int j = 0; j < vx_samples_; ++j) {
 
         vtheta_samp = min_vel_theta;
         //next sample all theta trajectories
-        ////将角速度从最小到最大 采样各个角速度值
-        for(int j = 0; j < vtheta_samples_ - 1; ++j){
-          generateTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp,
-              acc_x, acc_y, acc_theta, impossible_cost, *comp_traj);
-
+        ////将角速度从最小到最大 采样各个角速度值 vtheta_samples_默认为偶数
+        for(int i = 0; i < vtheta_samples_ ; ++i){
+          //ROS_INFO("i %d vtheat %f vs %f ",i,vtheta,vtheta_samp);
+          mgenerateTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp,acc_x, acc_y, acc_theta, impossible_cost, *comp_traj);
           //if the new trajectory is better... let's take it
-          if(comp_traj->cost_ >= 0 && (comp_traj->cost_ < best_traj->cost_ || best_traj->cost_ < 0)){
-            swap = best_traj;
-            best_traj = comp_traj;
-            comp_traj = swap;
-          }
-          //角度采样值增加
-          vtheta_samp += dvtheta;
+          if(comp_traj->cost_ >= 0 && (comp_traj->cost_ < best_traj->cost_ || best_traj->cost_ < 0)){swap = best_traj;best_traj = comp_traj;comp_traj = swap;}
+          
+          if (i<half_vtheta_samples_) vtheta_samp=vtheta-(half_vtheta_samples_-i)*dvtheta_l*scale;
+          else if(i==half_vtheta_samples_) vtheta_samp=vtheta;
+          else
+			{
+				vtheta_samp=vtheta+(i+2-half_vtheta_samples_)*dvtheta_h*scale;
+			}
         }
-        /******************************************/
+        
+        //最后采样最大值的角速度
+        vtheta_samp=max_vel_theta;
+        mgenerateTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp,acc_x, acc_y, acc_theta, impossible_cost, *comp_traj);
+        if(comp_traj->cost_ >= 0 && (comp_traj->cost_ < best_traj->cost_ || best_traj->cost_ < 0)){swap = best_traj;best_traj = comp_traj;comp_traj = swap;}
         //速度采样值增加
         vx_samp += dvx;
       }
-
-      //only explore y velocities with holonomic robots
-      if (holonomic_robot_) {
-        //explore trajectories that move forward but also strafe slightly
-        vx_samp = 0.1;
-        vy_samp = 0.1;
-        vtheta_samp = 0.0;
-        generateTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp,
-            acc_x, acc_y, acc_theta, impossible_cost, *comp_traj);
-
-        //if the new trajectory is better... let's take it
-        if(comp_traj->cost_ >= 0 && (comp_traj->cost_ < best_traj->cost_ || best_traj->cost_ < 0)){
-          swap = best_traj;
-          best_traj = comp_traj;
-          comp_traj = swap;
-        }
-
-        vx_samp = 0.1;
-        vy_samp = -0.1;
-        vtheta_samp = 0.0;
-        generateTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp,
-            acc_x, acc_y, acc_theta, impossible_cost, *comp_traj);
-
-        //if the new trajectory is better... let's take it
-        if(comp_traj->cost_ >= 0 && (comp_traj->cost_ < best_traj->cost_ || best_traj->cost_ < 0)){
-          swap = best_traj;
-          best_traj = comp_traj;
-          comp_traj = swap;
-        }
-      }
     } // end if not escaping
   }
-void TrajectoryPlanner::trajectoryRotate(
+void Winter_TrajectoryPlanner::trajectoryRotate(
 																					   Trajectory* &best_traj,Trajectory* &comp_traj ,
 																					   double x, double y, double theta,
 																					   double vx, double vy, double vtheta,
@@ -878,7 +808,7 @@ void TrajectoryPlanner::trajectoryRotate(
       double vtheta_samp_limited = vtheta_samp > 0 ? max(vtheta_samp, min_in_place_vel_th_)
         : min(vtheta_samp, -1.0 * min_in_place_vel_th_);
 
-      generateTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp_limited,
+      mgenerateTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp_limited,
           acc_x, acc_y, acc_theta, impossible_cost, *comp_traj);
 
       //if the new trajectory is better... let's take it...
@@ -917,7 +847,7 @@ void TrajectoryPlanner::trajectoryRotate(
       vtheta_samp += dvtheta;
     }
 	}
-void TrajectoryPlanner::trajectoryMoveBack(Trajectory* &best_traj,Trajectory* &comp_traj ,
+void Winter_TrajectoryPlanner::trajectoryMoveBack(Trajectory* &best_traj,Trajectory* &comp_traj ,
 																					double x, double y, double theta,
 																					double vx, double vy, double vtheta,
 																					double acc_x, double acc_y, double acc_theta) 
@@ -933,7 +863,7 @@ void TrajectoryPlanner::trajectoryMoveBack(Trajectory* &best_traj,Trajectory* &c
 	//any cell with a cost greater than the size of the map is impossible
 	double impossible_cost = path_map_.obstacleCosts();
 
-	generateTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp,
+	mgenerateTrajectory(x, y, theta, vx, vy, vtheta, vx_samp, vy_samp, vtheta_samp,
     acc_x, acc_y, acc_theta, impossible_cost, *comp_traj);
 
 		//if the new trajectory is better... let's take it
@@ -984,7 +914,7 @@ void TrajectoryPlanner::trajectoryMoveBack(Trajectory* &best_traj,Trajectory* &c
       best_traj->cost_ = 1.0;
       
 }
-void TrajectoryPlanner::trajectoryMoveX(Trajectory* &best_traj,Trajectory* &comp_traj ,
+void Winter_TrajectoryPlanner::trajectoryMoveX(Trajectory* &best_traj,Trajectory* &comp_traj ,
 																					   double x, double y, double theta,
 																					   double vx, double vy, double vtheta,
 																					   double acc_x, double acc_y, double acc_theta,

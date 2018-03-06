@@ -22,7 +22,6 @@ find_package(catkin REQUIRED
         rotate_recovery
         std_srvs
         tf
-        clear_costmap_recovery_gao
 )
 find_package(Eigen REQUIRED)
 add_definitions(${EIGEN_DEFINITIONS})

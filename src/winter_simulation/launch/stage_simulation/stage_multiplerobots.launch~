@@ -19,6 +19,6 @@
     <remap from="base_pose_ground_truth" to="base_pose_ground_truth"/>
     <remap from="robot_0/base_scan" to="scan"/>
   </node>
-  <node pkg="winter_simualtion" type="stage_robots_motion_driver.py" name="stage_robots" />
+  <node pkg="winter_simulation" type="stage_robots_motion_driver.py" name="stage_robots" />
 
 </launch>

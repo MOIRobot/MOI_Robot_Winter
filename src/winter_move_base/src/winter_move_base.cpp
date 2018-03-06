@@ -57,6 +57,7 @@ namespace move_base {
     planner_plan_(NULL), latest_plan_(NULL), controller_plan_(NULL),
     runPlanner_(false), setup_(false), p_freq_change_(false), c_freq_change_(false), new_global_plan_(false) {
 
+    //typedef actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction> MoveBaseActionServer;
     as_ = new MoveBaseActionServer(ros::NodeHandle(), "move_base", boost::bind(&MoveBase::executeCb, this, _1), false);
 
     ros::NodeHandle private_nh("~");
@@ -771,8 +772,6 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
           planner_cond_.notify_one();
           lock.unlock();
 
-          //publish the goal point to the visualizer
-          ROS_DEBUG_NAMED("move_base","move_base has received a goal of x: %.2f, y: %.2f", goal.pose.position.x, goal.pose.position.y);
           current_goal_pub_.publish(goal);
 
           //make sure to reset our timeouts and counters
@@ -794,6 +793,7 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
         }
       }
 
+
       //we also want to check if we've changed global frames because we need to transform our goal pose
       if(goal.header.frame_id != planner_costmap_ros_->getGlobalFrameID()){
         goal = goalToGlobalFrame(goal);
@@ -809,10 +809,6 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
         planner_cond_.notify_one();
         lock.unlock();
 
-        //publish the goal point to the visualizer
-        ROS_DEBUG_NAMED("move_base","The global frame for move_base has changed, new frame: %s, new goal position x: %.2f, y: %.2f", goal.header.frame_id.c_str(), goal.pose.position.x, goal.pose.position.y);
-        current_goal_pub_.publish(goal);
-
         //make sure to reset our timeouts and counters
         last_valid_control_ = ros::Time::now();
         last_valid_plan_ = ros::Time::now();
@@ -823,6 +819,7 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
       //for timing that gives real time even in simulation
       ros::WallTime start = ros::WallTime::now();
 
+		
 	//查看全局路径是否失效　如果失效重新规划一条路径　避免遇到障碍物等待时间太久
 		
       //the real work on pursuing a goal is done here
@@ -875,7 +872,7 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
     move_base_msgs::MoveBaseFeedback feedback;
     feedback.base_position = current_position;
     as_->publishFeedback(feedback);
-
+	
     //check to see if we've moved far enough to reset our oscillation timeout
     if(distance(current_position, oscillation_pose_) >= oscillation_distance_)
     {
@@ -944,7 +941,11 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
       //if we're controlling, we'll attempt to find valid velocity commands
       case CONTROLLING:
         ROS_DEBUG_NAMED("move_base","In controlling state.");
-         
+         if(!tc_->checkGlobalPath())
+			 {
+				 action_goal_pub_.publish(action_goal);
+				 ROS_INFO("planning a new path");
+			 }
         //check to see if we've reached our goal
         if(tc_->isGoalReached()){
           ROS_DEBUG_NAMED("move_base","Goal reached!");
@@ -961,7 +962,7 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
             //在此清除超声波层的障碍物 参数 静态层的名字 要清除层 的名字 要清除距离机器人中心多远以外的障碍物区域
          //mapLayerClearer.clearOnelayer("static_map","sonar",0.1);
          //清除激光雷达所在层的障碍物
-         mapLayerClearer.clearOnelayer("static_map","obstacle_layer",0.1);
+         //mapLayerClearer.clearOnelayer("static_map","obstacle_layer",0.1);
          recovery_behaviors_[0]->runBehavior();
          
           
@@ -983,19 +984,6 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
         
         
         if(tc_->computeVelocityCommands(cmd_vel)){
-			
-			 if(!tc_->checkGlobalPath())
-			 {
-				   publishZeroVelocity();
-				   resetState();
-					//disable the planner thread
-					boost::unique_lock<boost::recursive_mutex> lock(planner_mutex_);
-					runPlanner_ = false;
-					lock.unlock();
-					as_->setSucceeded(move_base_msgs::MoveBaseResult(), "Goal reached.");
-					 action_goal_pub_.publish(action_goal);
-					return true;
-			 }
           //ROS_INFO( "move_base　Got a valid command from the local planner: %.3lf, %.3lf, %.3lf",cmd_vel.linear.x, cmd_vel.linear.y, cmd_vel.angular.z );
           //# 判断是否原地旋转太久
           /*if((cmd_vel.linear.x==0.0) &&( cmd_vel.linear.y==0.0)&&(cmd_vel.angular.z!=0.0))
@@ -1058,52 +1046,6 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
         }
         }
 
-        break;
-
-      //we'll try to clear out space with any user-provided recovery behaviors
-      case CLEARING:
-        ROS_DEBUG_NAMED("move_base","In clearing/recovery state");
-        //we'll invoke whatever recovery behavior we're currently on if they're enabled
-        if(recovery_behavior_enabled_ && recovery_index_ < recovery_behaviors_.size()){
-          ROS_DEBUG_NAMED("move_base_recovery","Executing behavior %u of %zu", recovery_index_, recovery_behaviors_.size());
-          recovery_behaviors_[recovery_index_]->runBehavior();
-
-          //we at least want to give the robot some time to stop oscillating after executing the behavior
-          last_oscillation_reset_ = ros::Time::now();
-
-          //we'll check if the recovery behavior actually worked
-          ROS_DEBUG_NAMED("move_base_recovery","Going back to planning state");
-          last_valid_plan_ = ros::Time::now();
-          planning_retries_ = 0;
-          state_ = PLANNING;
-
-          //update the index of the next recovery behavior that we'll try
-          recovery_index_++;
-        }
-        else{
-          ROS_DEBUG_NAMED("move_base_recovery","All recovery behaviors have failed, locking the planner and disabling it.");
-          //disable the planner thread
-          boost::unique_lock<boost::recursive_mutex> lock(planner_mutex_);
-          runPlanner_ = false;
-          lock.unlock();
-
-          ROS_DEBUG_NAMED("move_base_recovery","Something should abort after this.");
-
-          if(recovery_trigger_ == CONTROLLING_R){
-            ROS_ERROR("Aborting because a valid control could not be found. Even after executing all recovery behaviors");
-            as_->setAborted(move_base_msgs::MoveBaseResult(), "Failed to find a valid control. Even after executing recovery behaviors.");
-          }
-          else if(recovery_trigger_ == PLANNING_R){
-            ROS_ERROR("Aborting because a valid plan could not be found. Even after executing all recovery behaviors");
-            as_->setAborted(move_base_msgs::MoveBaseResult(), "Failed to find a valid plan. Even after executing recovery behaviors.");
-          }
-          else if(recovery_trigger_ == OSCILLATION_R){
-            ROS_ERROR("Aborting because the robot appears to be oscillating over and over. Even after executing all recovery behaviors");
-            as_->setAborted(move_base_msgs::MoveBaseResult(), "Robot is oscillating. Even after executing recovery behaviors.");
-          }
-          resetState();
-          return true;
-        }
         break;
       default:
         ROS_ERROR("This case should never be reached, something is wrong, aborting");
@@ -1209,29 +1151,19 @@ void MoveBase::clearCostmapWindows(double size_x, double size_y){
     recovery_behaviors_.clear();
     try{
       //we need to set some parameters based on what's been passed in to us to maintain backwards compatibility
-      ros::NodeHandle n("~");
-      n.setParam("conservative_reset/reset_distance", conservative_reset_dist_);
+      ros::NodeHandle n("~");      
+      n.setParam("conservative_reset/reset_distance", 0.01);
       n.setParam("aggressive_reset/reset_distance", circumscribed_radius_ * 4);
-		
-	 //添加一个可用于实时清除地图障碍物层数据或者超声波层数据的恢复的behaviors_  以下  “超声波清除”
       
-	  mapLayerClearer.initialize("my_clear_costmap_recovery_gao", &tf_, planner_costmap_ros_,controller_costmap_ros_);
-      
-      // 以上 添加一个可用于实时清除地图障碍物层数据或者超声波层数据的恢复的behaviors_
-	
-	  //添加一个可以清除sonar层的recovery	
-      
-      n.setParam("sonar_clear/reset_distance",  0.1);
-      n.setParam("sonar_clear/static_layer_name", "static_map");
-      n.setParam("sonar_clear/sonar_layer_name", "sonar");
-      boost::shared_ptr<nav_core::RecoveryBehavior> sonar_clear(recovery_loader_.createInstance("clear_costmap_recovery_gao/ClearCostmapRecoveryGao"));
-      sonar_clear->initialize("obstacle_layer", &tf_, planner_costmap_ros_, controller_costmap_ros_);
-      recovery_behaviors_.push_back(sonar_clear);
-      
+      std::vector<std::string> clearable_layers;
+      clearable_layers.push_back( std::string("obstacle_layer") );//设置默认要被清除的层
+      clearable_layers.push_back( std::string("sonar") );
+      n.setParam("conservative_reset/layer_names",  clearable_layers);
       boost::shared_ptr<nav_core::RecoveryBehavior> cons_clear(recovery_loader_.createInstance("clear_costmap_recovery/ClearCostmapRecovery"));
       cons_clear->initialize("conservative_reset", &tf_, planner_costmap_ros_, controller_costmap_ros_);
       recovery_behaviors_.push_back(cons_clear);
 
+      
       //next, we'll load a recovery behavior to rotate in place
       boost::shared_ptr<nav_core::RecoveryBehavior> rotate(recovery_loader_.createInstance("rotate_recovery/RotateRecovery"));
       if(clearing_rotation_allowed_){

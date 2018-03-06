@@ -69,7 +69,7 @@ namespace base_local_planner {
         default_config_ = config;
         setup_ = true;
       }
-      tc_->reconfigure(config);
+      tc_->mreconfigure(config);
       reached_goal_ = false;
   }
 
@@ -116,7 +116,9 @@ namespace base_local_planner {
       std::string world_model_type;
       rotating_to_goal_ = false;
       turning_flag=0;
-
+	  
+	  NewPath=false;
+	  
       //initialize the copy of the costmap the controller will use
       costmap_ = costmap_ros_->getCostmap();
 
@@ -252,13 +254,13 @@ namespace base_local_planner {
 	  ROS_INFO("pdist_scale:%f gdist_scale:%f occdist_scale:%f",pdist_scale,gdist_scale, occdist_scale);
 	  ROS_INFO("max_vel_x:%f max_vel_th_:%f backup_vel:%f",max_vel_x,max_vel_th_, backup_vel);
 	  ROS_INFO("sim_period_:%f sim_granularity:%f angular_sim_granularity:%f",sim_period_,sim_granularity, angular_sim_granularity);
-      tc_ = new TrajectoryPlanner(*world_model_, *costmap_, footprint_spec_,
+      tc_ = new Winter_TrajectoryPlanner(*world_model_, *costmap_, footprint_spec_,
           acc_lim_x_, acc_lim_y_, acc_lim_theta_, sim_time, sim_granularity, vx_samples, vtheta_samples, pdist_scale,
           gdist_scale, occdist_scale, heading_lookahead, oscillation_reset_dist, escape_reset_dist, escape_reset_theta, holonomic_robot,
           max_vel_x, min_vel_x, max_vel_th_, min_vel_th_, min_in_place_vel_th_, backup_vel,
           dwa, heading_scoring, heading_scoring_timestep, meter_scoring, simple_attractor, y_vels, stop_time_buffer, sim_period_, angular_sim_granularity);
 
-      map_viz_.initialize(name, global_frame_, boost::bind(&TrajectoryPlanner::getCellCosts, tc_, _1, _2, _3, _4, _5, _6));
+      map_viz_.initialize(name, global_frame_, boost::bind(&Winter_TrajectoryPlanner::getCellCosts, tc_, _1, _2, _3, _4, _5, _6));
       initialized_ = true;
 
       dsrv_ = new dynamic_reconfigure::Server<BaseLocalPlannerConfig>(private_nh);
@@ -319,7 +321,7 @@ namespace base_local_planner {
 
     //we do want to check whether or not the command is valid
     double yaw = tf::getYaw(global_pose.getRotation());
-    bool valid_cmd = tc_->checkTrajectory(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), yaw, 
+    bool valid_cmd = tc_->mcheckTrajectory(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), yaw, 
         robot_vel.getOrigin().getX(), robot_vel.getOrigin().getY(), vel_yaw, vx, vy, vth);
 
     //if we have a valid command, we'll pass it on, otherwise we'll command all zeros
@@ -392,9 +394,9 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	
 	double MAX_ANGULAR_Z=max_vel_th_;
 	double ACC_ANGULAR_Z=acc_lim_theta_;
-	if (MAX_ANGULAR_Z>3.5)  MAX_ANGULAR_Z=3.5;
+	if (MAX_ANGULAR_Z>2.0)  MAX_ANGULAR_Z=2.0;
 	double MIN_ANGULAR_Z=0.3;
-	if (ACC_ANGULAR_Z>3.5) ACC_ANGULAR_Z=3.5;
+	if (ACC_ANGULAR_Z>1.0) ACC_ANGULAR_Z=1.0;
 	
 	double MODE1_ANGLE=MAX_ANGULAR_Z*MAX_ANGULAR_Z/ACC_ANGULAR_Z; //减速的距离
 	double sharke_dis=MODE1_ANGLE/2.0; //减速的距离
@@ -425,7 +427,7 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	ros::Rate r(RATE);
 	double cAngle;
 	ROS_INFO("MODE1_ANGLE %f",MODE1_ANGLE);
-	ROS_INFO("sharddis %f",sharke_dis);
+	ROS_INFO("shark angle %f",sharke_dis);
 	while ((fabs(turn_angle)>ANGULAR_Z_ERR)  and ros::ok())
 	{
 		ros::spinOnce();
@@ -436,18 +438,18 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 		}
 		cAngle=tf::getYaw(global_pose.getRotation());
 		turn_angle=normalize_angle(goalAngle-cAngle);
-		ROS_INFO("tangle %f speed %f",turn_angle,move_cmd.angular.z);
+		ROS_INFO("tangle %f O_turn_angle %f speed %f",turn_angle,O_turn_angle,move_cmd.angular.z);
 		bool up=true;
 		if (fabs(O_turn_angle)<MODE1_ANGLE)
 		{
 			//第一种模式 加速然后减速
-			if((fabs(turn_angle)>(fabs(O_turn_angle)/2.0)) and not NewPath)	{	up=true;	}
+			if(fabs(turn_angle)>(fabs(O_turn_angle)/2.0))	{	up=true;	}
 			else {	up=false;}
 		}
 		else
 		{
 				//第二种模式 加速 匀速 减速
-			if((fabs(turn_angle)>sharke_dis) and not NewPath)  { up=true;}
+			if(fabs(turn_angle)>sharke_dis)  { up=true;}
 			else {up=false;}
 		}
 		if(up)
@@ -458,15 +460,13 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 		else
 		{
 			if (fabs(move_cmd.angular.z)>MIN_ANGULAR_Z)
-					move_cmd.angular.z-=rotate_acc/RATE;
+					move_cmd.angular.z-=rotate_acc/RATE*1.4;
 			else
-				{
-					if(NewPath)
-					{
-						PublishMoveStopCMD();
-						return false ;
-					}
-				}
+			{
+				if (turn_angle<0.0)
+				move_cmd.angular.z=-0.3;
+				else move_cmd.angular.z=0.3;
+			}
 		}
 			
 	}
@@ -506,7 +506,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 				return true; 
 			}
 			
-			bool valid_cmd = tc_->checkTrajectory(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), yaw, 
+			bool valid_cmd = tc_->mcheckTrajectory(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), yaw, 
 															robot_vel.getOrigin().getX(), robot_vel.getOrigin().getY(), vel_yaw, vx, vy, vth);
 
 			//if we have a valid command, we'll pass it on, otherwise we'll command all zeros
@@ -556,7 +556,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
       : std::max( min_vel_th_, std::min( -1.0 * min_in_place_vel_th_, v_theta_samp ));
 
     //we still want to lay down the footprint of the robot and check if the action is legal
-    bool valid_cmd = tc_->checkTrajectory(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), yaw, 
+    bool valid_cmd = tc_->mcheckTrajectory(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), yaw, 
         robot_vel.getOrigin().getX(), robot_vel.getOrigin().getY(), vel_yaw, 0.0, 0.0, v_theta_samp);
 
     ROS_DEBUG("Moving to desired goal orientation, th cmd: %.2f, valid_cmd: %d", v_theta_samp, valid_cmd);
@@ -577,7 +577,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
       ROS_ERROR("This planner has not been initialized, please call initialize() before using this planner");
       return false;
     }
-
+	NewPath=true;
     //reset the global plan
     global_plan_.clear();
     global_plan_ = orig_global_plan;
@@ -613,16 +613,6 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
     //now we'll prune the plan based on the position of the robot
     if(prune_plan_)
       prunePlan(global_pose, transformed_plan, global_plan_);
-
-	//判断全局路径是否有效
-	if(tc_->checkPath(global_pose,global_plan_))
-	{
-		 globalPathvalid=true;
-	}
-	else
-	{
-		globalPathvalid=false;
-	}
 	
     tf::Stamped<tf::Pose> drive_cmds;
     drive_cmds.frame_id_ = robot_base_frame_;
@@ -631,11 +621,22 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
     tf::Stamped<tf::Pose> robot_vel;
     odom_helper_.getRobotVel(robot_vel);
     
+    //判断全局路径是否有效
+	if(tc_->checkPath(global_pose,transformed_plan))
+	{
+		 globalPathvalid=true;
+	}
+	else
+	{
+		globalPathvalid=false;
+	}
+	
     double cx=global_pose.getOrigin().x();
     double cy=global_pose.getOrigin().y();
     double disFromStart=canculateDistance(transformed_plan[0].pose.position.x,transformed_plan[0].pose.position.y,cx,cy);
     double current_angle=tf::getYaw(global_pose.getRotation());
     double goalAngle=canculateAngle(transformed_plan[5].pose.position.x,transformed_plan[5].pose.position.y,transformed_plan[0].pose.position.x,transformed_plan[0].pose.position.y);
+   
    double  ang_diff = normalize_angle(goalAngle-current_angle);
     //在起点且朝向角度与方向偏差很大　则转向到目标方向　0.523 30
     geometry_msgs::Twist cmd_v;
@@ -691,10 +692,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 				}
 			}
 	  }
-	
 	 
-	  
-	  
 	//得到机器人的速度
 	//vel 机器人的速度
     //Eigen::Vector3f vel(global_vel.getOrigin().getX(), global_vel.getOrigin().getY(), tf::getYaw(global_vel.getRotation()));
@@ -746,9 +744,10 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
       } else {
         //we need to call the next two lines to make sure that the trajectory
         //planner updates its path distance and goal distance grids
-        tc_->updatePlan(transformed_plan);
+        tc_->mupdatePlan(transformed_plan);
         //#tag得到速度的入口
-        Trajectory path = tc_->findBestPath(global_pose, robot_vel, drive_cmds);
+        
+        Trajectory path = tc_->mfindBestPath(global_pose, robot_vel, drive_cmds);
         if(ifPublishMessage)
         {
         map_viz_.publishCostCloud(costmap_);
@@ -788,52 +787,33 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
 	
 	//用turning flag 防止反复转向
 	 //ROS_INFO("dis %f  anglediff %f ",disFromStart,fabs(ang_diff));
-	 if((disFromStart<0.3)&&(turning_flag==0))
+	 if(((disFromStart<0.3)&&(turning_flag==0))||NewPath)
 	 {
-		 ROS_INFO("Ratating start");
-		 rotateToAngle(goalAngle,0.3);
-		 ROS_INFO("Ratating stop");
-	}
-	 
-    /*while(((disFromStart<0.35)&&(fabs(ang_diff)>0.3))&&(turning_flag==0))
-    {
-		if (!costmap_ros_->getRobotPose(global_pose)) {
-			return false;
-		}
-		current_angle=tf::getYaw(global_pose.getRotation());
-		ang_diff = normalize_angle(goalAngle-current_angle);
-		//ROS_INFO("turing");
-		 if(ang_diff>0)
-		 {
-				cmd_v.linear.x = 0.0;
-				cmd_v.linear.y = 0.0;
-				cmd_v.angular.z = 1.0;
-				vel_pub_.publish(cmd_v);
-		 }
-		 if(ang_diff<0)
-		{
-			cmd_v.linear.x = 0.0;
-			cmd_v.linear.y = 0.0;
-			cmd_v.angular.z = -1.0;
-			vel_pub_.publish(cmd_v);
-		}
-		loop_rate.sleep();
-	}*/
-	turning_flag=1;
-	if(turning_flag==1)
-	{
-		PublishMoveStopCMD();
-		turning_flag=2;
+		 /*double cvx=robot_vel.getOrigin().getX();
+		 double cvy=robot_vel.getOrigin().getY();
+		 double vtheta=tf::getYaw(robot_vel.getRotation());
+		 if (tc_->mcheckTrajectory(cx,cy,current_angle,cvx,cvy,vtheta,cvx,cvy,vtheta))
+		 {*/
+			ROS_INFO("Ratating start");
+			rotateToAngle(goalAngle,0.2); //0.2/3.14*180=11 degree
+			ROS_INFO("Ratating stop");
+			turning_flag=1;
+			NewPath=false;
+		/*}
+		else
+			return false;*/
 	}
 	if(disFromStart>0.4) turning_flag=0;
 	
 	
 	
 	/******************************************/
-    tc_->updatePlan(transformed_plan);
+    tc_->mupdatePlan(transformed_plan);
 
     //compute what trajectory to drive along
-    Trajectory path = tc_->findBestPath(global_pose, robot_vel, drive_cmds);
+    
+    Trajectory path = tc_->mfindBestPath(global_pose, robot_vel, drive_cmds);
+
 	if(ifPublishMessage)
 	{
     map_viz_.publishCostCloud(costmap_);
@@ -901,7 +881,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
         geometry_msgs::PoseStamped pose_msg;
         tf::poseStampedTFToMsg(global_pose, pose_msg);
         plan.push_back(pose_msg);
-        tc_->updatePlan(plan, true);
+        tc_->mupdatePlan(plan, true);
       }
 
       //copy over the odometry information
@@ -911,7 +891,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
         base_odom = base_odom_;
       }
 
-      return tc_->checkTrajectory(global_pose.getOrigin().x(), global_pose.getOrigin().y(), tf::getYaw(global_pose.getRotation()),
+      return tc_->mcheckTrajectory(global_pose.getOrigin().x(), global_pose.getOrigin().y(), tf::getYaw(global_pose.getRotation()),
           base_odom.twist.twist.linear.x,
           base_odom.twist.twist.linear.y,
           base_odom.twist.twist.angular.z, vx_samp, vy_samp, vtheta_samp);
@@ -933,7 +913,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
         geometry_msgs::PoseStamped pose_msg;
         tf::poseStampedTFToMsg(global_pose, pose_msg);
         plan.push_back(pose_msg);
-        tc_->updatePlan(plan, true);
+        tc_->mupdatePlan(plan, true);
       }
 
       //copy over the odometry information
@@ -943,7 +923,7 @@ bool  Winter_TrajectoryPlannerROS::MoveBack(const tf::Stamped<tf::Pose>& global_
         base_odom = base_odom_;
       }
 
-      return tc_->scoreTrajectory(global_pose.getOrigin().x(), global_pose.getOrigin().y(), tf::getYaw(global_pose.getRotation()),
+      return tc_->mscoreTrajectory(global_pose.getOrigin().x(), global_pose.getOrigin().y(), tf::getYaw(global_pose.getRotation()),
           base_odom.twist.twist.linear.x,
           base_odom.twist.twist.linear.y,
           base_odom.twist.twist.angular.z, vx_samp, vy_samp, vtheta_samp);

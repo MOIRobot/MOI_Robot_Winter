@@ -1,8 +1,6 @@
 <launch>
 
-  <arg name="world_file"     default=" $(find winter_simulation)/maps/stage/stage/maze2.world"/>
-
- 
+  <arg name="world_file"     default=" $(find winter_simulation)/maps/stage/stage/mazerobot_map.world"/>
   <node pkg="stage_ros" type="stageros" name="stageros" args="$(arg world_file)">
     <param name="base_watchdog_timeout" value="0.5"/>
     <remap from="base_pose_ground_truth" to="base_pose_ground_truth"/>

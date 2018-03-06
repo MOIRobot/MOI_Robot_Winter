@@ -1,0 +1,26 @@
+<launch>
+  
+   <arg name="model" />  
+   <arg name="gui" default="false" />  
+   <param name="robot_description" textfile="$(find winter_simulation)/urdf/moi_robot_usst.urdf" />  
+   <param name="use_gui" value="$(arg gui)"/>  
+   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+  
+  
+  <arg name="scan_topic"  default="scan" />
+  <arg name="base_frame"  default="base_link"/>
+  <arg name="odom_frame"  default="odom"/>
+
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <param name="base_frame" value="$(arg base_frame)"/>
+    <param name="odom_frame" value="$(arg odom_frame)"/>
+    <param name="map_update_interval" value="0.1"/> //地图更新的一个间隔，两次scanmatch的间隔
+    <param name="iterations" value="5"/> //icp的迭代次数
+    <param name="maxUrange" value="9.9"/>
+    <param name="maxRange" value="10.0"/>
+    <param name="minimumScore" value="300"/>
+    <param name="linearUpdate" value="0.05"/>//机器人移动linearUpdate距离，进行scanmatch
+    <param name="angularUpdate" value="0.0436"/>机器人选装angularUpdate角度，进行scanmatch
+    <remap from="scan" to="$(arg scan_topic)"/>
+  </node>
+</launch>

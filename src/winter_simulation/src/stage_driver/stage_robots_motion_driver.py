@@ -43,23 +43,23 @@ if __name__ == '__main__':
 			cmd3.linear.y=1
 			cmd4.linear.x=1.3
 			cmd5.linear.x=10
-			cmd5.angular.z=0.3
+			cmd5.angular.z=1.0
 			cmd6.linear.x=-1
 			cmd6.linear.y=-1
-		elif i==50:
+		elif i==30:
 			cmd1.linear.y=-1
 			cmd2.linear.x=-0.7
 			cmd3.linear.x=-1
 			cmd3.linear.y=-1
 			cmd4.linear.x=-1.3
-		elif i==100:
+		elif i==50:
 			cmd6.linear.x=1
 			cmd6.linear.y=1
-		elif i==150:
+		elif i==70:
 			cmd1.linear.y=1
 			cmd2.linear.x=0.7
 			cmd3.linear.x=1
 			cmd3.linear.y=1
 			cmd4.linear.x=1.3
-		elif i==200:
+		elif i==90:
 			i=0

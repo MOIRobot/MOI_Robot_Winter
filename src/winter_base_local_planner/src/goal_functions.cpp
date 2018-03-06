@@ -71,6 +71,8 @@ namespace base_local_planner {
     std::vector<geometry_msgs::PoseStamped>::iterator it = plan.begin();
     std::vector<geometry_msgs::PoseStamped>::iterator global_it = global_plan.begin();
     while(it != plan.end()){
+      
+      // it 改变坐标系后的路径
       const geometry_msgs::PoseStamped& w = *it;
       // Fixed error bound of 2 meters for now. Can reduce to a portion of the map size or based on the resolution
       double x_diff = global_pose.getOrigin().x() - w.pose.position.x;
@@ -80,6 +82,7 @@ namespace base_local_planner {
         ROS_DEBUG("Nearest waypoint to <%f, %f> is <%f, %f>\n", global_pose.getOrigin().x(), global_pose.getOrigin().y(), w.pose.position.x, w.pose.position.y);
         break;
       }
+      //清除改变后的　和　全局的已经计算过的路径
       it = plan.erase(it);
       global_it = global_plan.erase(global_it);
     }

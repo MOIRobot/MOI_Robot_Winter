@@ -396,7 +396,7 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 	double ACC_ANGULAR_Z=acc_lim_theta_;
 	if (MAX_ANGULAR_Z>2.0)  MAX_ANGULAR_Z=1.3;
 	double MIN_ANGULAR_Z=0.3;
-	if (ACC_ANGULAR_Z>1.0) ACC_ANGULAR_Z=1.0;
+	if (ACC_ANGULAR_Z>0.8) ACC_ANGULAR_Z=0.8;
 	
 	double max_z=0.0;//运行中机器人旋转的最大速度
 	double MODE1_ANGLE=MAX_ANGULAR_Z*MAX_ANGULAR_Z/ACC_ANGULAR_Z; //减速的距离
@@ -471,7 +471,7 @@ double Winter_TrajectoryPlannerROS::normalize_angle(double angle)
 		else
 		{
 			if (fabs(move_cmd.angular.z)>MIN_ANGULAR_Z)
-					move_cmd.angular.z-=rotate_acc/RATE*1.4;
+					move_cmd.angular.z-=rotate_acc/RATE*1.5;
 			else
 			{
 				if (turn_angle<0.0)
